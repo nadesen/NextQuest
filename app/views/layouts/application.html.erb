@@ -1,16 +1,43 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
   <head>
-    <title>NextQuest</title>
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <%= csrf_meta_tags %>
-    <%= csp_meta_tag %>
-
-    <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
-    <%= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="style.css" />
+    <!-- スマートフォンやタブレットなどの画面サイズが違う端末でも、ページが見やすくなるように設定 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lorem_Ipsum</title>
+    <!-- ブラウザのタブや、お気に入りに表示される小さなアイコン -->
+    <link rel="shortcut icon" href="img/favicon.ico" />
+    <!-- Font Awesome（フォントオーサム）というアイコンフォントのCSSファイルを読み込む -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   </head>
 
   <body>
-    <%= yield %>
-  </body>
+    <header>
+      <div class="container header-group">
+        <!-- 画像をクリックすると、ページ内の「mv」という場所（セクション）にジャンプするリンク(<section id="mv">へジャンプ) -->
+        <a href="#mv">
+          <img class="logo" src="img/logo.png" alt="ロゴ" />
+        </a>
+        <!-- 「ハンバーガーメニューアイコン」を作るためのHTML -->
+        <div class="menu-box">
+          <span class="list-bar"></span>
+          <span class="list-bar"></span>
+          <span class="list-bar"></span>
+        </div>
+        <!-- Webページの「ナビゲーションメニュー（メニュー）」部分 -->
+        <nav>
+          <ul class="nav">
+            <li class="nav-list"><a href="#about">About</a></li>
+            <li class="nav-list"><a href="#community">Community</a></li>
+            <li class="nav-list"><a href="#reviews">Reviews</a></li>
+            <li class="nav-list"><a href="#logout">Logout</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <mein>
+      <%= yield %>
+    </main>
 </html>
