@@ -1,0 +1,79 @@
+<header>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container header-group">
+      <!-- ロゴ画像。クリックすると#mv（ページ上部など）へ移動 -->
+      <a href="#mv">
+        <img class="logo" src="img/logo.png" alt="ロゴ" />
+      </a>
+      <!-- ハンバーガーメニューのアイコン（スマホサイズで表示） -->
+      <div class="menu-box">
+        <span class="list-bar"></span>
+        <span class="list-bar"></span>
+        <span class="list-bar"></span>
+      </div>
+      <!-- ナビゲーションを開閉するボタン（スマホサイズで表示） -->
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <!-- ナビゲーションメニュー本体 -->
+      <div class="collapse navbar-collapse" id="navbarNavDropdown">
+        <!-- 右寄せ（ml-auto）でメニューリストを表示 -->
+        <ul class="navbar-nav ml-auto">
+        <% if user_signed_in? %>
+          <!-- ログインしている場合のメニュー -->
+          <li class="nav-item">
+            <!-- マイページへのリンク -->
+            <%= link_to user_path(current_user), class: 'nav-link text-light' do %>
+              <i class="fas fa-home"></i> Home
+            <% end %>
+          </li>
+          <li class="nav-item">
+            <!-- ユーザー一覧ページへのリンク -->
+            <%= link_to users_path, class: 'nav-link text-light' do %>
+              <i class="fas fa-users"></i> Users
+            <% end %>
+          </li>
+          <li class="nav-item">
+            <!-- 本の一覧ページへのリンク -->
+            <%= link_to books_path, class: 'nav-link text-light' do %>
+              <i class="fas fa-book-open"></i> Books
+            <% end %>
+          </li>
+          <li class="nav-item">
+            <!-- ログアウトのリンク（DELETEメソッドでリクエスト） -->
+            <%= link_to destroy_user_session_path, method: :delete, class: 'nav-link text-light' do %>
+              <i class="fas fa-sign-out-alt"></i> logout
+            <% end %>
+          </li>
+        <% else %>
+          <!-- ログインしていない場合のメニュー -->
+          <li class="nav-item">
+            <!-- トップページへのリンク -->
+            <%= link_to root_path, class: 'nav-link text-light' do %>
+              <i class="fas fa-home"></i> Home
+            <% end %>
+          </li>
+          <li class="nav-item">
+            <!-- サイトのAboutページへのリンク -->
+            <%= link_to home_about_path, class: 'nav-link text-light' do %>
+              <i class="fas fa-link"></i> About
+            <% end %>
+          </li>
+          <li class="nav-item">
+            <!-- 新規登録ページへのリンク -->
+            <%= link_to new_user_registration_path, class: 'nav-link text-light' do %>
+              <i class="fas fa-user-plus"></i> sign up
+            <% end %>
+          </li>
+          <li class="nav-item">
+            <!-- ログインページへのリンク -->
+            <%= link_to new_user_session_path, class: 'nav-link text-light' do %>
+              <i class="fas fa-sign-in-alt"></i> login
+            <% end %>
+          </li>
+        <% end %>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</header>
