@@ -36,4 +36,5 @@
 https://www.bing.com/ck/a?!&&p=9367a2c5f99071b5c4ab011b7a621f5237f1f8b63b51b8a601e2f1ecfe4d63e2JmltdHM9MTc2MDE0MDgwMA&ptn=3&ver=2&hsh=4&fclid=29016e7c-7fca-6910-16e7-7de17e4e6821&psq=Gemini&u=a1aHR0cHM6Ly9nZW1pbmkuZ29vZ2xlLmNvbS8_aGw9amE
 - ChatGPT
 https://www.bing.com/ck/a?!&&p=f9e5cf9d3c856d90ec374992a46ede18173cff96a96326fa90688dc72348b720JmltdHM9MTc2MDE0MDgwMA&ptn=3&ver=2&hsh=4&fclid=29016e7c-7fca-6910-16e7-7de17e4e6821&psq=Chat+gpt&u=a1aHR0cHM6Ly9jaGF0Z3B0LmNvbS8
+
 なお今後、実在するデータを利用する際には、事前に著作権保持者と契約を結んだ上で利用します。
