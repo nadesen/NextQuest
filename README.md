@@ -1,24 +1,40 @@
-# README
+# NextQuest
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## サイト概要
+### サイトテーマ
+多様なジャンル・プラットフォームのゲームの評価と体験談を共有し、「次に遊ぶ一本」を見つけるためのレビューコミュニティサイト
+​
+### テーマを選んだ理由
+近年、ゲームタイトルの供給量が爆発的に増え、ユーザーは多すぎる情報の中から、自分に合うゲームを探すことに時間と手間をかけているという背景があります。特にインディーズゲームやニッチな良作は、大手メディアのレビューだけでは多種多様なゲーマーの「リアルな評価」を知ることが難しく、埋もれやすいという課題を感じていました。この膨大なゲーム情報に疲弊し、「せっかく買ったのに合わなかった」という失敗を避けたいと考えているユーザーに対し、信頼できるゲーマー仲間のおすすめや、詳細なレビューを多角的に集約する場所が必要だと考えます。そこで、ユーザー同士の率直な意見交換を通じて、ゲーム探しの失敗を減らし、新たな「好き」に出会える場を提供することで、この問題を解決できると考え、本サイトを制作してみようと考えました。
+​
+### ターゲットユーザ
+- 次に遊ぶゲームを探す際の失敗を減らしたいと考えている人
+- 自分の好きなゲームの熱い想いや詳細なレビューを共有し、共感を得たい人
+- 大手レビューサイトには載らない、インディーズゲームやレトロゲームの情報を知りたい人
 
-Things you may want to cover:
+​
+### 主な利用シーン
+- 話題の新作ゲームが、本当に自分の好みに合うのか、購入前に実際の評価を確認したい時
+- 長編ゲームのクリア直後に、その感動や詳細な評価を記録・共有したい時
+- 特定のジャンルで、埋もれている良作のおすすめを知りたい時
+- 過去に遊んだ名作について、他のユーザーと熱量のある議論を交わしたい時
+​
+## 設計書
+後ほど作成予定
+​
+## 開発環境
+- OS：Windows
+- 言語：HTML,CSS,JavaScript,Ruby,SQL
+- フレームワーク：Ruby on Rails
+- JSライブラリ：jQuery
+- IDE：Visual Studio Code（VSCode）
+​
+## 使用素材
+著作権を考慮し、架空のデータを扱う予定です。
+モチーフデータとしてロゴや背景を以下AIサイトを使用して作成しています。
+- Gemini
+https://www.bing.com/ck/a?!&&p=9367a2c5f99071b5c4ab011b7a621f5237f1f8b63b51b8a601e2f1ecfe4d63e2JmltdHM9MTc2MDE0MDgwMA&ptn=3&ver=2&hsh=4&fclid=29016e7c-7fca-6910-16e7-7de17e4e6821&psq=Gemini&u=a1aHR0cHM6Ly9nZW1pbmkuZ29vZ2xlLmNvbS8_aGw9amE
+- ChatGPT
+https://www.bing.com/ck/a?!&&p=f9e5cf9d3c856d90ec374992a46ede18173cff96a96326fa90688dc72348b720JmltdHM9MTc2MDE0MDgwMA&ptn=3&ver=2&hsh=4&fclid=29016e7c-7fca-6910-16e7-7de17e4e6821&psq=Chat+gpt&u=a1aHR0cHM6Ly9jaGF0Z3B0LmNvbS8
 
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+なお今後、実在するデータを利用する際には、事前に著作権保持者と契約を結んだ上で利用します。
