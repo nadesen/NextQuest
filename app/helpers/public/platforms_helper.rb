@@ -1,0 +1,2 @@
+module Public::PlatformsHelper
+end

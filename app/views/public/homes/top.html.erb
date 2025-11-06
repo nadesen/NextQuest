@@ -1,0 +1,86 @@
+<!-- Bootstrap 5 を前提としたトップページ（サイト概要 + 状態に応じたアクションボタン） -->
+<section class="bg-light py-5">
+  <div class="container">
+    <div class="row align-items-center">
+      <!-- 左: サイトタイトル / 概要 -->
+      <div class="col-lg-8">
+        <h1 class="display-5 fw-bold mb-3">ゲームレビュー＆コミュニティプラットフォーム</h1>
+        <p class="lead">
+          近年、ゲームタイトルの供給量が爆発的に増え、ユーザーは多すぎる情報の中から、自分に合うゲームを探すことに時間と手間をかけているという背景があります。
+          特にインディーズゲームやニッチな良作は、大手メディアのレビューだけでは多種多様なゲーマーの「リアルな評価」を知ることが難しく、埋もれやすいという課題を感じていました。
+          この膨大なゲーム情報に疲弊し、「せっかく買ったのに合わなかった」という失敗を避けたいと考えているユーザーに対し、信頼できるゲーマー仲間のおすすめや、詳細なレビューを多角的に集約する場所が必要だと考えます。
+          そこで、ユーザー同士の率直な意見交換を通じて、ゲーム探しの失敗を減らし、新たな「好き」に出会える場を提供することで、この問題を解決できると考え、本サイトを制作してみようと考えました。
+        </p>
+
+        <!-- 状態に応じたアクションボタン -->
+        <div class="mt-4">
+          <% unless user_signed_in? %>
+            <div class="d-flex flex-wrap gap-2">
+              <%= link_to '新規登録', new_user_registration_path, class: 'btn btn-primary' %>
+              <%= link_to 'ログイン', new_user_session_path, class: 'btn btn-outline-primary' %>
+              <%= button_to 'ゲストログイン', guest_sign_in_users_path, method: :post, form: { class: 'd-inline' }, class: 'btn btn-secondary', data: { turbo: false } %>
+            </div>
+          <% else %>
+            <% is_guest = current_user.respond_to?(:guest?) ? current_user.guest? : false %>
+            <% if is_guest %>
+              <div class="d-flex flex-wrap gap-2">
+                <%= link_to 'コミュニティ一覧', forums_path, class: 'btn btn-primary' %>
+                <%= link_to 'レビュー一覧', reviews_path, class: 'btn btn-outline-primary' %>
+              </div>
+            <% else %>
+              <div class="d-flex flex-wrap gap-2">
+                <%= link_to 'コミュニティ一覧', forums_path, class: 'btn btn-primary' %>
+                <%= link_to '新規コミュニティ作成', new_forum_path, class: 'btn btn-outline-primary' %>
+                <%= link_to 'レビュー一覧', reviews_path, class: 'btn btn-success' %>
+                <%= link_to '新規レビュー作成', new_review_path, class: 'btn btn-outline-success' %>
+              </div>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- 右: ビジュアル（任意のイメージ／プレースホルダ） -->
+      <div class="col-lg-4 text-center mt-4 mt-lg-0">
+        <!-- ここにロゴ画像やヒーローイメージを置くと良いです。assets に hero.png 等を配置してください。 -->
+        <% if defined?(Rails.application.assets) && Rails.application.assets.respond_to?(:find_asset) && Rails.application.assets.find_asset('hero.png') %>
+          <%= image_tag 'hero.png', class: 'img-fluid rounded shadow', alt: 'Hero image' %>
+        <% else %>
+          <div class="border rounded p-4 bg-white shadow-sm">
+            <svg width="160" height="120" viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg" class="mb-2" aria-hidden="true">
+              <rect width="160" height="120" fill="#f8f9fa"></rect>
+              <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#6c757d" font-size="12">Hero Image</text>
+            </svg>
+            <p class="small text-muted mb-0">ゲーム探しをサポートするコミュニティ & レビュー集約サイト</p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 下部に簡易的なサマリー / プレースホルダ（新着レビュー・注目トピック等を後で差し替え可能） -->
+<section class="py-5">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-md-6">
+        <div class="card h-100">
+          <div class="card-body">
+            <h5 class="card-title">新着レビュー</h5>
+            <p class="card-text text-muted">最新のレビューをここに表示します。レビュー一覧ページで詳細を確認できます。</p>
+            <%= link_to 'レビュー一覧へ', reviews_path, class: 'btn btn-sm btn-outline-secondary' %>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="card h-100">
+          <div class="card-body">
+            <h5 class="card-title">注目トピック</h5>
+            <p class="card-text text-muted">盛り上がっているコミュニティのトピックや注目の投稿をここに表示します。</p>
+            <%= link_to 'コミュニティ一覧へ', forums_path, class: 'btn btn-sm btn-outline-secondary' %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

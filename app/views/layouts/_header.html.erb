@@ -1,0 +1,78 @@
+<header>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+    <div class="container">
+      <!-- 左: ロゴ -->
+      <%= link_to root_path, class: 'navbar-brand d-flex align-items-center' do %>
+        <%# logo.svg を app/assets/images に置いてください。無ければテキスト表示になります %>
+        <% if defined?(Rails.application.assets) && Rails.application.assets.respond_to?(:find_asset) && Rails.application.assets.find_asset('logo.svg') %>
+          <%= image_tag 'logo.svg', alt: 'AppName', height: 36, class: 'me-2' %>
+        <% else %>
+          <span class="me-2 h5 mb-0">AppName</span>
+        <% end %>
+      <% end %>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <!-- 右: ナビリンク -->
+      <div class="collapse navbar-collapse" id="mainNavbar">
+        <ul class="navbar-nav ms-auto align-items-lg-center">
+          <%# 未ログイン時 %>
+          <% unless user_signed_in? %>
+            <li class="nav-item">
+              <%= link_to '新規登録', new_user_registration_path, class: 'nav-link' %>
+            </li>
+            <li class="nav-item">
+              <%= link_to 'ログイン', new_user_session_path, class: 'nav-link' %>
+            </li>
+            <li class="nav-item">
+              <%# POST のため method: :post を付けています。button_to を使いたい場合は置き換えてください。 %>
+              <%= link_to 'ゲストログイン', guest_sign_in_users_path, method: :post, class: 'nav-link', data: { turbo: false } %>
+            </li>
+          <% else %>
+            <%# ログイン中（ゲストか通常ユーザーかを分岐） %>
+            <% is_guest = current_user.respond_to?(:guest?) ? current_user.guest? : false %>
+            <% if is_guest %>
+              <li class="nav-item">
+                <%= link_to 'コミュニティ一覧', forums_path, class: 'nav-link' %>
+              </li>
+              <li class="nav-item">
+                <%= link_to 'レビュー一覧', reviews_path, class: 'nav-link' %>
+              </li>
+              <li class="nav-item">
+                <%= link_to 'ログアウト', destroy_user_session_path, method: :delete, class: 'nav-link' %>
+              </li>
+            <% else %>
+              <li class="nav-item">
+                <%= link_to 'マイページ', user_path(current_user), class: 'nav-link' %>
+              </li>
+              <li class="nav-item">
+                <%= link_to 'コミュニティ一覧', forums_path, class: 'nav-link' %>
+              </li>
+              <li class="nav-item">
+                <%= link_to '新規コミュニティ作成', new_forum_path, class: 'nav-link' %>
+              </li>
+              <li class="nav-item">
+                <%= link_to 'レビュー一覧', reviews_path, class: 'nav-link' %>
+              </li>
+              <li class="nav-item">
+                <%= link_to '新規レビュー作成', new_review_path, class: 'nav-link' %>
+              </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarUserDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  <%= current_user.name.presence || current_user.email %>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarUserDropdown">
+                  <li><%= link_to 'プロフィール編集', edit_user_path(current_user), class: 'dropdown-item' %></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><%= link_to 'ログアウト', destroy_user_session_path, method: :delete, class: 'dropdown-item' %></li>
+                </ul>
+              </li>
+            <% end %>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</header>
