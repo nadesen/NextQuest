@@ -1,6 +1,24 @@
 # frozen_string_literal: true
 
 class Public::RegistrationsController < Devise::RegistrationsController
+  before_action :ensure_sign_up_params_present, only: :create
+
+  def after_sign_up_path_for(resource)
+    flash[:notice] = "会員登録が完了しました"
+    root_path
+  end
+
+  private
+
+  def ensure_sign_up_params_present
+    user_params = params[resource_name] || {}
+    if user_params[:name].blank? || user_params[:nickname].blank? || user_params[:email].blank? || user_params[:password].blank?
+      flash[:alert] = "氏名・ニックネーム・メールアドレス・パスワードは必須です。"
+      redirect_to new_registration_path(resource_name)
+    end
+  end
+
+
   # before_action :configure_sign_up_params, only: [:create]
   # before_action :configure_account_update_params, only: [:update]
 

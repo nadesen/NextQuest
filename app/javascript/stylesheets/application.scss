@@ -1,1 +1,18 @@
 @use '~bootstrap/scss/bootstrap';
+
+.flash {
+  padding: 10px;
+  border-radius: 4px;
+  margin: 10px 0;
+  text-align: center;
+}
+
+.flash.notice {
+  background-color: #d4edda; /* 緑系（成功） */
+  color: #155724;
+}
+
+.flash.alert {
+  background-color: #f8d7da; /* 赤系（エラー） */
+  color: #721c24;
+}

@@ -41,7 +41,7 @@
                 <%= link_to 'レビュー一覧', reviews_path, class: 'nav-link' %>
               </li>
               <li class="nav-item">
-                <%= link_to 'ログアウト', destroy_user_session_path, method: :delete, class: 'nav-link' %>
+                <%= button_to 'ログアウト', destroy_user_session_path, method: :delete, class: 'nav-link btn btn-link p-0', form: { class: 'd-inline' } %>
               </li>
             <% else %>
               <li class="nav-item">
@@ -59,15 +59,8 @@
               <li class="nav-item">
                 <%= link_to '新規レビュー作成', new_review_path, class: 'nav-link' %>
               </li>
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarUserDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  <%= current_user.name.presence || current_user.email %>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarUserDropdown">
-                  <li><%= link_to 'プロフィール編集', edit_user_path(current_user), class: 'dropdown-item' %></li>
-                  <li><hr class="dropdown-divider"></li>
-                  <li><%= link_to 'ログアウト', destroy_user_session_path, method: :delete, class: 'dropdown-item' %></li>
-                </ul>
+              <li class="nav-item">
+                <%= button_to 'ログアウト', destroy_user_session_path, method: :delete, class: 'nav-link btn btn-link p-0', form: { class: 'd-inline' } %>
               </li>
             <% end %>
           <% end %>
