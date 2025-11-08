@@ -1,0 +1,70 @@
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-9 col-md-10">
+
+      <!-- トピックカード -->
+      <div class="card mb-4">
+        <div class="card-body">
+          <h2 class="card-title"><%= @topic.title %></h2>
+          <div class="mb-2 text-muted small">
+            フォーラム:
+            <%= link_to @forum.title, forum_path(@forum), class: 'text-decoration-none' %>
+            &nbsp;・&nbsp;
+            作成者:
+            <%= @topic.respond_to?(:creator) ? (@topic.creator&.name.presence || @topic.creator&.email) : '匿名' %>
+            &nbsp;・&nbsp;
+            <%= l(@topic.created_at, format: :short) %>
+            &nbsp;・&nbsp;
+            <span class="badge bg-secondary">閲覧 <%= @topic.views_count %></span>
+            <span class="badge bg-secondary">投稿 <%= @topic.posts_count %></span>
+          </div>
+
+          <% if @topic.description.present? %>
+            <p class="card-text"><%= simple_format(@topic.description) %></p>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- 投稿一覧 -->
+      <div class="mb-4">
+        <h4 class="mb-3">投稿</h4>
+
+        <% if @posts.present? && @posts.any? %>
+          <ul class="list-group">
+            <%= render partial: 'post', collection: @posts, as: :post %>
+          </ul>
+
+          <%# ページネーション（Kaminari/WillPaginate を使っている場合） %>
+          <% if defined?(Kaminari) || defined?(WillPaginate) %>
+            <div class="mt-3">
+              <%= paginate @posts if defined?(Kaminari) %>
+              <%# will_paginate の場合: = will_paginate @posts %>
+            </div>
+          <% end %>
+        <% else %>
+          <div class="alert alert-light">まだ投稿がありません。最初の投稿をしませんか？</div>
+        <% end %>
+      </div>
+
+      <!-- 新規投稿フォーム -->
+      <div class="mb-5">
+        <h4 class="mb-3">返信・投稿する</h4>
+
+        <% if user_signed_in? %>
+          <!-- namespaced (Public::PostsController) partial is stored at app/views/public/posts/_form.html.erb -->
+          <%= render 'public/posts/form', forum: @forum, topic: @topic %>
+        <% else %>
+          <div class="alert alert-info">
+            投稿するには <%= link_to 'ログイン', new_user_session_path %> が必要です。
+          </div>
+        <% end %>
+      </div>
+
+      <div class="d-flex justify-content-between">
+        <%= link_to 'トピック一覧に戻る', forum_topics_path(@forum), class: 'btn btn-outline-secondary' %>
+        <%= link_to 'フォーラム一覧に戻る', forums_path, class: 'btn btn-link' %>
+      </div>
+
+    </div>
+  </div>
+</div>

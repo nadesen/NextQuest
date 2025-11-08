@@ -1,0 +1,21 @@
+<%= form_with(model: [forum, topic, Post.new], url: forum_topic_posts_path(forum, topic), local: true) do |f| %>
+  <% if f.object.errors.any? %>
+    <div class="alert alert-danger">
+      <ul class="mb-0">
+        <% f.object.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="mb-3">
+    <%= f.label :content, '投稿内容', class: 'form-label' %>
+    <%= f.text_area :content, class: 'form-control', rows: 6, required: true %>
+  </div>
+
+  <div class="d-flex gap-2">
+    <%= f.submit '送信する', class: 'btn btn-primary' %>
+    <%= link_to 'キャンセル', forum_topic_path(forum, topic), class: 'btn btn-outline-secondary' %>
+  </div>
+<% end %>

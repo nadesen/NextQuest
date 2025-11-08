@@ -1,0 +1,74 @@
+<section class="py-5">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-start mb-4">
+      <div>
+        <h2 class="h4 mb-1"><%= h @forum.title %></h2>
+        <% if @forum.description.present? %>
+          <p class="text-muted small mb-0"><%= h(truncate(@forum.description, length: 150)) %></p>
+        <% end %>
+      </div>
+      <div class="ms-3">
+        <% if user_signed_in? && !(current_user.respond_to?(:guest?) && current_user.guest?) %>
+          <%= link_to '新規トピック作成', new_forum_topic_path(@forum), class: 'btn btn-primary' %>
+        <% elsif user_signed_in? %>
+          <span class="badge bg-secondary d-inline-block py-2 px-3">投稿はゲスト不可</span>
+        <% end %>
+      </div>
+    </div>
+
+    <% if @topics.present? %>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead class="table-light">
+            <tr>
+              <th scope="col">トピック</th>
+              <th scope="col" class="d-none d-md-table-cell">作成者</th>
+              <th scope="col" class="text-center">投稿数</th>
+              <th scope="col" class="text-end d-none d-md-table-cell">最終更新</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @topics.each do |topic| %>
+              <tr role="button" class="clickable-row" data-href="<%= forum_topic_path(@forum, topic) %>">
+                <td class="align-middle">
+                  <% if topic.respond_to?(:pinned) && topic.pinned %>
+                    <span class="badge bg-warning text-dark me-2">Pinned</span>
+                  <% end %>
+                  <strong class="d-block"><%= h topic.title %></strong>
+                  <% if topic.respond_to?(:description) && topic.description.present? %>
+                    <small class="text-muted d-block mt-1"><%= h(truncate(topic.description, length: 120)) %></small>
+                  <% end %>
+                </td>
+                <td class="align-middle d-none d-md-table-cell">
+                  <% creator = (topic.respond_to?(:creator) ? topic.creator : topic.user) %>
+                  <%= h(creator.try(:name).presence || creator.try(:username) || creator.try(:email) || 'Unknown') %>
+                </td>
+                <td class="align-middle text-center">
+                  <span class="badge bg-secondary"><%= topic.posts_count.to_i %></span>
+                </td>
+                <td class="align-middle text-end d-none d-md-table-cell">
+                  <small class="text-muted"><%= time_ago_in_words(topic.updated_at) %> 前</small>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="d-flex justify-content-center mt-3">
+        <%= paginate(@topics) if defined?(Kaminari) || defined?(WillPaginate) || respond_to?(:paginate) rescue '' %>
+      </div>
+    <% else %>
+      <div class="alert alert-info">
+        このコミュニティにはまだトピックがありません。
+        <% if user_signed_in? && !(current_user.respond_to?(:guest?) && current_user.guest?) %>
+          <%= link_to '最初のトピックを作成する', new_forum_topic_path(@forum), class: 'btn btn-sm btn-primary ms-2' %>
+        <% end %>
+      </div>
+    <% end %>
+
+    <div class="mt-4">
+      <%= link_to 'コミュニティ一覧に戻る', forums_path, class: 'btn btn-link' %>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,53 @@
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10">
+      <h1 class="mb-4">新規トピック作成</h1>
+
+      <% if flash[:alert].present? %>
+        <div class="alert alert-danger"><%= flash[:alert] %></div>
+      <% end %>
+
+      <%# フォーラム一覧が空の場合の注意表示 %>
+      <% if @forums.blank? %>
+        <div class="alert alert-warning">
+          フォーラムを選択してください。
+        </div>
+      <% end %>
+
+      <%= form_with(model: @topic, url: topics_path, local: true) do |f| %>
+        <% if @topic.errors.any? %>
+          <div class="alert alert-danger">
+            <ul class="mb-0">
+              <% @topic.errors.full_messages.each do |msg| %>
+                <li><%= msg %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+
+        <div class="mb-3">
+          <%= f.label :forum_id, 'フォーラム種類', class: 'form-label' %>
+          <%= f.collection_select :forum_id, @forums, :id, :title,
+                { prompt: 'フォーラムを選択' },
+                { class: 'form-select', required: true } %>
+        </div>
+
+        <div class="mb-3">
+          <%= f.label :title, 'タイトル', class: 'form-label' %>
+          <%= f.text_field :title, class: 'form-control', required: true %>
+        </div>
+
+        <div class="mb-3">
+          <%= f.label :description, '説明文', class: 'form-label' %>
+          <%= f.text_area :description, class: 'form-control', rows: 6 %>
+        </div>
+
+        <div class="d-flex gap-2">
+          <%= f.submit '作成する', class: 'btn btn-primary' %>
+          <%= link_to 'キャンセル', forums_path, class: 'btn btn-outline-secondary' %>
+        </div>
+      <% end %>
+
+    </div>
+  </div>
+</div>

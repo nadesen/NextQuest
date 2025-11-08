@@ -66,7 +66,7 @@ ActiveRecord::Schema.define(version: 2025_11_06_060716) do
     t.string "title", null: false
     t.text "description"
     t.boolean "public", default: true, null: false
-    t.integer "creator_id", null: false
+    t.integer "creator_id"
     t.integer "topics_count", default: 0, null: false
     t.integer "posts_count", default: 0, null: false
     t.integer "position", default: 0, null: false
@@ -75,7 +75,6 @@ ActiveRecord::Schema.define(version: 2025_11_06_060716) do
     t.index ["creator_id"], name: "index_forums_on_creator_id"
     t.index ["position"], name: "index_forums_on_position"
     t.index ["public"], name: "index_forums_on_public"
-    t.index ["title"], name: "index_forums_on_title"
   end
 
   create_table "genres", force: :cascade do |t|

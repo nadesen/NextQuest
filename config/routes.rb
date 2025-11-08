@@ -44,9 +44,12 @@ Rails.application.routes.draw do
       end
     end
 
+    # トピック作成フォーム
+    resources :topics, only: [:new, :create]
+
     # フォーラム / トピック / 投稿
-    resources :forums do
-      resources :topics do
+    resources :forums, only: [:index, :show] do
+      resources :topics, only: [:index, :show, :edit, :update,:destroy] do
         resources :posts, only: [:index, :create, :edit, :update, :destroy]
         resources :subscriptions, only: [:create] # /forums/:forum_id/topics/:topic_id/subscriptions
       end
