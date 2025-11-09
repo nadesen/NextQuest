@@ -19,20 +19,18 @@ class Public::TopicsController < ApplicationController
 
   # GET /topics/new  (全フォーラム共通) または /forums/:forum_id/topics/new
   def new
-    # ネストされたルートなら @forum が set_forum により存在するはず。
+    @forums = Forum.order(:position)
+
     if params[:forum_id].present?
       @forum = Forum.find(params[:forum_id])
       @topic = @forum.topics.build
     else
-      # トップレベル new: フォーラム選択を表示するため @forums を渡す
-      @forums = Forum.order(:position)
       @topic = Topic.new
     end
   end
 
   # POST /topics  (全フォーラム共通) または /forums/:forum_id/topics
   def create
-    # 優先順: ネストされた forum_id -> フォームの topic[:forum_id]
     forum_id = params[:forum_id].presence || topic_params[:forum_id].presence
 
     if forum_id.present?
@@ -64,12 +62,29 @@ class Public::TopicsController < ApplicationController
 
   # GET /forums/:forum_id/topics/:id/edit
   def edit
+    # フォーラム選択肢が必要なので必ず用意する
+    @forums = Forum.order(:position)
   end
 
   # PATCH/PUT /forums/:forum_id/topics/:id
   def update
-    if @topic.update(topic_params.except(:forum_id))
-      redirect_to forum_topic_path(@forum, @topic), notice: 'トピックを更新しました。'
+    # edit を再描画する場合のために準備
+    @forums = Forum.order(:position)
+
+    tp = topic_params.dup
+    new_forum_id = tp.delete(:forum_id)
+
+    if @topic.update(tp)
+      if new_forum_id.present? && new_forum_id.to_i != @forum.id
+        if @topic.update(forum_id: new_forum_id)
+          redirect_to forum_topic_path(@topic.forum, @topic), notice: 'トピックを更新しました。' and return
+        else
+          flash.now[:alert] = 'フォーラムの移動に失敗しました。'
+          render :edit and return
+        end
+      end
+
+      redirect_to forum_topic_path(@forum, @topic), notice: 'トピックを更新しました.'
     else
       flash.now[:alert] = 'トピックの更新に失敗しました。入力内容を確認してください。'
       render :edit
@@ -114,7 +129,7 @@ class Public::TopicsController < ApplicationController
   end
 
   def authorize_topic_owner!
-    return if current_user&.admin?
+    return if current_user&.respond_to?(:admin?) && current_user.admin?
     return if @topic.respond_to?(:creator_id) && @topic.creator_id == current_user&.id
     return if @topic.respond_to?(:user) && @topic.user == current_user
 

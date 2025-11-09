@@ -1,30 +1,25 @@
 <li class="list-group-item">
-  <div class="d-flex">
-    <!-- アバター（必要なら実装を差し替えてください） -->
-    <div class="me-3">
-      <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center" style="width:48px; height:48px;">
-        <%= (post.creator&.name || post.creator&.email || 'U')[0].upcase %>
-      </div>
+  <div class="d-flex justify-content-between">
+    <div>
+      <strong><%= h(post.creator&.nickname.presence || post.user&.nickname.presence || '匿名') %></strong>
+      <small class="text-muted ms-2"><%= post.created_at.strftime('%Y/%m/%d %H:%M') %></small>
     </div>
 
-    <div class="flex-grow-1">
-      <div class="d-flex justify-content-between">
-        <div>
-          <strong><%= post.creator&.name.presence || post.creator&.email || '匿名' %></strong>
-          <span class="text-muted small ms-2"><%= l(post.created_at, format: :short) %></span>
-        </div>
-        <div class="text-end">
-          <%# 編集・削除ボタン（オーナーまたは管理者のみ） %>
-          <% if current_user && (current_user&.admin? || (post.respond_to?(:creator_id) && post.creator_id == current_user&.id) || (post.respond_to?(:user) && post.user == current_user)) %>
-            <%= link_to '編集', edit_forum_topic_post_path(post.topic.forum, post.topic, post), class: 'btn btn-sm btn-outline-secondary me-1' %>
-            <%= link_to '削除', forum_topic_post_path(post.topic.forum, post.topic, post), method: :delete, data: { confirm: '本当に削除しますか？' }, class: 'btn btn-sm btn-outline-danger' %>
-          <% end %>
-        </div>
-      </div>
+    <div class="text-end">
+      <%# 削除ボタンは投稿の作成者のみ表示（編集ボタンは削除） %>
+      <% if current_user && (
+            (post.respond_to?(:creator_id) && post.creator_id == current_user.id) ||
+            (post.respond_to?(:user) && post.user == current_user)
+          ) %>
 
-      <div class="mt-2">
-        <%= simple_format(post.content || post.body || post.text) %>
-      </div>
+        <%= form_with url: forum_topic_post_path(post.topic.forum, post.topic, post), method: :delete, local: true, html: { class: 'd-inline' } do %>
+          <%= submit_tag '削除', data: { confirm: '本当に削除しますか？' }, class: 'btn btn-sm btn-outline-danger' %>
+        <% end %>
+      <% end %>
     </div>
+  </div>
+
+  <div class="mt-2">
+    <%= simple_format(h(post.content || post.body || '')) %>
   </div>
 </li>

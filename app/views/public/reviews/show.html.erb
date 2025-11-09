@@ -1,0 +1,78 @@
+<div class="py-5">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+          <div>
+            <h1 class="h4 mb-1"><%= h(@review.title) %></h1>
+            <div class="small text-muted">
+              <span class="me-3">投稿日: <%= @review.created_at.strftime('%Y/%m/%d') if @review.created_at %></span>
+              <span class="me-2">プラットフォーム: <%= h(@review.platform&.name.presence || '未設定') %></span>
+              <span class="me-2">ジャンル: <%= h(@review.genre&.name.presence || '未設定') %></span>
+            </div>
+          </div>
+
+          <div class="text-end">
+            <%# 投稿者表示（ニックネームのみ） %>
+            <div class="mb-1 small text-muted">
+              投稿者:
+              <% if @review.user && @review.user.nickname.present? %>
+                <span class="fw-medium"><%= h(@review.user.nickname) %></span>
+              <% else %>
+                <span class="text-muted">不明</span>
+              <% end %>
+            </div>
+
+            <%# 編集・削除は投稿者のみ表示（任意） %>
+            <% if user_signed_in? && current_user.id == @review.user_id %>
+              <div class="d-flex justify-content-end">
+                <%= link_to '編集', edit_review_path(@review), class: 'btn btn-sm btn-outline-secondary me-2' %>
+                <%= button_to '削除', review_path(@review), method: :delete, data: { confirm: '本当に削除しますか？' }, class: 'btn btn-sm btn-danger' %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+
+        <div class="card mb-4 shadow-sm">
+          <div class="card-body">
+            <div class="mb-3">
+              <strong class="me-2">評価:</strong>
+              <%# 簡易的に数字表示。星表示にしたい場合はJS/CSSで拡張可 %>
+              <span class="badge bg-warning text-dark"><%= @review.rating %> / 5</span>
+              <span class="ms-3 text-muted">いいね: <%= @review.likes_count.to_i %></span>
+            </div>
+
+            <div class="mb-3">
+              <strong class="me-2">プレイ時間:</strong>
+              <span><%= h(@review.play_time.presence || '未記入') %></span>
+            </div>
+
+            <hr>
+
+            <div class="mb-3">
+              <h5 class="h6">レビュー本文</h5>
+              <p class="mb-0" style="white-space: pre-wrap;"><%= simple_format(h(@review.content)) %></p>
+            </div>
+          </div>
+
+          <div class="card-footer d-flex justify-content-between align-items-center">
+            <small class="text-muted">
+              投稿日時: <%= @review.created_at.strftime('%Y/%m/%d %H:%M') if @review.created_at %>
+            </small>
+            <div>
+              <%# いいね機能のリンク（既存の likes コントローラを使う場合に合わせてください） %>
+              <span class="me-2"><i class="bi bi-hand-thumbs-up"></i> <%= @review.likes_count.to_i %></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-between">
+          <%= link_to '一覧に戻る', reviews_path, class: 'btn btn-outline-secondary' %>
+          <% if user_signed_in? %>
+            <%= link_to '新規レビュー作成', new_review_path, class: 'btn btn-primary' %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

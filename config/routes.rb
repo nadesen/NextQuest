@@ -49,13 +49,13 @@ Rails.application.routes.draw do
 
     # フォーラム / トピック / 投稿
     resources :forums, only: [:index, :show] do
-      resources :topics, only: [:index, :show, :edit, :update,:destroy] do
+      resources :topics, only: [:index, :show, :new, :create, :edit, :update, :destroy] do
         resources :posts, only: [:index, :create, :edit, :update, :destroy]
-        resources :subscriptions, only: [:create] # /forums/:forum_id/topics/:topic_id/subscriptions
+        resources :subscriptions, only: [:create]
       end
     end
 
-    # サブスクリプションの削除パス（仕様に従ってネストなし）
+    # サブスクリプションの削除パス
     resources :subscriptions, only: [:destroy]
   end
 

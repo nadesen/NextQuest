@@ -29,23 +29,29 @@
           </thead>
           <tbody>
             <% @topics.each do |topic| %>
-              <tr role="button" class="clickable-row" data-href="<%= forum_topic_path(@forum, topic) %>">
-                <td class="align-middle">
-                  <% if topic.respond_to?(:pinned) && topic.pinned %>
-                    <span class="badge bg-warning text-dark me-2">Pinned</span>
+              <tr>
+                <!-- position-relative を付けたセル内に stretched-link を置くと行全体がクリック可能になる -->
+                <td class="align-middle position-relative">
+                  <%= link_to forum_topic_path(@forum, topic),
+                              class: 'stretched-link text-decoration-none text-reset',
+                              aria: { label: "#{topic.title} のトピックを開く" } do %>
+                    <strong class="d-block"><%= h topic.title %></strong>
                   <% end %>
-                  <strong class="d-block"><%= h topic.title %></strong>
+
                   <% if topic.respond_to?(:description) && topic.description.present? %>
                     <small class="text-muted d-block mt-1"><%= h(truncate(topic.description, length: 120)) %></small>
                   <% end %>
                 </td>
+
                 <td class="align-middle d-none d-md-table-cell">
                   <% creator = (topic.respond_to?(:creator) ? topic.creator : topic.user) %>
                   <%= h(creator.try(:name).presence || creator.try(:username) || creator.try(:email) || 'Unknown') %>
                 </td>
+
                 <td class="align-middle text-center">
                   <span class="badge bg-secondary"><%= topic.posts_count.to_i %></span>
                 </td>
+
                 <td class="align-middle text-end d-none d-md-table-cell">
                   <small class="text-muted"><%= time_ago_in_words(topic.updated_at) %> 前</small>
                 </td>

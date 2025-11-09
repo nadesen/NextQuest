@@ -1,0 +1,82 @@
+<div class="py-5">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h2 class="h4 mb-1">レビュー一覧</h2>
+        <small class="text-muted"><%= "レビュー数：#{@reviews&.size || 0}" %></small>
+      </div>
+
+      <div class="ms-3">
+        <% if user_signed_in? %>
+          <%= link_to '新規レビュー作成', new_review_path, class: 'btn btn-primary' %>
+        <% else %>
+          <%= link_to 'ログインしてレビュー作成', new_user_session_path, class: 'btn btn-outline-primary' %>
+        <% end %>
+      </div>
+    </div>
+
+    <% if @reviews.present? %>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead class="table-light">
+            <tr>
+              <th scope="col" class="text-nowrap">投稿日</th>
+              <th scope="col">プラットフォーム</th>
+              <th scope="col">ジャンル</th>
+              <th scope="col">ゲームタイトル</th>
+              <th scope="col" class="text-nowrap">プレイ時間</th>
+              <th scope="col" class="d-none d-md-table-cell">作成者</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <% @reviews.each do |review| %>
+              <!-- position-relative を tr に付与して、stretched-link が行全体に広がるようにする -->
+              <tr class="position-relative">
+                <td class="text-nowrap">
+                  <%= review.created_at.strftime('%Y/%m/%d') if review.created_at %>
+                </td>
+
+                <td>
+                  <%= h(review.platform&.name.presence || '未設定') %>
+                </td>
+
+                <td>
+                  <%= h(review.genre&.name.presence || '未設定') %>
+                </td>
+
+                <td>
+                  <!-- stretched-link をここに付与すると行全体がクリック可能になります -->
+                  <%= link_to h(review.title.presence || 'タイトルなし'), review_path(review),
+                              class: 'stretched-link text-decoration-none text-reset',
+                              aria: { label: "#{review.title} のレビューを表示" } %>
+                  <!-- ここにタイトルの表示テキストを別に置く必要はありません（link 自体が表示されます） -->
+                </td>
+
+                <td class="text-nowrap">
+                  <%= h(review.play_time.presence || '未記入') %>
+                </td>
+
+                <td class="d-none d-md-table-cell">
+                  <% if review.user && review.user.nickname.present? %>
+                    <%= h(review.user.nickname) %>
+                  <% else %>
+                    <span class="text-muted">不明</span>
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="d-flex justify-content-center mt-3">
+        <%= paginate(@reviews) if defined?(Kaminari) || defined?(WillPaginate) rescue '' %>
+      </div>
+    <% else %>
+      <div class="alert alert-info">
+        現在、表示するレビューはありません。
+      </div>
+    <% end %>
+  </div>
+</div>

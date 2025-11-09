@@ -1,14 +1,13 @@
 <section class="py-5">
   <div class="container">
 
-
-    <h2 class="mb-4">コミュニティ一覧</h2>
+    <h2 class="mb-4">コミュニティフォーラム選択</h2>
     <% if @forums.present? %>
       <div class="table-responsive">
         <table class="table table-hover align-middle">
           <thead class="table-light">
             <tr>
-              <th scope="col">コミュニティ名</th>
+              <th scope="col">フォーラム名</th>
               <th scope="col">説明</th>
               <th scope="col" class="text-end">トピック数</th>
             </tr>
@@ -16,18 +15,19 @@
           <tbody>
 
             <% @forums.each do |forum| %>
-
-              <tr role="button" class="clickable-row" data-href="<%= forum_topics_path(forum) %>">
+              <!-- tr に position-relative を付ける（Bootstrap のユーティリティクラス） -->
+              <tr class="position-relative">
                 <td class="align-middle">
-                  <strong><%= h forum.title %></strong>
+                  <!-- visible link に stretched-link を付けると行全体がクリック可能になる -->
+                  <%= link_to forum_topics_path(forum), class: 'stretched-link text-decoration-none text-reset', aria: { label: "#{forum.title} のトピック一覧へ" } do %>
+                    <strong><%= h forum.title %></strong>
+                  <% end %>
                 </td>
 
-                <%# 説明は長くなる可能性があるため truncate して表示幅を制限している %>
                 <td class="align-middle text-truncate" style="max-width:50ch;">
                   <%= h(truncate(forum.description.to_s, length: 200)) %>
                 </td>
 
-                <%# トピック数はバッジで視覚的に表示（整数に変換） %>
                 <td class="align-middle text-end">
                   <span class="badge bg-secondary"><%= forum.topics_count.to_i %></span>
                 </td>
@@ -37,14 +37,12 @@
         </table>
       </div>
 
-    <%# @forums が空の場合のメッセージ表示 %>
     <% else %>
       <div class="alert alert-warning">
         コミュニティが見つかりませんでした。
       </div>
     <% end %>
 
-    <%# 下部ナビゲーション（トップに戻る） %>
     <div class="mt-4">
       <%= link_to 'トップに戻る', root_path, class: 'btn btn-link' %>
     </div>

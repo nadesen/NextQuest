@@ -1,19 +1,13 @@
 <div class="container py-5">
   <div class="row justify-content-center">
     <div class="col-lg-8 col-md-10">
-      <h1 class="mb-4">新規トピック作成</h1>
+      <h1 class="mb-4">新規コミュニティトピック作成</h1>
 
       <% if flash[:alert].present? %>
         <div class="alert alert-danger"><%= flash[:alert] %></div>
       <% end %>
 
-      <%# フォーラム一覧が空の場合の注意表示 %>
-      <% if @forums.blank? %>
-        <div class="alert alert-warning">
-          フォーラムを選択してください。
-        </div>
-      <% end %>
-
+      <%# フォーラム選択は常に表示する。フォームはトップレベルの create に送る（topics_path） %>
       <%= form_with(model: @topic, url: topics_path, local: true) do |f| %>
         <% if @topic.errors.any? %>
           <div class="alert alert-danger">
@@ -27,9 +21,12 @@
 
         <div class="mb-3">
           <%= f.label :forum_id, 'フォーラム種類', class: 'form-label' %>
-          <%= f.collection_select :forum_id, @forums, :id, :title,
-                { prompt: 'フォーラムを選択' },
-                { class: 'form-select', required: true } %>
+          <%= f.collection_select :forum_id,
+                                 (@forums || Forum.order(:position)),
+                                 :id,
+                                 :title,
+                                 { prompt: 'フォーラムを選択', selected: (@topic.forum_id || @forum&.id) },
+                                 { class: 'form-select', required: true } %>
         </div>
 
         <div class="mb-3">

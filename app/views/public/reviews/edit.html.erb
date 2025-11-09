@@ -1,0 +1,64 @@
+<div class="py-5">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h1 class="h4 mb-0">レビューの編集</h1>
+          <small class="text-muted">投稿日：<%= @review.created_at.strftime('%Y/%m/%d') if @review.created_at %></small>
+        </div>
+
+        <%= form_with model: @review, local: true do |f| %>
+          <% if @review.errors.any? %>
+            <div class="alert alert-danger">
+              <ul class="mb-0">
+                <% @review.errors.full_messages.each do |msg| %>
+                  <li><%= msg %></li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
+
+          <div class="mb-3">
+            <%= f.label :platform_id, 'プラットフォーム', class: 'form-label' %>
+            <%= f.select :platform_id, options_from_collection_for_select(@platforms, 'id', 'name', @review.platform_id),
+                          { include_blank: '選択してください' }, class: 'form-select' %>
+          </div>
+
+          <div class="mb-3">
+            <%= f.label :genre_id, 'ジャンル', class: 'form-label' %>
+            <%= f.select :genre_id, options_from_collection_for_select(@genres, 'id', 'name', @review.genre_id),
+                          { include_blank: '選択してください' }, class: 'form-select' %>
+          </div>
+
+          <div class="mb-3">
+            <%= f.label :title, 'ゲームタイトル', class: 'form-label' %>
+            <%= f.text_field :title, class: 'form-control' %>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-4">
+              <%= f.label :rating, '評価 (1-5)', class: 'form-label' %>
+              <%= f.number_field :rating, in: 1..5, class: 'form-control' %>
+            </div>
+            <div class="col-md-8">
+              <%= f.label :play_time, 'プレイ時間', class: 'form-label' %>
+              <%= f.text_field :play_time, class: 'form-control', placeholder: '例: 10時間' %>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <%= f.label :content, 'レビュー内容', class: 'form-label' %>
+            <%= f.text_area :content, class: 'form-control', rows: 10 %>
+          </div>
+
+          <div class="d-flex justify-content-between">
+            <%= link_to 'キャンセル', review_path(@review), class: 'btn btn-secondary' %>
+            <div>
+              <%= f.submit '更新', class: 'btn btn-primary' %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
