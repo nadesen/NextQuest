@@ -31,35 +31,58 @@
 
           <tbody>
             <% @reviews.each do |review| %>
-              <!-- position-relative を tr に付与して、stretched-link が行全体に広がるようにする -->
-              <tr class="position-relative">
-                <td class="text-nowrap">
-                  <%= review.created_at.strftime('%Y/%m/%d') if review.created_at %>
-                </td>
-
-                <td>
-                  <%= h(review.platform&.name.presence || '未設定') %>
-                </td>
-
-                <td>
-                  <%= h(review.genre&.name.presence || '未設定') %>
-                </td>
-
-                <td>
-                  <!-- stretched-link をここに付与すると行全体がクリック可能になります -->
-                  <%= link_to h(review.title.presence || 'タイトルなし'), review_path(review),
+              <tr>
+                <!-- 各セルをクリック可能にする：セルに position-relative を付与し、その中に stretched-link を置く -->
+                <td class="text-nowrap position-relative">
+                  <%= link_to review_path(review),
                               class: 'stretched-link text-decoration-none text-reset',
-                              aria: { label: "#{review.title} のレビューを表示" } %>
-                  <!-- ここにタイトルの表示テキストを別に置く必要はありません（link 自体が表示されます） -->
+                              aria: { label: "レビュー #{review.title} の詳細を表示" } do %>
+                    <%= review.created_at.strftime('%Y/%m/%d') if review.created_at %>
+                  <% end %>
                 </td>
 
-                <td class="text-nowrap">
-                  <%= h(review.play_time.presence || '未記入') %>
+                <td class="position-relative">
+                  <%= link_to review_path(review),
+                              class: 'stretched-link text-decoration-none text-reset',
+                              aria: { label: "レビュー #{review.title} の詳細を表示（プラットフォーム）" } do %>
+                    <%= h(review.platform&.name.presence || '未設定') %>
+                  <% end %>
                 </td>
 
-                <td class="d-none d-md-table-cell">
-                  <% if review.user && review.user.nickname.present? %>
-                    <%= h(review.user.nickname) %>
+                <td class="position-relative">
+                  <%= link_to review_path(review),
+                              class: 'stretched-link text-decoration-none text-reset',
+                              aria: { label: "レビュー #{review.title} の詳細を表示（ジャンル）" } do %>
+                    <%= h(review.genre&.name.presence || '未設定') %>
+                  <% end %>
+                </td>
+
+                <!-- ゲームタイトルは強調表示 -->
+                <td class="align-middle position-relative">
+                  <%= link_to review_path(review),
+                              class: 'stretched-link text-decoration-none text-reset',
+                              aria: { label: "#{review.title} のレビューを表示" } do %>
+                    <strong class="d-block"><%= h(review.title.presence || 'タイトルなし') %></strong>
+                    <%# 必要なら説明文の抜粋もここに表示できます（オプション） %>
+                    <% if review.respond_to?(:description) && review.try(:description).present? %>
+                      <small class="text-muted d-block mt-1"><%= h(truncate(review.description, length: 120)) %></small>
+                    <% end %>
+                  <% end %>
+                </td>
+
+                <td class="text-nowrap position-relative">
+                  <%= link_to review_path(review),
+                              class: 'stretched-link text-decoration-none text-reset',
+                              aria: { label: "レビュー #{review.title} の詳細を表示（プレイ時間）" } do %>
+                    <%= h(review.play_time.presence || '未記入') %>
+                  <% end %>
+                </td>
+
+                <!-- 作成者セルは別扱い（クリック可能） -->
+                <td class="align-middle d-none d-md-table-cell">
+                  <% if review.user.present? %>
+                    <% display_name = review.user.nickname.presence || review.user.name.presence || review.user.email.presence || '不明' %>
+                    <%= link_to h(display_name), user_path(review.user), class: 'text-decoration-none' %>
                   <% else %>
                     <span class="text-muted">不明</span>
                   <% end %>

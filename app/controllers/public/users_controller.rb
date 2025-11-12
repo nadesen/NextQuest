@@ -1,5 +1,5 @@
 class Public::UsersController < ApplicationController
-  before_action :authenticate_user!, only: [:edit, :update, :destroy]
+  before_action :require_login, only: [:edit, :update, :destroy, :my_page]
   before_action :set_user, only: [:show, :edit, :update, :destroy]
   before_action :authorize_user!, only: [:edit, :update, :destroy]
 
@@ -61,7 +61,6 @@ class Public::UsersController < ApplicationController
 
   def fetch_user_posts(user_id, limit: 20)
     return [] unless defined?(Post)
-    # 1) association があれば使う
     if @user.respond_to?(:posts)
       @user.posts.includes(:topic).order(created_at: :desc).limit(limit)
     else
@@ -107,8 +106,14 @@ class Public::UsersController < ApplicationController
   end
 
   def authorize_user!
+    # current_user が自分のページを編集しようとしているかチェック
     unless current_user && current_user.id == @user.id
-      redirect_to user_path(@user), alert: '権限がありません。'
+      # ログイン済みなら current_user の show ページへ、未ログインなら通常のユーザー詳細へ
+      if user_signed_in?
+        redirect_to user_path(current_user), alert: '編集権限がありません。マイページに移動しました。'
+      else
+        redirect_to user_path(@user), alert: '権限がありません。'
+      end
     end
   end
 

@@ -58,6 +58,18 @@
             </div>
           </div>
         <% end %>
+
+        <%# 削除ボタン（フォーム外に置くことでネストを避ける） %>
+        <% can_delete = user_signed_in? && (current_user.id == @review.user_id || current_user&.admin?) %>
+        <% if can_delete %>
+          <div class="mt-3 d-flex justify-content-end">
+            <%= button_to '削除', review_path(@review),
+                          method: :delete,
+                          data: { confirm: 'レビューを削除してもよろしいですか？' },
+                          class: 'btn btn-danger' %>
+          </div>
+        <% end %>
+
       </div>
     </div>
   </div>

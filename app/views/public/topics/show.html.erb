@@ -15,7 +15,12 @@
             <%# 作成者のニックネームのみ表示する（存在しない場合は '匿名'） %>
             作成者:
             <% creator = @topic.respond_to?(:creator) ? @topic.creator : @topic.user %>
-            <%= h(creator&.nickname.presence || '匿名') %>
+            <% if creator.present? %>
+              <% display_name = creator.nickname.presence || creator.name.presence || 'ユーザー' %>
+              <%= link_to h(display_name), user_path(creator), class: 'fw-medium text-decoration-none', aria: { label: "#{display_name} さんのユーザーページへ" } %>
+            <% else %>
+              <span class="text-muted">匿名</span>
+            <% end %>
             &nbsp;・&nbsp;
 
             <%# 日付を yyyy/mm/dd 形式で表示 %>

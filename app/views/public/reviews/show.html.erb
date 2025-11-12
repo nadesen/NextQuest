@@ -16,8 +16,9 @@
             <%# 投稿者表示（ニックネームのみ） %>
             <div class="mb-1 small text-muted">
               投稿者:
-              <% if @review.user && @review.user.nickname.present? %>
-                <span class="fw-medium"><%= h(@review.user.nickname) %></span>
+              <% if @review.user.present? %>
+                <% display_name = @review.user.nickname.presence || @review.user.name.presence || 'ユーザー' %>
+                <%= link_to h(display_name), user_path(@review.user), class: 'fw-medium text-decoration-none' %>
               <% else %>
                 <span class="text-muted">不明</span>
               <% end %>

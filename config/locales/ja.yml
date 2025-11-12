@@ -1,0 +1,49 @@
+ja:
+  activerecord:
+    models:
+      review: "レビュー"
+      post: "投稿"
+      topic: "トピック"
+      user: "ユーザー"
+      platform: "プラットフォーム"
+      genre: "ジャンル"
+      forum: "フォーラム"
+    attributes:
+      review:
+        platform: "プラットフォーム"
+        genre: "ジャンル"
+        title: "タイトル"
+        play_time: "プレイ時間"
+        rating: "評価"
+        content: "レビュー内容"
+      post:
+        content: "本文"
+      topic:
+        forum: "フォーラム"
+        forum_id: "フォーラム"
+        title: "タイトル"
+        description: "説明文"
+      user:
+        email: "メールアドレス"
+        nickname: "ニックネーム"
+        name: "名前"
+      platform:
+        name: "プラットフォーム名"
+      genre:
+        name: "ジャンル名"
+
+  errors:
+    format: "%{attribute}%{message}"
+    messages:
+      blank: "を入力してください"
+      invalid: "は不正な値です"
+      not_a_number: "は数値で入力してください"
+      too_short: "は%{count}文字以上にしてください"
+      too_long: "は%{count}文字以下にしてください"
+      taken: "は既に存在します"
+      greater_than_or_equal_to: "は%{count}以上の値にしてください"
+      less_than_or_equal_to: "は%{count}以下の値にしてください"
+      greater_than: "は%{count}より大きい値にしてください"
+      less_than: "は%{count}より小さい値にしてください"
+      must_exist: "を選択してください"
+      required: "が必要です"

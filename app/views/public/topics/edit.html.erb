@@ -52,6 +52,24 @@
               <%= link_to 'キャンセル', forum_topic_path(@forum, @topic), class: 'btn btn-link ms-3' %>
             </div>
           <% end %>
+
+          <%# 削除ボタン：編集権限がある場合のみ表示%>
+          <% can_edit = user_signed_in? && (
+                (@topic.respond_to?(:creator) && @topic.creator == current_user) ||
+                (@topic.respond_to?(:creator_id) && @topic.creator_id == current_user&.id) ||
+                (@topic.respond_to?(:user_id) && @topic.user_id == current_user&.id) ||
+                (current_user&.admin?)
+              ) %>
+
+          <% if can_edit %>
+            <div class="mt-3 d-flex justify-content-end">
+              <%= button_to '削除', forum_topic_path(@forum, @topic),
+                            method: :delete,
+                            data: { confirm: 'トピックを削除してもよろしいですか？' },
+                            class: 'btn btn-danger' %>
+            </div>
+          <% end %>
+
         </div>
       </div>
 

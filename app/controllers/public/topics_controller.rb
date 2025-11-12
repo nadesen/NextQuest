@@ -1,7 +1,8 @@
 class Public::TopicsController < ApplicationController
   before_action :set_forum, except: %i[new create]
   before_action :set_topic, only: %i[show edit update destroy]
-  before_action :authenticate_user!, only: %i[new create edit update destroy]
+  # new/create/show/edit/update/destroy に対してログイン必須に統一
+  before_action :require_login, only: %i[new create show edit update destroy]
   before_action :prevent_guest_posting!, only: %i[new create]
   before_action :authorize_topic_owner!, only: %i[edit update destroy]
 
@@ -20,7 +21,6 @@ class Public::TopicsController < ApplicationController
   # GET /topics/new  (全フォーラム共通) または /forums/:forum_id/topics/new
   def new
     @forums = Forum.order(:position)
-
     if params[:forum_id].present?
       @forum = Forum.find(params[:forum_id])
       @topic = @forum.topics.build
@@ -29,7 +29,6 @@ class Public::TopicsController < ApplicationController
     end
   end
 
-  # POST /topics  (全フォーラム共通) または /forums/:forum_id/topics
   def create
     forum_id = params[:forum_id].presence || topic_params[:forum_id].presence
 
@@ -37,14 +36,16 @@ class Public::TopicsController < ApplicationController
       @forum = Forum.find(forum_id)
       @topic = @forum.topics.build(topic_params.except(:forum_id))
     else
-      # フォーラム未選択ならエラー
+      # フォーラム未選択なら topic_params をそのまま使ってモデル検証させる
       @forums = Forum.order(:position)
       @topic = Topic.new(topic_params.except(:forum_id))
-      flash.now[:alert] = 'フォーラムを選択してください'
+      # モデル側の validates :forum_id があるので valid? を呼んでエラーを収集する
+      @topic.valid?
+      # ここでは追加で errors.add をしない（モデルの message を利用する）
       render :new and return
     end
 
-    # 作成者情報をセット（モデルのカラムに合わせて調整してください）
+    # 作成者情報をセット
     if @topic.respond_to?(:creator_id)
       @topic.creator_id ||= current_user.id
     elsif @topic.respond_to?(:user_id)
@@ -52,10 +53,10 @@ class Public::TopicsController < ApplicationController
     end
 
     if @topic.save
-      redirect_to forum_topic_path(@forum, @topic), notice: 'トピックを作成しました。'
+      redirect_to forum_topic_path(@forum, @topic), notice: 'コミュニティを作成しました。'
     else
       @forums ||= Forum.order(:position)
-      flash.now[:alert] = 'トピックの作成に失敗しました。入力内容を確認してください。'
+      flash.now[:alert] = 'コミュニティの作成に失敗しました。入力内容を確認してください。'
       render :new
     end
   end
@@ -77,16 +78,16 @@ class Public::TopicsController < ApplicationController
     if @topic.update(tp)
       if new_forum_id.present? && new_forum_id.to_i != @forum.id
         if @topic.update(forum_id: new_forum_id)
-          redirect_to forum_topic_path(@topic.forum, @topic), notice: 'トピックを更新しました。' and return
+          redirect_to forum_topic_path(@topic.forum, @topic), notice: 'コミュニティを更新しました。' and return
         else
           flash.now[:alert] = 'フォーラムの移動に失敗しました。'
           render :edit and return
         end
       end
 
-      redirect_to forum_topic_path(@forum, @topic), notice: 'トピックを更新しました.'
+      redirect_to forum_topic_path(@forum, @topic), notice: 'コミュニティを更新しました.'
     else
-      flash.now[:alert] = 'トピックの更新に失敗しました。入力内容を確認してください。'
+      flash.now[:alert] = 'コミュニティの更新に失敗しました。入力内容を確認してください。'
       render :edit
     end
   end
@@ -94,7 +95,13 @@ class Public::TopicsController < ApplicationController
   # DELETE /forums/:forum_id/topics/:id
   def destroy
     @topic.destroy
-    redirect_to forum_topics_path(@forum), notice: 'トピックを削除しました。'
+    # 削除後はマイページ（現在のユーザーの show）へ遷移
+    if user_signed_in?
+      redirect_to user_path(current_user), notice: 'コミュニティを削除しました。'
+    else
+      # 万一ログインしていなければフォーラムのトピック一覧へフォールバック
+      redirect_to forum_topics_path(@forum), notice: 'コミュニテを削除しました。'
+    end
   end
 
   private

@@ -9,7 +9,7 @@
       </div>
       <div class="ms-3">
         <% if user_signed_in? && !(current_user.respond_to?(:guest?) && current_user.guest?) %>
-          <%= link_to '新規トピック作成', new_forum_topic_path(@forum), class: 'btn btn-primary' %>
+          <%= link_to '新規コミュニティ作成', new_forum_topic_path(@forum), class: 'btn btn-primary' %>
         <% elsif user_signed_in? %>
           <span class="badge bg-secondary d-inline-block py-2 px-3">投稿はゲスト不可</span>
         <% end %>
@@ -45,7 +45,12 @@
 
                 <td class="align-middle d-none d-md-table-cell">
                   <% creator = (topic.respond_to?(:creator) ? topic.creator : topic.user) %>
-                  <%= h(creator.try(:name).presence || creator.try(:username) || creator.try(:email) || 'Unknown') %>
+                  <% if creator.present? %>
+                    <% display_name = creator.nickname.presence || creator.name.presence || creator.username.presence || creator.email.presence || '匿名' %>
+                    <%= link_to h(display_name), user_path(creator), class: 'text-decoration-none' %>
+                  <% else %>
+                    <span class="text-muted">匿名</span>
+                  <% end %>
                 </td>
 
                 <td class="align-middle text-center">

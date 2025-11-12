@@ -11,11 +11,11 @@ Rails.application.routes.draw do
     sessions: 'public/sessions'
   }
   # ユーザー側のルーティング設定
-  scope module: :public do
+  scope module: :public do    
     resources :tags, only: [:show]
 
     # ユーザーとプロフィール関連
-    resources :users, only: [:index, :show, :edit, :update] do
+    resources :users, only: [:index, :show, :edit, :update, :destroy] do
       member do
         get :followings
         get :followers

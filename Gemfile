@@ -57,6 +57,7 @@ gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 gem 'devise'
 gem 'kaminari'
+gem 'rails-i18n', '~> 6.0'
 
 gem 'dotenv-rails'
 group :production do

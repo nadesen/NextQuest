@@ -3,12 +3,9 @@
     <div class="col-lg-8 col-md-10">
       <h1 class="mb-4">新規コミュニティトピック作成</h1>
 
-      <% if flash[:alert].present? %>
-        <div class="alert alert-danger"><%= flash[:alert] %></div>
-      <% end %>
+      <%# レビュー画面と同じように、先頭で全件エラーを表示するようにしました %>
+      <%= form_with(model: @topic, url: topics_path, local: true, html: { novalidate: true }) do |f| %>
 
-      <%# フォーラム選択は常に表示する。フォームはトップレベルの create に送る（topics_path） %>
-      <%= form_with(model: @topic, url: topics_path, local: true) do |f| %>
         <% if @topic.errors.any? %>
           <div class="alert alert-danger">
             <ul class="mb-0">
@@ -26,12 +23,12 @@
                                  :id,
                                  :title,
                                  { prompt: 'フォーラムを選択', selected: (@topic.forum_id || @forum&.id) },
-                                 { class: 'form-select', required: true } %>
+                                 { class: 'form-select' } %>
         </div>
 
         <div class="mb-3">
           <%= f.label :title, 'タイトル', class: 'form-label' %>
-          <%= f.text_field :title, class: 'form-control', required: true %>
+          <%= f.text_field :title, class: 'form-control' %>
         </div>
 
         <div class="mb-3">

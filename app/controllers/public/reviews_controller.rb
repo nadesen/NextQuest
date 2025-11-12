@@ -1,6 +1,7 @@
 class Public::ReviewsController < ApplicationController
-  before_action :authenticate_user!, only: [:new, :create, :edit, :update, :destroy]
-  before_action :set_review, only: [:show, :edit, :update, :destroy]
+  # new/create/show/edit/update/destroy を保護
+  before_action :require_login, only: %i[new create show edit update destroy]
+  before_action :set_review, only: %i[show edit update destroy]
 
   def index
     @reviews = Review.includes(:platform, :genre, :user).order(created_at: :desc)
@@ -20,7 +21,7 @@ class Public::ReviewsController < ApplicationController
     @review.user_id = current_user.id
 
     if @review.save
-      redirect_to reviews_path, notice: 'レビューを作成しました。'
+      redirect_to review_path(@review), notice: 'レビューを作成しました。'
     else
       load_selects
       flash.now[:alert] = 'レビューの作成に失敗しました。入力内容を確認してください。'
@@ -54,7 +55,7 @@ class Public::ReviewsController < ApplicationController
     # 投稿者または管理者のみ削除できるようにする場合は条件を追加してください
     if current_user && current_user.id == @review.user_id
       @review.destroy
-      redirect_to reviews_path, notice: 'レビューを削除しました。'
+      redirect_to user_path(current_user), notice: 'レビューを削除しました。'
     else
       redirect_to review_path(@review), alert: '削除権限がありません。'
     end

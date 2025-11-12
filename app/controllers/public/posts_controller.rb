@@ -1,7 +1,8 @@
 class Public::PostsController < ApplicationController
   before_action :set_forum_and_topic, only: %i[create destroy edit update]
   before_action :set_post, only: %i[destroy edit update]
-  before_action :authenticate_user!, only: %i[create destroy edit update]
+  # create/destroy/edit/update を保護
+  before_action :require_login, only: %i[create destroy edit update]
   before_action :authorize_post_owner!, only: %i[destroy edit update]
 
   def create
@@ -39,9 +40,11 @@ class Public::PostsController < ApplicationController
   end
 
   def authorize_post_owner!
+    # 投稿の所有者（creator_id あるいは user association）かどうかを判定
     return if @post.respond_to?(:creator_id) && @post.creator_id == current_user&.id
     return if @post.respond_to?(:user) && @post.user == current_user
 
-    redirect_to forum_topic_path(@forum, @topic), alert: 'この操作を行う権限がありません。'
+    # 非所有者の場合は "投稿一覧"（そのトピックのページ）へリダイレクト
+    redirect_to forum_topic_path(@forum, @topic), alert: '編集権限がありません。投稿一覧に戻ります。'
   end
 end
