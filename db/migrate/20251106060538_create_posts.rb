@@ -9,8 +9,5 @@ class CreatePosts < ActiveRecord::Migration[6.1]
 
       t.timestamps
     end
-
-    add_index :posts, :topic_id
-    add_index :posts, :creator_id
   end
 end

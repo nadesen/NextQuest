@@ -11,10 +11,5 @@ class CreateTopics < ActiveRecord::Migration[6.1]
 
       t.timestamps
     end
-
-    add_index :topics, :forum_id
-    add_index :topics, :creator_id
-    add_index :topics, :title
-    add_index :topics, :locked
   end
 end
