@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2025_11_06_060716) do
+ActiveRecord::Schema.define(version: 2025_11_13_064413) do
 
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
@@ -140,9 +140,11 @@ ActiveRecord::Schema.define(version: 2025_11_06_060716) do
     t.integer "views_count", default: 0, null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.boolean "pinned", default: false, null: false
     t.index ["creator_id"], name: "index_topics_on_creator_id"
     t.index ["forum_id"], name: "index_topics_on_forum_id"
     t.index ["locked"], name: "index_topics_on_locked"
+    t.index ["pinned"], name: "index_topics_on_pinned"
     t.index ["title"], name: "index_topics_on_title"
   end
 
