@@ -18,6 +18,21 @@ class Topic < ApplicationRecord
   # 指定された forum_id が実際に存在するか確認したい場合は下を有効にする
   validate :forum_must_exist, if: -> { forum_id.present? }
 
+  def self.search_for(content, method)
+    return none if content.blank?
+
+    case method
+    when 'perfect'
+      where(title: content)
+    when 'forward'
+      where('title LIKE ?', "#{sanitize_sql_like(content)}%")
+    when 'backward'
+      where('title LIKE ?', "%#{sanitize_sql_like(content)}")
+    else # partial
+      where('title LIKE ?', "%#{sanitize_sql_like(content)}%")
+    end
+  end
+
   private
 
   def forum_must_exist

@@ -1,8 +1,7 @@
 Rails.application.routes.draw do
   # 共通
   root to: 'public/homes#top'
-  get '/about', to: 'public/homes#about'
-  get '/search', to: 'searches#index'
+  get '/search', to: 'searches#search', as: :search
 
   # ユーザー用
   # URL /customers/sign_in ...

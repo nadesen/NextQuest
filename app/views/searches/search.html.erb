@@ -1,0 +1,18 @@
+<% if @model == 'user' %>
+  <h3>Users search for "<%= @content %>"</h3>
+  <!-- users/index パーシャルが users: を期待している想定 -->
+  <%= render 'users/index', users: @records %>
+
+<% elsif @model == 'topic' %>
+  <h3>Topics search for "<%= @content %>"</h3>
+  <!-- topics/index パーシャルが topics: を期待している想定 -->
+  <%= render 'topics/index', topics: @records %>
+
+<% elsif @model == 'review' %>
+  <h3>Reviews search for "<%= @content %>"</h3>
+  <!-- reviews/index パーシャルが reviews: を期待している想定 -->
+  <%= render 'reviews/index', reviews: @records %>
+
+<% else %>
+  <p>検索対象を選択してください。</p>
+<% end %>

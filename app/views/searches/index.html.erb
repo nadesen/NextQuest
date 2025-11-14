@@ -1,0 +1,286 @@
+<div class="py-5">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h2 class="h4 mb-1">検索結果</h2>
+        <% if defined?(@content) && @content.present? %>
+          <small class="text-muted">検索ワード: "<%= h(@content) %>"</small>
+        <% end %>
+      </div>
+      <div class="ms-3">
+        <%= link_to 'トップページに戻る', root_path, class: 'btn btn-outline-secondary' %>
+      </div>
+    </div>
+
+    <%# ------------------------------------------------------------ %>
+    <%# 表示は選択した model のみを出す(いずれallで一括検索に挑戦したい) %>
+    <%# @model の値は SearchesController#search でセットされています。%>
+    <%# 'user' / 'topic' / 'review' / 'all' を想定。               %>
+    <%# ------------------------------------------------------------ %>
+
+    <% if @model == 'user' || @model == 'all' %>
+      <!-- Users -->
+      <div class="card mb-4">
+        <div class="card-header">
+          ユーザー（<%= @users.try(:size).to_i %> 件）
+        </div>
+        <div class="card-body p-0">
+          <% if @users.present? %>
+            <div class="table-responsive">
+              <table class="table table-hover mb-0 align-middle">
+                <thead class="table-light">
+                  <tr>
+                    <th>ニックネーム</th>
+                    <th>プロフィール</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% @users.each do |user| %>
+                    <tr>
+                      <td class="align-middle position-relative">
+                        <!-- ニックネームをクリックすると該当ユーザーの show に遷移 -->
+                        <%= link_to user_path(user),
+                                    class: 'stretched-link text-decoration-none',
+                                    aria: { label: "#{user.nickname.presence || user.name} のプロフィールを表示" } do %>
+                          <%= h(user.nickname.presence || user.name.presence || 'ユーザー') %>
+                        <% end %>
+                      </td>
+
+                      <td class="position-relative">
+                        <% if user.respond_to?(:profile_text) && user.profile_text.present? %>
+                          <!-- プロフィール部分をクリックすると該当ユーザーの show に遷移 -->
+                          <%= link_to user_path(user),
+                                      class: 'stretched-link text-decoration-none text-reset',
+                                      aria: { label: "#{user.nickname.presence || user.name} のプロフィールを表示（プロフィール本文）" } do %>
+                            <%= h(truncate(user.profile_text, length: 120)) %>
+                          <% end %>
+                        <% else %>
+                          <!-- 未設定の場合もクリックするとユーザーの show に行くようにする -->
+                          <%= link_to user_path(user), class: 'text-decoration-none' do %>
+                            <span class="text-muted">プロフィール未設定</span>
+                          <% end %>
+                        <% end %>
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          <% else %>
+            <div class="p-3 text-muted">該当するユーザーは見つかりませんでした。</div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <% if @model == 'topic' || @model == 'all' %>
+      <!-- Topics -->
+      <div class="card mb-4">
+        <div class="card-header">
+          トピック（<%= @topics.try(:size).to_i %> 件）
+        </div>
+        <div class="card-body p-0">
+          <% if @topics.present? %>
+            <div class="table-responsive">
+              <table class="table table-hover mb-0 align-middle">
+                <thead class="table-light">
+                  <tr>
+                    <th>タイトル</th>
+                    <th class="text-center">投稿数</th>
+                    <th class="d-none d-md-table-cell text-end">最終更新</th>
+                    <th class="d-none d-md-table-cell">作成者</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% @topics.each do |topic| %>
+                    <%# resolve topic show path (prefer forum_topic_path if forum present) %>
+                    <% topic_show_path = if topic.respond_to?(:forum) && topic.forum.present?
+                                           (defined?(forum_topic_path) ? forum_topic_path(topic.forum, topic) : nil)
+                                         else
+                                           (defined?(topic_path) ? topic_path(topic) : nil)
+                                         end %>
+
+                    <tr>
+                      <!-- タイトルセル：クリックで topic の show へ -->
+                      <td class="align-middle position-relative">
+                        <% if topic_show_path.present? %>
+                          <%= link_to topic_show_path,
+                                      class: 'stretched-link text-decoration-none text-reset',
+                                      aria: { label: "#{topic.title} を表示" } do %>
+                            <%= h(topic.title) %>
+                          <% end %>
+                        <% else %>
+                          <%= h(topic.title) %>
+                        <% end %>
+                      </td>
+
+                      <!-- 投稿数セル：クリックで topic の show へ -->
+                      <td class="align-middle text-center position-relative">
+                        <% if topic_show_path.present? %>
+                          <%= link_to topic_show_path,
+                                      class: 'stretched-link text-decoration-none text-reset',
+                                      aria: { label: "#{topic.title} の投稿一覧を表示" } do %>
+                            <span class="badge bg-secondary"><%= topic.try(:posts_count).to_i %></span>
+                          <% end %>
+                        <% else %>
+                          <span class="badge bg-secondary"><%= topic.try(:posts_count).to_i %></span>
+                        <% end %>
+                      </td>
+
+                      <!-- 最終更新セル：クリックで topic の show へ -->
+                      <td class="align-middle text-end d-none d-md-table-cell position-relative">
+                        <% if topic_show_path.present? %>
+                          <%= link_to topic_show_path,
+                                      class: 'stretched-link text-decoration-none text-reset',
+                                      aria: { label: "#{topic.title} の詳細を表示(最終更新)" } do %>
+                            <small class="text-muted"><%= time_ago_in_words(topic.updated_at) %> 前</small>
+                          <% end %>
+                        <% else %>
+                          <small class="text-muted"><%= time_ago_in_words(topic.updated_at) %> 前</small>
+                        <% end %>
+                      </td>
+
+                      <!-- 作成者セル：クリックで作成者のユーザー show へ -->
+                      <td class="align-middle d-none d-md-table-cell">
+                        <% creator = (topic.respond_to?(:creator) ? topic.creator : topic.user) rescue nil %>
+                        <% if creator.present? %>
+                          <%= link_to h(creator.try(:nickname).presence || creator.try(:name).presence || '匿名'), user_path(creator), class: 'text-decoration-none' %>
+                        <% else %>
+                          <span class="text-muted">匿名</span>
+                        <% end %>
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          <% else %>
+            <div class="p-3 text-muted">該当するトピックは見つかりませんでした。</div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <% if @model == 'review' || @model == 'all' %>
+      <!-- Reviews -->
+      <div class="card mb-4">
+        <div class="card-header">
+          レビュー（<%= @reviews.try(:size).to_i %> 件）
+        </div>
+        <div class="card-body p-0">
+          <% if @reviews.present? %>
+            <div class="table-responsive">
+              <table class="table table-hover mb-0 align-middle">
+                <thead class="table-light">
+                  <tr>
+                    <th class="text-nowrap">投稿日</th>
+                    <th>プラットフォーム</th>
+                    <th>ジャンル</th>
+                    <th>ゲームタイトル</th>
+                    <th class="text-nowrap">プレイ時間</th>
+                    <th class="d-none d-md-table-cell">作成者</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% @reviews.each do |review| %>
+                    <% review_show_path = (defined?(review_path) ? review_path(review) : nil) %>
+
+                    <tr>
+                      <!-- 日付セル（クリックで review show） -->
+                      <td class="text-nowrap position-relative">
+                        <% if review_show_path.present? %>
+                          <%= link_to review_show_path,
+                                      class: 'stretched-link text-decoration-none text-reset',
+                                      aria: { label: "#{review.title} のレビューを表示" } do %>
+                            <%= review.created_at.strftime('%Y/%m/%d') if review.created_at %>
+                          <% end %>
+                        <% else %>
+                          <%= review.created_at.strftime('%Y/%m/%d') if review.created_at %>
+                        <% end %>
+                      </td>
+
+                      <!-- プラットフォームセル（クリックで review show） -->
+                      <td class="position-relative">
+                        <% if review_show_path.present? %>
+                          <%= link_to review_show_path,
+                                      class: 'stretched-link text-decoration-none text-reset',
+                                      aria: { label: "#{review.title} のレビューを表示（プラットフォーム）" } do %>
+                            <%= h(review.platform&.name.presence || '未設定') %>
+                          <% end %>
+                        <% else %>
+                          <%= h(review.platform&.name.presence || '未設定') %>
+                        <% end %>
+                      </td>
+
+                      <!-- ジャンルセル（クリックで review show） -->
+                      <td class="position-relative">
+                        <% if review_show_path.present? %>
+                          <%= link_to review_show_path,
+                                      class: 'stretched-link text-decoration-none text-reset',
+                                      aria: { label: "#{review.title} のレビューを表示（ジャンル）" } do %>
+                            <%= h(review.genre&.name.presence || '未設定') %>
+                          <% end %>
+                        <% else %>
+                          <%= h(review.genre&.name.presence || '未設定') %>
+                        <% end %>
+                      </td>
+
+                      <!-- タイトルセル（クリックで review show） -->
+                      <td class="align-middle position-relative">
+                        <% if review_show_path.present? %>
+                          <%= link_to review_show_path,
+                                      class: 'stretched-link text-decoration-none text-reset',
+                                      aria: { label: "#{review.title} のレビューを表示" } do %>
+                            <strong class="d-block"><%= h(review.title.presence || 'タイトルなし') %></strong>
+                          <% end %>
+                        <% else %>
+                          <strong class="d-block"><%= h(review.title.presence || 'タイトルなし') %></strong>
+                        <% end %>
+                      </td>
+
+                      <!-- プレイ時間セル（クリックで review show） -->
+                      <td class="text-nowrap position-relative">
+                        <% if review_show_path.present? %>
+                          <%= link_to review_show_path,
+                                      class: 'stretched-link text-decoration-none text-reset',
+                                      aria: { label: "#{review.title} のレビューを表示（プレイ時間）" } do %>
+                            <%= h(review.play_time.presence || '未記入') %>
+                          <% end %>
+                        <% else %>
+                          <%= h(review.play_time.presence || '未記入') %>
+                        <% end %>
+                      </td>
+
+                      <!-- 作成者セル：クリックでユーザーの show へ -->
+                      <td class="align-middle d-none d-md-table-cell">
+                        <% if review.user.present? %>
+                          <%= link_to h(review.user.try(:nickname).presence || review.user.try(:name) || '不明'), user_path(review.user), class: 'text-decoration-none' %>
+                        <% else %>
+                          <span class="text-muted">不明</span>
+                        <% end %>
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          <% else %>
+            <div class="p-3 text-muted">該当するレビューは見つかりませんでした。</div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <%# if @model が未指定または不正な値なら案内メッセージを出す %>
+    <% unless ['user', 'topic', 'review', 'all'].include?(@model) %>
+      <div class="alert alert-info">
+        検索対象を選択してください。
+      </div>
+    <% end %>
+
+    <div class="d-flex justify-content-center mt-3">
+      <!-- ページネーションを使う場合は controller で .page を付けてください -->
+      <%#= paginate(@results) if defined?(paginate) %>
+    </div>
+  </div>
+</div>
