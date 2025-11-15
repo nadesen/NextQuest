@@ -1,6 +1,7 @@
 class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
+  has_many :review_comments, dependent: :destroy
 
   validates :name, presence: true, length: { maximum: 30 }
   validates :nickname, presence: true, length: { maximum: 50 }

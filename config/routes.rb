@@ -41,6 +41,8 @@ Rails.application.routes.draw do
       collection do
         post :preview
       end
+
+      resources :review_comments, only: [:create, :destroy]
     end
 
     # トピック作成フォーム

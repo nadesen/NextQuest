@@ -22,12 +22,7 @@
 
             <div class="mt-4 d-grid gap-2">
               <% if user_signed_in? && current_user.id == @user.id %>
-                <%= link_to '編集', edit_user_path(@user), class: 'btn btn-outline-primary' %>
-
-                <%= button_to '退会（アカウント削除）', user_path(@user),
-                              method: :delete,
-                              data: { confirm: '本当にアカウントを削除しますか？（この操作は取り消せません）' },
-                              class: 'btn btn-danger' %>
+                <%= link_to '編集 (退会処理もこちら)', edit_user_path(@user), class: 'btn btn-outline-primary' %>
               <% end %>
             </div>
           </div>
@@ -60,13 +55,8 @@
                       <% @topics.each do |topic| %>
                         <tr>
                           <td class="text-nowrap"><%= topic.created_at.strftime('%Y/%m/%d') %></td>
-
-                          <td>
-                            <%= h(topic.title) %>
-                          </td>
-
+                          <td><%= h(topic.title) %></td>
                           <td class="d-none d-md-table-cell"><%= h(topic.try(:forum).try(:title) || '—') %></td>
-
                           <td class="text-end text-nowrap">
                             <% target_path = topic.respond_to?(:forum) && topic.forum.present? ? forum_topic_path(topic.forum, topic) : (defined?(topic_path) ? topic_path(topic) : '#') rescue '#' %>
                             <%= link_to '表示', target_path,
@@ -103,13 +93,8 @@
                       <% @posts.each do |post| %>
                         <tr>
                           <td class="text-nowrap"><%= post.created_at.strftime('%Y/%m/%d') %></td>
-
-                          <td>
-                            <%= h(truncate(post.content.to_s, length: 80)) %>
-                          </td>
-
+                          <td><%= h(truncate(post.content.to_s, length: 80)) %></td>
                           <td class="d-none d-md-table-cell"><%= h(post.try(:topic).try(:title) || '—') %></td>
-
                           <td class="text-end text-nowrap">
                             <% if post.respond_to?(:topic) && post.topic.present? %>
                               <% target_path = post.topic.respond_to?(:forum) && post.topic.forum.present? ? forum_topic_path(post.topic.forum, post.topic) : (defined?(topic_path) ? topic_path(post.topic) : '#') rescue '#' %>
@@ -152,14 +137,10 @@
                       <% @reviews.each do |review| %>
                         <tr>
                           <td class="text-nowrap"><%= review.created_at.strftime('%Y/%m/%d') %></td>
-
                           <td><%= h(review.platform&.name.presence || '—') %></td>
                           <td><%= h(review.genre&.name.presence || '—') %></td>
-
                           <td><%= h(review.title) %></td>
-
                           <td class="text-nowrap"><%= h(review.play_time.presence || '—') %></td>
-
                           <td class="text-end text-nowrap">
                             <% review_path_target = (defined?(review_path) ? review_path(review) : '#') rescue '#' %>
                             <%= link_to '表示', review_path_target,
@@ -176,6 +157,49 @@
               <% end %>
             </div>
           </div>
+
+          <!-- レビューへのコメント一覧（テーブル形式） -->
+          <div class="card mb-3">
+            <div class="card-header">レビューへのコメント（最近 <%= @review_comments.size %> 件）</div>
+            <div class="card-body p-0">
+              <% if @review_comments.any? %>
+                <div class="table-responsive">
+                  <table class="table mb-0 align-middle">
+                    <thead class="table-light">
+                      <tr>
+                        <th>投稿日</th>
+                        <th>コメントしたレビュー</th>
+                        <th>コメント内容</th>
+                        <th class="text-end" style="width:120px;"></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <% @review_comments.each do |rc| %>
+                        <%# rc.review は controller 側で存在確認済み（joins(:review)） %>
+                        <tr>
+                          <td class="text-nowrap"><%= rc.created_at.strftime('%Y/%m/%d') %></td>
+                          <td>
+                            <%= link_to h(rc.review.title), review_path(rc.review), class: 'text-decoration-none' %>
+                            <div class="small text-muted">
+                              <%= h(rc.review.platform&.name.presence || '未設定') %> /
+                              <%= h(rc.review.genre&.name.presence || '未設定') %>
+                            </div>
+                          </td>
+                          <td><%= h(truncate(rc.comment.to_s, length: 120)) %></td>
+                          <td class="text-end text-nowrap">
+                            <%= link_to '表示', review_path(rc.review), class: 'btn btn-sm btn-outline-primary', aria: { label: "#{rc.review.title} のレビューを表示" } %>
+                          </td>
+                        </tr>
+                      <% end %>
+                    </tbody>
+                  </table>
+                </div>
+              <% else %>
+                <div class="p-3 text-muted">レビューに対するコメントはまだありません。</div>
+              <% end %>
+            </div>
+          </div>
+
         </div>
 
         <div class="mt-3">

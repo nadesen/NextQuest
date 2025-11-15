@@ -67,6 +67,35 @@
           </div>
         </div>
 
+        <!-- コメントセクション: partial を利用 -->
+        <div class="card mb-4">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="mb-0">コメント</h5>
+              <div class="review-comments-counter small text-muted">
+                <%= render 'public/review_comments/counter', review: @review %>
+              </div>
+            </div>
+
+            <div class="review-comments-index mb-3">
+              <%= render 'public/review_comments/index', review: @review %>
+            </div>
+
+            <hr>
+
+            <% if user_signed_in? %>
+              <div>
+                <%= render 'public/review_comments/form', review: @review, review_comment: (@review_comment || ReviewComment.new) %>
+              </div>
+            <% else %>
+              <div class="text-center">
+                <%= link_to 'ログインしてコメントする', new_user_session_path, class: 'btn btn-outline-primary' %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+        <!-- コメントセクション終わり -->
+
         <div class="d-flex justify-content-between">
           <%= link_to '一覧に戻る', reviews_path, class: 'btn btn-outline-secondary' %>
           <% if user_signed_in? %>

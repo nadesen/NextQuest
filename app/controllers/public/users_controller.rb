@@ -4,9 +4,15 @@ class Public::UsersController < ApplicationController
   before_action :authorize_user!, only: [:edit, :update, :destroy]
 
   def show
+    @user = User.find(params[:id])
     @topics = fetch_user_topics(@user.id, limit: 20)
     @posts  = fetch_user_posts(@user.id, limit: 20)
     @reviews = fetch_user_reviews(@user.id, limit: 20)
+    # joins(:review) によって review が存在するコメントのみを取得します。
+    @review_comments = @user.review_comments.joins(:review)
+                            .includes(:review)
+                            .order(created_at: :desc)
+                            .limit(10)
   end
 
   def edit; end

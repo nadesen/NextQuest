@@ -1,0 +1,5 @@
+<%# render partial with locals: review: @review, review_comment: @review_comment %>
+<%= form_with(model: [review, review_comment], local: false) do |f| %>
+  <%= f.text_area :comment, rows: 5, placeholder: "ここにコメントを記載", class: "w-100 comment-textarea" %>
+  <%= f.submit "送信する", class: "btn btn-md btn-outline-primary mt-2 pull-right" %>
+<% end %>
