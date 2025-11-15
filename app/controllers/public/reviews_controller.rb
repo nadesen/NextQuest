@@ -9,6 +9,8 @@ class Public::ReviewsController < ApplicationController
 
   def show
     # @review は set_review でセット
+    @review = Review.find(params[:id])
+    @review_comment = ReviewComment.new
   end
 
   def new
