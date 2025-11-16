@@ -75,6 +75,7 @@ Rails.application.routes.draw do
     resources :topics, only: [:index, :show, :update, :destroy]
     resources :posts, only: [:index, :show, :update, :destroy]
     resources :actions, only: [:create] # admin actions / audit log
+    resources :reviews, only: [:index, :show, :update, :destroy]
   end
 
   # ActionCable

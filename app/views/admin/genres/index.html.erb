@@ -1,0 +1,45 @@
+<div class="container mt-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="h4 mb-0">ジャンル一覧</h2>
+      <div class="text-muted">ジャンルの作成・編集・削除</div>
+    </div>
+    <div>
+      <%= link_to '新規作成', new_admin_genre_path, class: 'btn btn-primary me-2' %>
+      <%= link_to '戻る: 管理ダッシュボード', admin_root_path, class: 'btn btn-outline-secondary' %>
+    </div>
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>#</th>
+              <th>名前</th>
+              <th class="text-end">操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @genres.each do |genre| %>
+              <tr>
+                <td><%= genre.id %></td>
+                <td><%= genre.name %></td>
+                <td class="text-end">
+                  <%= link_to '編集', edit_admin_genre_path(genre), class: 'btn btn-sm btn-outline-secondary me-2' %>
+                  <%= link_to '削除', admin_genre_path(genre), method: :delete, data: { confirm: '削除しますか？' }, class: 'btn btn-sm btn-danger' %>
+                </td>
+              </tr>
+            <% end %>
+            <% if @genres.empty? %>
+              <tr>
+                <td colspan="3" class="text-center text-muted py-4">ジャンルが見つかりません。</td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

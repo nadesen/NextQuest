@@ -18,50 +18,89 @@
       <!-- 右: ナビリンク -->
       <div class="collapse navbar-collapse" id="mainNavbar">
         <ul class="navbar-nav ms-auto align-items-lg-center">
-          <%# 未ログイン時 %>
-          <% unless user_signed_in? %>
+
+          <%# 管理者がサインインしている場合のナビ（優先表示） %>
+          <% if defined?(admin_signed_in?) && admin_signed_in? %>
+
             <li class="nav-item">
-              <%= link_to '新規登録', new_user_registration_path, class: 'nav-link' %>
+              <%= link_to 'ダッシュボード', admin_root_path, class: 'nav-link' %>
             </li>
+
             <li class="nav-item">
-              <%= link_to 'ログイン', new_user_session_path, class: 'nav-link' %>
+              <%= link_to 'ユーザー一覧', admin_users_path, class: 'nav-link' %>
             </li>
+
             <li class="nav-item">
-              <%# POST のため method: :post を付けています。button_to を使いたい場合は置き換えてください。 %>
-              <%= link_to 'ゲストログイン', guest_sign_in_users_path, method: :post, class: 'nav-link', data: { turbo: false } %>
+              <%= link_to 'コミュニティ一覧', admin_forums_path, class: 'nav-link' %>
             </li>
+
+            <li class="nav-item">
+              <%# admin_reviews_path が未定義の場合はリンク先を無効表示にするためのフォールバック %>
+              <% if respond_to?(:admin_reviews_path) %>
+                <%= link_to 'レビュー一覧', admin_reviews_path, class: 'nav-link' %>
+              <% else %>
+                <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">レビュー一覧</a>
+              <% end %>
+            </li>
+
+            <li class="nav-item">
+              <%= link_to 'プラットフォーム一覧', admin_platforms_path, class: 'nav-link' %>
+            </li>
+
+            <li class="nav-item">
+              <%= link_to 'ジャンル一覧', admin_genres_path, class: 'nav-link' %>
+            </li>
+
+            <li class="nav-item">
+              <%= button_to 'ログアウト', destroy_admin_session_path, method: :delete, class: 'nav-link btn btn-link p-0', form: { class: 'd-inline' } %>
+            </li>
+
           <% else %>
-            <%# ログイン中（ゲストか通常ユーザーかを分岐） %>
-            <% is_guest = current_user.respond_to?(:guest?) ? current_user.guest? : false %>
-            <% if is_guest %>
+            <%# 未ログイン時 / ユーザーサインイン時の既存ナビ %>
+            <% unless user_signed_in? %>
               <li class="nav-item">
-                <%= link_to 'コミュニティ一覧', forums_path, class: 'nav-link' %>
+                <%= link_to '新規登録', new_user_registration_path, class: 'nav-link' %>
               </li>
               <li class="nav-item">
-                <%= link_to 'レビュー一覧', reviews_path, class: 'nav-link' %>
+                <%= link_to 'ログイン', new_user_session_path, class: 'nav-link' %>
               </li>
               <li class="nav-item">
-                <%= button_to 'ログアウト', destroy_user_session_path, method: :delete, class: 'nav-link btn btn-link p-0', form: { class: 'd-inline' } %>
+                <%# POST のため method: :post を付けています。button_to を使いたい場合は置き換えてください。 %>
+                <%= link_to 'ゲストログイン', guest_sign_in_users_path, method: :post, class: 'nav-link', data: { turbo: false } %>
               </li>
             <% else %>
-              <li class="nav-item">
-                <%= link_to 'マイページ', user_path(current_user), class: 'nav-link' %>
-              </li>
-              <li class="nav-item">
-                <%= link_to 'コミュニティ一覧', forums_path, class: 'nav-link' %>
-              </li>
-              <li class="nav-item">
-                <%= link_to '新規コミュニティ作成', new_topic_path, class: 'nav-link' %>
-              </li>
-              <li class="nav-item">
-                <%= link_to 'レビュー一覧', reviews_path, class: 'nav-link' %>
-              </li>
-              <li class="nav-item">
-                <%= link_to '新規レビュー作成', new_review_path, class: 'nav-link' %>
-              </li>
-              <li class="nav-item">
-                <%= button_to 'ログアウト', destroy_user_session_path, method: :delete, class: 'nav-link btn btn-link p-0', form: { class: 'd-inline' } %>
-              </li>
+              <%# ログイン中（ゲストか通常ユーザーかを分岐） %>
+              <% is_guest = current_user.respond_to?(:guest?) ? current_user.guest? : false %>
+              <% if is_guest %>
+                <li class="nav-item">
+                  <%= link_to 'コミュニティ一覧', forums_path, class: 'nav-link' %>
+                </li>
+                <li class="nav-item">
+                  <%= link_to 'レビュー一覧', reviews_path, class: 'nav-link' %>
+                </li>
+                <li class="nav-item">
+                  <%= button_to 'ログアウト', destroy_user_session_path, method: :delete, class: 'nav-link btn btn-link p-0', form: { class: 'd-inline' } %>
+                </li>
+              <% else %>
+                <li class="nav-item">
+                  <%= link_to 'マイページ', user_path(current_user), class: 'nav-link' %>
+                </li>
+                <li class="nav-item">
+                  <%= link_to 'コミュニティ一覧', forums_path, class: 'nav-link' %>
+                </li>
+                <li class="nav-item">
+                  <%= link_to '新規コミュニティ作成', new_topic_path, class: 'nav-link' %>
+                </li>
+                <li class="nav-item">
+                  <%= link_to 'レビュー一覧', reviews_path, class: 'nav-link' %>
+                </li>
+                <li class="nav-item">
+                  <%= link_to '新規レビュー作成', new_review_path, class: 'nav-link' %>
+                </li>
+                <li class="nav-item">
+                  <%= button_to 'ログアウト', destroy_user_session_path, method: :delete, class: 'nav-link btn btn-link p-0', form: { class: 'd-inline' } %>
+                </li>
+              <% end %>
             <% end %>
           <% end %>
         </ul>

@@ -6,6 +6,17 @@ class User < ApplicationRecord
   validates :name, presence: true, length: { maximum: 30 }
   validates :nickname, presence: true, length: { maximum: 50 }
 
+  # suspended が true の場合はログイン不可にする
+  def active_for_authentication?
+    super && !suspended?
+  end
+
+  # ログイン不可（active_for_authentication? が false）の理由を返す
+  # :suspended を返すと Devise は devise.failure.suspended の i18n を使います
+  def inactive_message
+    suspended? ? :suspended : super
+  end
+
   # 検索メソッド（searches_controller から呼び出す）
   # content: 検索語
   # method: 'perfect' | 'forward' | 'backward' | 'partial'

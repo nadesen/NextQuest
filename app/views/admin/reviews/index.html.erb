@@ -1,0 +1,52 @@
+<div class="container mt-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="h4 mb-0">レビュー一覧</h2>
+      <div class="text-muted">ユーザー投稿レビューの管理</div>
+    </div>
+    <div>
+      <%= link_to '戻る: 管理ダッシュボード', admin_root_path, class: 'btn btn-outline-secondary' %>
+    </div>
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>#</th>
+              <th>タイトル</th>
+              <th>ユーザー</th>
+              <th>プラットフォーム</th>
+              <th>ジャンル</th>
+              <th>評価</th>
+              <th class="text-end">操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @reviews.each do |review| %>
+              <tr>
+                <td><%= review.id %></td>
+                <td><%= truncate(review.title, length: 50) %></td>
+                <td><%= review.user&.nickname.presence || "User##{review.user_id}" %></td>
+                <td><%= review.platform&.name %></td>
+                <td><%= review.genre&.name %></td>
+                <td><%= review.rating %></td>
+                <td class="text-end">
+                  <%= link_to '表示', admin_review_path(review), class: 'btn btn-sm btn-outline-primary me-2' %>
+                  <%= link_to '削除', admin_review_path(review), method: :delete, data: { confirm: 'レビューを削除しますか？' }, class: 'btn btn-sm btn-danger' %>
+                </td>
+              </tr>
+            <% end %>
+            <% if @reviews.empty? %>
+              <tr>
+                <td colspan="7" class="text-center text-muted py-4">レビューが見つかりません。</td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

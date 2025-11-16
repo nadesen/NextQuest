@@ -19,3 +19,4 @@ ja:
         unauthenticated: 'ログインしてください。'
       invalid: '認証に失敗しました。'
       not_found_in_database: 'アカウントが見つかりません。'
+      suspended: "あなたのアカウントは停止されています。管理者にお問い合わせください。"

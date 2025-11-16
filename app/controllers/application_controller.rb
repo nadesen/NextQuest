@@ -1,6 +1,9 @@
 class ApplicationController < ActionController::Base
-  before_action :authenticate_user!, except: [:top]
+  before_action :authenticate_user!, except: [:top], unless: :skip_user_authentication?
   before_action :configure_permitted_parameters, if: :devise_controller?
+
+  # ログイン中ユーザーが 停止中(suspended) なら強制ログアウトしてサインイン画面へ
+  before_action :sign_out_suspended_user
 
   def after_sign_out_path_for(resource_or_scope)
     root_path
@@ -14,6 +17,19 @@ class ApplicationController < ActionController::Base
   end
 
   private
+
+  def sign_out_suspended_user
+    return unless user_signed_in?
+    return unless current_user.suspended?
+
+    # sign_out してフラッシュを出し、サインインページへ
+    sign_out(current_user)
+    redirect_to new_user_session_path, alert: 'アカウントは停止されています。管理者にお問い合わせください。'
+  end
+
+  def skip_user_authentication?
+    devise_controller? || controller_path.start_with?('admin/')
+  end
 
   # 汎用のログイン必須フィルタ（必要なコントローラで before_action :require_login を使う）
   def require_login

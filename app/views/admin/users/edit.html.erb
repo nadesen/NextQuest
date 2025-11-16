@@ -1,0 +1,89 @@
+<div class="container mt-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="h4 mb-0">ユーザー編集</h2>
+      <div class="text-muted">ID: <%= @user.id %> の情報を編集します</div>
+    </div>
+    <div>
+      <%= link_to '一覧に戻る', admin_users_path, class: 'btn btn-outline-secondary' %>
+    </div>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <%= form_with(model: [:admin, @user], local: true) do |f| %>
+            <div class="mb-3 row">
+              <label class="col-sm-3 col-form-label">名前</label>
+              <div class="col-sm-9">
+                <%= f.text_field :name, class: 'form-control' %>
+              </div>
+            </div>
+
+            <div class="mb-3 row">
+              <label class="col-sm-3 col-form-label">ニックネーム</label>
+              <div class="col-sm-9">
+                <%= f.text_field :nickname, class: 'form-control' %>
+              </div>
+            </div>
+
+            <div class="mb-3 row">
+              <label class="col-sm-3 col-form-label">メール</label>
+              <div class="col-sm-9">
+                <%= f.email_field :email, class: 'form-control' %>
+              </div>
+            </div>
+
+            <div class="mb-3 row">
+              <label class="col-sm-3 col-form-label">プロフィール</label>
+              <div class="col-sm-9">
+                <%= f.text_area :profile_text, rows: 5, class: 'form-control' %>
+              </div>
+            </div>
+
+            <div class="mb-3 row align-items-center">
+              <label class="col-sm-3 col-form-label">停止フラグ</label>
+              <div class="col-sm-9 d-flex align-items-center gap-3">
+                <div class="form-check">
+                  <%= f.check_box :suspended, class: 'form-check-input', id: 'user_suspended' %>
+                  <%= f.label :suspended, '停止に設定 (チェックで停止)', class: 'form-check-label' %>
+                </div>
+                <% if @user.suspended? %>
+                  <span class="badge bg-danger">現在：停止中</span>
+                <% else %>
+                  <span class="badge bg-success">現在：有効</span>
+                <% end %>
+              </div>
+            </div>
+
+            <div class="mt-4 d-flex justify-content-end gap-2">
+              <%= f.submit '更新する', class: 'btn btn-primary' %>
+              <%= link_to 'キャンセル', admin_user_path(@user), class: 'btn btn-outline-secondary' %>
+            </div>
+          <% end %>
+
+          <hr class="my-4" />
+
+          <div class="d-flex gap-2">
+            <% if @user.suspended? %>
+              <%= button_to '強制解除 (即時有効化)', admin_user_path(@user),
+                    method: :patch,
+                    params: { user: { suspended: false } },
+                    class: 'btn btn-warning',
+                    data: { confirm: 'ユーザーを即時有効化します。よろしいですか？' } %>
+            <% else %>
+              <%= button_to '強制停止 (即時無効化)', admin_user_path(@user),
+                    method: :patch,
+                    params: { user: { suspended: true } },
+                    class: 'btn btn-danger',
+                    data: { confirm: 'ユーザーを即時停止します。本当に続けますか？' } %>
+            <% end %>
+
+            <%= link_to '削除', admin_user_path(@user), method: :delete, data: { confirm: 'このユーザーを削除しますか？' }, class: 'btn btn-outline-danger' %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
