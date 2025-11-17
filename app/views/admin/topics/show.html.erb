@@ -1,0 +1,102 @@
+<div class="container mt-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="h4 mb-0"><%= h(@topic.title) %></h1>
+      <div class="text-muted">トピックID: <%= @topic.id %> ・ フォーラム: <%= @topic.forum&.title || 'N/A' %></div>
+    </div>
+    <div>
+      <%= link_to 'トピック一覧へ戻る', admin_topics_path, class: 'btn btn-outline-secondary me-2' %>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="card shadow-sm mb-4">
+        <div class="card-body">
+          <% if @topic.description.present? %>
+            <p class="mb-2"><%= simple_format(@topic.description) %></p>
+          <% else %>
+            <p class="text-muted mb-2">説明はありません。</p>
+          <% end %>
+
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="small text-muted">
+              作成者: <%= @topic.creator&.nickname || "User##{@topic.creator_id}" %> ・ 投稿数: <%= @topic.posts_count %> ・ 閲覧数: <%= @topic.views_count %>
+            </div>
+
+            <div class="d-flex align-items-center">
+              <% if @topic.locked? %>
+                <span class="badge bg-danger me-3">ロック中</span>
+                <%= button_to 'ロック解除', admin_topic_path(@topic),
+                      method: :patch,
+                      params: { topic: { locked: false } },
+                      class: 'btn btn-sm btn-outline-success me-2',
+                      data: { confirm: 'このトピックのロックを解除しますか？' } %>
+              <% else %>
+                <span class="badge bg-success me-3">公開中</span>
+                <%= button_to 'ロックする', admin_topic_path(@topic),
+                      method: :patch,
+                      params: { topic: { locked: true } },
+                      class: 'btn btn-sm btn-outline-warning me-2',
+                      data: { confirm: 'このトピックをロック（投稿禁止）にしますか？' } %>
+              <% end %>
+
+              <%= link_to '削除', admin_topic_path(@topic), method: :delete,
+                    data: { confirm: 'このトピックを削除しますか？' },
+                    class: 'btn btn-sm btn-danger' %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <%# 投稿一覧 %>
+      <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <strong class="mb-0">投稿一覧</strong>
+          <small class="text-muted">全 <%= @posts.size %> 件</small>
+        </div>
+
+        <div class="card-body p-0">
+          <% if @posts.any? %>
+            <div class="list-group list-group-flush">
+              <% @posts.each do |post| %>
+                <%= render partial: 'post', locals: { post: post } %>
+              <% end %>
+            </div>
+          <% else %>
+            <div class="p-4 text-center text-muted">投稿がありません。</div>
+          <% end %>
+        </div>
+
+        <%# 必要ならページネーションを下に表示 %>
+        <div class="card-footer text-center">
+          <%# paginate(@posts) を入れる場合はコントローラでページネーションを有効にしてください %>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="card shadow-sm mb-3">
+        <div class="card-body">
+          <h6 class="mb-2">フォーラム</h6>
+          <% if @topic.forum.present? %>
+            <p class="mb-1"><%= link_to @topic.forum.title, admin_forum_path(@topic.forum), class: 'text-decoration-none' %></p>
+            <p class="text-muted small mb-0">ID: <%= @topic.forum.id %></p>
+          <% else %>
+            <p class="text-muted small mb-0">関連フォーラムがありません。</p>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h6 class="mb-2">管理アクション</h6>
+          <div class="d-grid gap-2">
+            <%= link_to 'フォーラム一覧へ', admin_forums_path, class: 'btn btn-outline-secondary' %>
+            <%= link_to 'トピック一覧へ', admin_topics_path(forum_id: @topic.forum_id), class: 'btn btn-outline-secondary' %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

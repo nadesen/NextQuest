@@ -1,0 +1,84 @@
+<div class="container mt-5">
+  <div class="row justify-content-between align-items-center mb-4">
+    <div class="col-auto">
+      <h1 class="h3 mb-0">管理者ダッシュボード</h1>
+      <div class="text-muted">管理者用の操作パネルです</div>
+    </div>
+    <div class="col-auto">
+      <% if admin_signed_in? %>
+        <div class="d-flex align-items-center">
+          <%= link_to "ログアウト", destroy_admin_session_path, method: :delete, data: { confirm: "ログアウトしますか？" }, class: "btn btn-outline-secondary btn-sm" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="row g-3">
+    <!-- ユーザー一覧 -->
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title">ユーザー管理</h5>
+          <p class="card-text text-muted">登録ユーザーの一覧・編集・削除を行います。</p>
+          <div class="mt-auto">
+            <%= link_to "ユーザー一覧", admin_users_path, class: "btn btn-primary w-100" %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- コミュニティ一覧（forums） -->
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title">コミュニティ（フォーラム）管理</h5>
+          <p class="card-text text-muted">フォーラム・トピック・ポストの管理を行います。</p>
+          <div class="mt-auto">
+            <%= link_to "コミュニティ一覧", admin_forums_path, class: "btn btn-primary w-100" %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- レビュー一覧 -->
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title">レビュー管理</h5>
+          <p class="card-text text-muted">レビューの一覧やモデレーションを行います。</p>
+          <div class="mt-auto">
+            <%# routes に admin_reviews_path が存在しない場合は、管理用レビュー一覧用のルート/コントローラを追加してください %>
+            <%= link_to "レビュー一覧", (defined?(admin_reviews_path) ? admin_reviews_path : '#'), class: "btn btn-primary w-100" %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- プラットフォーム一覧 -->
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title">プラットフォーム管理</h5>
+          <p class="card-text text-muted">プラットフォームの作成・編集・削除を行います。</p>
+          <div class="mt-auto">
+            <%= link_to "プラットフォーム一覧", admin_platforms_path, class: "btn btn-primary w-100" %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ジャンル一覧 -->
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title">ジャンル管理</h5>
+          <p class="card-text text-muted">ジャンルの作成・編集・削除を行います。</p>
+          <div class="mt-auto">
+            <%= link_to "ジャンル一覧", admin_genres_path, class: "btn btn-primary w-100" %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

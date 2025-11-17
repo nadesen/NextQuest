@@ -1,0 +1,36 @@
+<div class="container mt-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="h4 mb-0">フォーラム編集</h1>
+      <div class="text-muted">ID: <%= @forum.id %> を編集します</div>
+    </div>
+    <div>
+      <%= link_to '一覧に戻る', admin_forums_path, class: 'btn btn-outline-secondary' %>
+    </div>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <%= form_with(model: [:admin, @forum], local: true) do |f| %>
+            <%= render 'form', form: f, forum: @forum %>
+
+            <div class="d-flex justify-content-end gap-2 mt-4">
+              <%= f.submit '更新する', class: 'btn btn-primary' %>
+              <%= link_to 'キャンセル', admin_forums_path, class: 'btn btn-outline-secondary' %>
+            </div>
+          <% end %>
+
+          <hr class="my-4" />
+
+          <div class="d-flex">
+            <%= link_to '削除', admin_forum_path(@forum), method: :delete,
+                        data: { confirm: 'このフォーラムを削除します。よろしいですか？' },
+                        class: 'btn btn-outline-danger' %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

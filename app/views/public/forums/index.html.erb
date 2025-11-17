@@ -29,7 +29,7 @@
                 </td>
 
                 <td class="align-middle text-end">
-                  <span class="badge bg-secondary"><%= forum.topics_count.to_i %></span>
+                  <span class="badge bg-secondary"><%= h(forum.actual_topics_count) %></span>
                 </td>
               </tr>
             <% end %>

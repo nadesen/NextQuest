@@ -1,0 +1,50 @@
+<div class="container mt-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="h4 mb-0">コミュニティ一覧（フォーラム）</h2>
+      <div class="text-muted">フォーラムの管理</div>
+    </div>
+    <div>
+      <%= link_to '新規作成', new_admin_forum_path, class: 'btn btn-primary me-2' %>
+      <%= link_to '戻る: 管理ダッシュボード', admin_root_path, class: 'btn btn-outline-secondary' %>
+    </div>
+  </div>
+
+  <div class="row g-3">
+    <% @forums.each do |forum| %>
+      <div class="col-12">
+        <div class="card shadow-sm">
+          <div class="card-body d-flex justify-content-between align-items-start">
+            <div>
+              <h5 class="mb-1"><%= forum.title %></h5>
+              <p class="mb-1 text-muted"><%= truncate(forum.description, length: 120) if forum.description.present? %></p>
+              <small class="text-muted">ID: <%= forum.id %> ・ トピック: <%= h(forum.actual_topics_count) %> ・ 投稿: <%= forum.posts_count %></small>
+            </div>
+            <div class="text-end">
+              <%# 追加：各フォーラムのトピック一覧へ（edit の左） %>
+              <%= link_to 'トピック一覧', admin_topics_path(forum_id: forum.id),
+                    class: 'btn btn-sm btn-outline-primary me-2' %>
+
+              <%= link_to '編集', edit_admin_forum_path(forum), class: 'btn btn-sm btn-outline-secondary me-2' %>
+              <%= link_to '削除', admin_forum_path(forum), method: :delete, data: { confirm: 'このフォーラムを削除しますか？' }, class: 'btn btn-sm btn-danger' %>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <% if @forums.empty? %>
+      <div class="col-12">
+        <div class="card shadow-sm">
+          <div class="card-body text-center text-muted">フォーラムが見つかりません。</div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="d-flex justify-content-center mt-3">
+    <!-- 下部ページネーション -->
+    <%= paginate @users, theme: 'bootstrap4' %>
+  </div>
+
+</div>
