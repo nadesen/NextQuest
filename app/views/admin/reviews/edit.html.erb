@@ -1,0 +1,58 @@
+<div class="container mt-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="h4 mb-0">レビュー編集</h1>
+      <div class="text-muted">レビューID: <%= @review.id %></div>
+    </div>
+    <div>
+      <%= link_to '一覧に戻る', admin_reviews_path, class: 'btn btn-outline-secondary me-2' %>
+      <%= link_to '表示', admin_review_path(@review), class: 'btn btn-outline-primary' %>
+    </div>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="mb-3 d-flex justify-content-between align-items-center">
+            <div>
+              <% if @review.approved? %>
+                <span class="badge bg-success">承認済み</span>
+              <% else %>
+                <span class="badge bg-warning text-dark">未承認</span>
+              <% end %>
+            </div>
+
+            <div>
+              <%# 承認切替ボタン（即時反映） %>
+              <% if @review.approved? %>
+                <%= button_to '承認を取り消す', admin_review_path(@review),
+                      method: :patch,
+                      params: { review: { approved: false } },
+                      class: 'btn btn-sm btn-outline-warning me-2',
+                      data: { confirm: 'このレビューの承認を取り消しますか？' } %>
+              <% else %>
+                <%= button_to '承認する', admin_review_path(@review),
+                      method: :patch,
+                      params: { review: { approved: true } },
+                      class: 'btn btn-sm btn-success me-2',
+                      data: { confirm: 'このレビューを承認しますか？' } %>
+              <% end %>
+
+              <%= link_to '削除', admin_review_path(@review), method: :delete, data: { confirm: 'レビューを削除しますか？' }, class: 'btn btn-sm btn-danger' %>
+            </div>
+          </div>
+
+          <%= form_with(model: [:admin, @review], local: true) do |f| %>
+            <%= render 'form', form: f, review: @review %>
+
+            <div class="d-flex justify-content-end gap-2 mt-3">
+              <%= f.submit '更新する', class: 'btn btn-primary' %>
+              <%= link_to 'キャンセル', admin_review_path(@review), class: 'btn btn-outline-secondary' %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

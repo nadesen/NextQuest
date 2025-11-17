@@ -5,19 +5,46 @@
       <div class="text-muted">レビューID: <%= @review.id %></div>
     </div>
     <div>
-      <%= link_to '一覧へ戻る', admin_reviews_path, class: 'btn btn-outline-secondary' %>
+      <%= link_to '一覧へ戻る', admin_reviews_path, class: 'btn btn-outline-secondary me-2' %>
+      <%= link_to '編集', edit_admin_review_path(@review), class: 'btn btn-outline-primary' %>
     </div>
   </div>
 
   <div class="card shadow-sm">
     <div class="card-body">
-      <h5 class="mb-2"><%= @review.title %></h5>
-      <p class="text-muted mb-2">投稿者: <%= @review.user&.nickname || @review.user_id %> ・ 評価: <%= @review.rating %></p>
+      <div class="d-flex justify-content-between align-items-start mb-3">
+        <div>
+          <h5 class="mb-2"><%= @review.title %></h5>
+          <p class="text-muted mb-2">投稿者: <%= @review.user&.nickname || @review.user_id %> ・ 評価: <%= @review.rating %></p>
+        </div>
+        <div class="text-end">
+          <% if @review.approved? %>
+            <span class="badge bg-success">承認済み</span>
+          <% else %>
+            <span class="badge bg-warning text-dark">未承認</span>
+          <% end %>
+        </div>
+      </div>
+
       <p><%= simple_format(@review.content) %></p>
 
-      <div class="mt-4">
+      <div class="mt-4 d-flex gap-2">
+        <%# 承認切替ボタンを show にも追加 %>
+        <% if @review.approved? %>
+          <%= button_to '承認取り消し', admin_review_path(@review),
+                method: :patch,
+                params: { review: { approved: false } },
+                class: 'btn btn-warning',
+                data: { confirm: 'このレビューの承認を取り消しますか？' } %>
+        <% else %>
+          <%= button_to '承認する', admin_review_path(@review),
+                method: :patch,
+                params: { review: { approved: true } },
+                class: 'btn btn-success',
+                data: { confirm: 'このレビューを承認しますか？' } %>
+        <% end %>
+
         <%= link_to '削除', admin_review_path(@review), method: :delete, data: { confirm: 'このレビューを削除しますか？' }, class: 'btn btn-danger' %>
-        <%= link_to '編集（必要なら実装）', '#', class: 'btn btn-outline-secondary ms-2 disabled' %>
       </div>
     </div>
   </div>

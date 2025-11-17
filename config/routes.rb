@@ -71,11 +71,11 @@ Rails.application.routes.draw do
     resources :users, only: [:index, :show, :edit, :update, :destroy]
     resources :platforms, only: [:index, :new, :create, :edit, :update, :destroy]
     resources :genres, only: [:index, :new, :create, :edit, :update, :destroy]
-    resources :forums, only: [:index, :edit, :update, :destroy]
+    resources :forums, only: [:index, :new, :create, :edit, :update, :destroy]
     resources :topics, only: [:index, :show, :update, :destroy]
     resources :posts, only: [:index, :show, :update, :destroy]
     resources :actions, only: [:create] # admin actions / audit log
-    resources :reviews, only: [:index, :show, :update, :destroy]
+    resources :reviews, only: [:index, :show, :edit, :update, :destroy]
   end
 
   # ActionCable

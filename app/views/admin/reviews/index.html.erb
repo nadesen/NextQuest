@@ -21,7 +21,8 @@
               <th>プラットフォーム</th>
               <th>ジャンル</th>
               <th>評価</th>
-              <th class="text-end">操作</th>
+              <th>状態</th>
+              <th class="text-end">操作<br>(承認切替のみ、機能未実装)</th>
             </tr>
           </thead>
           <tbody>
@@ -33,7 +34,29 @@
                 <td><%= review.platform&.name %></td>
                 <td><%= review.genre&.name %></td>
                 <td><%= review.rating %></td>
+                <td>
+                  <% if review.approved? %>
+                    <span class="badge bg-success">承認済み</span>
+                  <% else %>
+                    <span class="badge bg-warning text-dark">未承認</span>
+                  <% end %>
+                </td>
                 <td class="text-end">
+                  <%# 承認切替ボタン %>
+                  <% if review.approved? %>
+                    <%= button_to '承認取り消し', admin_review_path(review),
+                          method: :patch,
+                          params: { review: { approved: false } },
+                          class: 'btn btn-sm btn-outline-warning me-2',
+                          data: { confirm: 'このレビューの承認を取り消しますか？' } %>
+                  <% else %>
+                    <%= button_to '承認する', admin_review_path(review),
+                          method: :patch,
+                          params: { review: { approved: true } },
+                          class: 'btn btn-sm btn-success me-2',
+                          data: { confirm: 'このレビューを承認しますか？' } %>
+                  <% end %>
+
                   <%= link_to '表示', admin_review_path(review), class: 'btn btn-sm btn-outline-primary me-2' %>
                   <%= link_to '削除', admin_review_path(review), method: :delete, data: { confirm: 'レビューを削除しますか？' }, class: 'btn btn-sm btn-danger' %>
                 </td>
@@ -41,7 +64,7 @@
             <% end %>
             <% if @reviews.empty? %>
               <tr>
-                <td colspan="7" class="text-center text-muted py-4">レビューが見つかりません。</td>
+                <td colspan="8" class="text-center text-muted py-4">レビューが見つかりません。</td>
               </tr>
             <% end %>
           </tbody>
@@ -49,4 +72,10 @@
       </div>
     </div>
   </div>
+
+  <div class="d-flex justify-content-center mt-3">
+    <!-- 下部ページネーション -->
+    <%= paginate @users, theme: 'bootstrap4' %>
+  </div>
+
 </div>

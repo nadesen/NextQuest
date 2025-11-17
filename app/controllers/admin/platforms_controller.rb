@@ -3,7 +3,7 @@ class Admin::PlatformsController < ApplicationController
   before_action :set_platform, only: [:edit, :update, :destroy]
 
   def index
-    @platforms = Platform.order(:name)
+    @platforms = Platform.order(id: :asc).page(params[:page]).per(20)
   end
 
   def new

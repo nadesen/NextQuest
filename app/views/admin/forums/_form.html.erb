@@ -1,0 +1,38 @@
+<%# 共通フォーム（new と edit で使用） %>
+<% if defined?(forum) && forum.errors.any? %>
+  <div class="alert alert-danger">
+    <h6 class="mb-2">入力に問題があります。以下を確認してください：</h6>
+    <ul class="mb-0">
+      <% forum.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<div class="mb-3">
+  <%= form.label :title, 'タイトル', class: 'form-label' %>
+  <%= form.text_field :title, class: 'form-control', required: true, maxlength: 255 %>
+</div>
+
+<div class="mb-3">
+  <%= form.label :description, '説明', class: 'form-label' %>
+  <%= form.text_area :description, class: 'form-control', rows: 6 %>
+  <div class="form-text">フォーラムの説明（省略可）。HTMLは無効化されます。</div>
+</div>
+
+<div class="row mb-3">
+  <div class="col-md-6">
+    <div class="form-check">
+      <%= form.check_box :public, class: 'form-check-input', id: 'forum_public' %>
+      <%= form.label :public, '公開する', class: 'form-check-label', for: 'forum_public' %>
+      <div class="form-text">チェックが入っていると一般公開されます。</div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <%= form.label :position, '表示順（position）', class: 'form-label' %>
+    <%= form.number_field :position, class: 'form-control', min: 0 %>
+    <div class="form-text">小さい値が上位に表示されます（数値が小さいほど先頭）。</div>
+  </div>
+</div>

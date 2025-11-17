@@ -1,0 +1,36 @@
+<div class="container mt-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="h4 mb-0">ジャンル編集</h1>
+      <div class="text-muted">ID: <%= @genre.id %> を編集します</div>
+    </div>
+    <div>
+      <%= link_to '一覧に戻る', admin_genres_path, class: 'btn btn-outline-secondary' %>
+    </div>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-lg-6">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <%= form_with(model: [:admin, @genre], local: true) do |f| %>
+            <%= render 'form', form: f, genre: @genre %>
+
+            <div class="d-flex justify-content-end gap-2 mt-4">
+              <%= f.submit '更新する', class: 'btn btn-primary' %>
+              <%= link_to 'キャンセル', admin_genres_path, class: 'btn btn-outline-secondary' %>
+            </div>
+          <% end %>
+
+          <hr class="my-4" />
+
+          <div class="d-flex">
+            <%= link_to '削除', admin_genre_path(@genre), method: :delete,
+                        data: { confirm: 'このジャンルを削除します。よろしいですか？' },
+                        class: 'btn btn-outline-danger' %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

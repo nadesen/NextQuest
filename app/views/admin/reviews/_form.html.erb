@@ -1,0 +1,51 @@
+<%# 共通フォーム（edit に使う） %>
+<% if review.errors.any? %>
+  <div class="alert alert-danger">
+    <h6 class="mb-2">入力に問題があります。以下を確認してください：</h6>
+    <ul class="mb-0">
+      <% review.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<div class="mb-3">
+  <%= form.label :title, 'タイトル', class: 'form-label' %>
+  <%= form.text_field :title, class: 'form-control', required: true %>
+</div>
+
+<div class="row g-3">
+  <div class="col-md-4">
+    <div class="mb-3">
+      <%= form.label :rating, '評価', class: 'form-label' %>
+      <%= form.select :rating, options_for_select((1..5).to_a.reverse.map { |i| [ "#{i} / 5", i ] }, review.rating), {}, class: 'form-select' %>
+      <div class="form-text">1 が最低、5 が最高です。</div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="mb-3">
+      <%= form.label :platform_id, 'プラットフォーム', class: 'form-label' %>
+      <%= form.select :platform_id, options_from_collection_for_select(@platforms, :id, :name, review.platform_id), { include_blank: '選択してください' }, class: 'form-select' %>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="mb-3">
+      <%= form.label :genre_id, 'ジャンル', class: 'form-label' %>
+      <%= form.select :genre_id, options_from_collection_for_select(@genres, :id, :name, review.genre_id), { include_blank: '選択してください' }, class: 'form-select' %>
+    </div>
+  </div>
+</div>
+
+<div class="mb-3">
+  <%= form.label :play_time, 'プレイ時間（分）', class: 'form-label' %>
+  <%= form.number_field :play_time, class: 'form-control', min: 0 %>
+</div>
+
+<div class="mb-3">
+  <%= form.label :content, 'レビュー本文', class: 'form-label' %>
+  <%= form.text_area :content, class: 'form-control', rows: 10, required: true %>
+  <div class="form-text">最大 2000 文字程度</div>
+</div>

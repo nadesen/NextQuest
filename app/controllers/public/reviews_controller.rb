@@ -74,7 +74,7 @@ class Public::ReviewsController < ApplicationController
   end
 
   def load_selects
-    @platforms = Platform.all.order(:name)
+    @platforms = Platform.all.order(id: :asc)
     @genres = Genre.all.order(:name)
   end
 end

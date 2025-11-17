@@ -1,0 +1,17 @@
+<%# 共通フォーム（new と edit で使用） %>
+<% if platform.errors.any? %>
+  <div class="alert alert-danger">
+    <h6 class="mb-2">入力に問題があります。以下を確認してください：</h6>
+    <ul class="mb-0">
+      <% platform.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<div class="mb-3">
+  <%= form.label :name, 'プラットフォーム名', class: 'form-label' %>
+  <%= form.text_field :name, class: 'form-control', required: true, maxlength: 255 %>
+  <div class="form-text">例：PC / PlayStation / Nintendo Switch など</div>
+</div>

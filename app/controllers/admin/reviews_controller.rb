@@ -1,12 +1,25 @@
 class Admin::ReviewsController < ApplicationController
   before_action :authenticate_admin!
-  before_action :set_review, only: [:show, :destroy]
+  before_action :set_review, only: [:show, :edit, :update, :destroy]
+  before_action :load_collections, only: [:edit, :update]
 
   def index
     @reviews = Review.includes(:user, :platform, :genre).order(created_at: :desc).limit(200)
   end
 
   def show; end
+
+  def edit
+  end
+
+  def update
+    if @review.update(review_params)
+      redirect_to admin_review_path(@review), notice: 'レビューを更新しました。'
+    else
+      # load_collections は before_action で呼ばれているので view 用のデータは揃っています
+      render :edit
+    end
+  end
 
   def destroy
     @review.destroy
@@ -17,5 +30,15 @@ class Admin::ReviewsController < ApplicationController
 
   def set_review
     @review = Review.find(params[:id])
+  end
+
+  def load_collections
+    @platforms = Platform.order(:name)
+    @genres = Genre.order(:name)
+  end
+
+  def review_params
+    # 管理画面から編集可能にする属性（approved を必ず許可）
+    params.require(:review).permit(:title, :content, :rating, :play_time, :platform_id, :genre_id, :approved)
   end
 end
