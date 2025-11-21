@@ -3,7 +3,7 @@ class Admin::TopicsController < ApplicationController
   before_action :set_topic, only: [:show, :update, :destroy]
 
   def index
-    @topics = Topic.includes(:forum, :creator).order(created_at: :desc)
+    @topics = Topic.includes(:forum, :creator).order(created_at: :desc).page(params[:page]).per(20)
 
     if params[:forum_id].present?
       @forum = Forum.find_by(id: params[:forum_id])

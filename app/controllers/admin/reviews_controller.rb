@@ -4,7 +4,7 @@ class Admin::ReviewsController < ApplicationController
   before_action :load_collections, only: [:edit, :update]
 
   def index
-    @reviews = Review.includes(:user, :platform, :genre).order(created_at: :desc).limit(200)
+    @reviews = Review.includes(:user, :platform, :genre).order(created_at: :desc).page(params[:page]).per(20)
   end
 
   def show; end
