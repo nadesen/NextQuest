@@ -6,7 +6,7 @@
           <div>
             <h1 class="h4 mb-1"><%= h(@review.title) %></h1>
             <div class="small text-muted">
-              <span class="me-3">投稿日: <%= @review.created_at.strftime('%Y/%m/%d') if @review.created_at %></span>
+              <span class="me-3">投稿日: <%= @review.created_at.in_time_zone(Time.zone).strftime('%Y/%m/%d') if @review.created_at %></span>
               <span class="me-2">プラットフォーム: <%= h(@review.platform&.name.presence || '未設定') %></span>
               <span class="me-2">ジャンル: <%= h(@review.genre&.name.presence || '未設定') %></span>
             </div>
@@ -57,7 +57,7 @@
 
           <div class="card-footer d-flex justify-content-between align-items-center">
             <small class="text-muted">
-              投稿日時: <%= @review.created_at.strftime('%Y/%m/%d %H:%M') if @review.created_at %>
+              投稿日時: <%= @review.created_at.in_time_zone(Time.zone).strftime('%Y/%m/%d %H:%M') if @review.created_at %>
             </small>
             <div>
               <%# いいねボタン（部分テンプレートで差し替え） %>
@@ -68,7 +68,7 @@
           </div>
         </div>
 
-        <!-- 以下、コメントセクション等は既存のまま -->
+        <!-- コメント(post)部分 -->
         <div class="card mb-4">
           <div class="card-body">
             <div class="d-flex justify-content-between align-items-center mb-3">
@@ -95,7 +95,7 @@
             <% end %>
           </div>
         </div>
-        <!-- コメントセクション終わり -->
+        <!-- コメント(post)終わり -->
 
         <div class="d-flex justify-content-between">
           <%= link_to '一覧に戻る', reviews_path, class: 'btn btn-outline-secondary' %>

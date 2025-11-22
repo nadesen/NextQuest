@@ -8,13 +8,17 @@ class  Public::ReviewCommentsController < ApplicationController
 
     if @comment.save
       respond_to do |format|
-        format.js   # create.js.erb を返す
+        format.js   # create.js.erb を返す（成功時）
         format.html { redirect_to review_path(@review), notice: 'コメントを投稿しました' }
       end
     else
       respond_to do |format|
-        format.js { render status: :unprocessable_entity } # create.js.erb 側でエラー処理可
-        format.html { redirect_to review_path(@review), alert: 'コメントを投稿できませんでした' }
+        # 失敗時も create.js.erb をレンダリングする（JS 側で @comment.errors を処理するため）
+        format.js { render :create, status: :unprocessable_entity }
+        format.html do
+          flash[:alert] = @comment.errors.full_messages.join(', ')
+          redirect_to review_path(@review)
+        end
       end
     end
   end

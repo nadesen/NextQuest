@@ -1,0 +1,8 @@
+<%# フォロー/フォロー解除ボタン（ユーザー表示ページ等で render 'public/follows/btn', user: @user のように呼ぶ） %>
+<% if user.present? && user != current_user && user_signed_in? %>
+  <% if current_user.following?(user) %>
+    <%= link_to "フォロー外す", unfollow_user_path(user), method: :delete, class: "btn btn-info" %>
+  <% else %>
+    <%= link_to "フォローする", follow_user_path(user), method: :post, class: "btn btn-success" %>
+  <% end %>
+<% end %>

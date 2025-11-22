@@ -38,7 +38,7 @@
                   <%= link_to review_path(review),
                               class: 'stretched-link text-decoration-none text-reset',
                               aria: { label: "レビュー #{review.title} の詳細を表示" } do %>
-                    <%= review.created_at.strftime('%Y/%m/%d') if review.created_at %>
+                    <%= review.created_at.in_time_zone(Time.zone).strftime('%Y/%m/%d') if review.created_at %>
                   <% end %>
                 </td>
 

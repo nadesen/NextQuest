@@ -1,0 +1,64 @@
+<div class="py-4">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <div>
+        <h2 class="h4 mb-1">フォロー中（<%= @users.try(:size).to_i %> 件）</h2>
+      </div>
+      <div>
+        <%= link_to 'マイページへ戻る', user_path(current_user), class: 'btn btn-outline-secondary' if user_signed_in? && current_user %>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-body p-0">
+        <% if @users.present? && @users.any? %>
+          <div class="table-responsive">
+            <table class="table table-hover mb-0 align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th>ニックネーム</th>
+                  <th>プロフィール</th>
+                  <th class="text-end">操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% @users.each do |user| %>
+                  <tr>
+                    <td class="align-middle position-relative">
+                      <%= link_to user_path(user),
+                                  class: 'stretched-link text-decoration-none',
+                                  aria: { label: "#{user.nickname.presence || user.name} のプロフィールを表示" } do %>
+                        <%= h(user.nickname.presence || user.name.presence || 'ユーザー') %>
+                      <% end %>
+                    </td>
+
+                    <td class="position-relative">
+                      <% if user.respond_to?(:profile_text) && user.profile_text.present? %>
+                        <%= link_to user_path(user),
+                                    class: 'stretched-link text-decoration-none text-reset',
+                                    aria: { label: "#{user.nickname.presence || user.name} のプロフィールを表示（プロフィール本文）" } do %>
+                          <%= h(truncate(user.profile_text, length: 120)) %>
+                        <% end %>
+                      <% else %>
+                        <%= link_to user_path(user), class: 'text-decoration-none' do %>
+                          <span class="text-muted">プロフィール未設定</span>
+                        <% end %>
+                      <% end %>
+                    </td>
+
+                    <td class="text-end">
+                      <%# フォロー/アンフォローボタン（ログイン中かつ自分以外のユーザーに表示） %>
+                      <%= render 'public/follows/btn', user: user %>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        <% else %>
+          <div class="p-3 text-muted">フォロー中のユーザーはいません。</div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

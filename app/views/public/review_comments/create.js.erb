@@ -1,3 +1,22 @@
-$('.comment-textarea').val("");
-$('.review-comments-counter').html("<%= j(render 'public/review_comments/counter', review: @review) %>");
-$('.review-comments-index').html("<%= j(render 'public/review_comments/index', review: @review) %>");
+<% if @comment && @comment.errors.any? %>
+  // バリデーションエラーがある場合（status: 422 でもこのテンプレがレンダリングされる）
+  var errorsHtml = '<div class="alert alert-danger"><ul>';
+  <% @comment.errors.full_messages.each do |msg| %>
+    errorsHtml += '<li><%= j msg %></li>';
+  <% end %>
+  errorsHtml += '</ul></div>';
+
+  $("#comment-errors-<%= @review.id %>").html(errorsHtml);
+
+  // 該当フォームの textarea に is-invalid を付与（視覚的にエラーを示す）
+  $("#new-review-comment-<%= @review.id %> textarea.comment-textarea").addClass("is-invalid");
+<% else %>
+  // 成功時：コメントをリストに追加してフォームをリセット、エラー表示をクリア
+  $('.comment-textarea').val("");
+  $('.review-comments-counter').html("<%= j(render 'public/review_comments/counter', review: @review) %>");
+  $('.review-comments-index').html("<%= j(render 'public/review_comments/index', review: @review) %>");
+
+  // 該当フォームの textarea の is-invalid を解除し、エラー領域をクリア
+  $("#new-review-comment-<%= @review.id %> textarea.comment-textarea").removeClass("is-invalid");
+  $("#comment-errors-<%= @review.id %>").html('');
+<% end %>
