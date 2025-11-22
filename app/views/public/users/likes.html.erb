@@ -2,20 +2,15 @@
   <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <div>
-        <h2 class="h4 mb-1">レビュー一覧</h2>
-        <small class="text-muted"><%= "レビュー数：#{@reviews&.size || 0}" %></small>
+        <h3 class="h5 mb-1"><%= h(@user.nickname.presence || @user.name || 'ユーザー') %> のいいねしたレビュー</h3>
+        <small class="text-muted"><%= "いいね数：#{@liked_reviews&.size || 0}" %></small>
       </div>
-
-      <div class="ms-3">
-        <% if user_signed_in? %>
-          <%= link_to '新規レビュー作成', new_review_path, class: 'btn btn-primary' %>
-        <% else %>
-          <%= link_to 'ログインしてレビュー作成', new_user_session_path, class: 'btn btn-outline-primary' %>
-        <% end %>
+      <div>
+        <%= link_to 'ユーザーに戻る', user_path(@user), class: 'btn btn-outline-secondary' %>
       </div>
     </div>
 
-    <% if @reviews.present? %>
+    <% if @liked_reviews.present? %>
       <div class="table-responsive">
         <table class="table table-hover align-middle">
           <thead class="table-light">
@@ -31,9 +26,8 @@
           </thead>
 
           <tbody>
-            <% @reviews.each do |review| %>
+            <% @liked_reviews.each do |review| %>
               <tr>
-                <!-- 各セルをクリック可能にする：セルに position-relative を付与し、その中に stretched-link を置く -->
                 <td class="text-nowrap position-relative">
                   <%= link_to review_path(review),
                               class: 'stretched-link text-decoration-none text-reset',
@@ -58,7 +52,6 @@
                   <% end %>
                 </td>
 
-                <!-- ゲームタイトルは強調表示 -->
                 <td class="align-middle position-relative">
                   <%= link_to review_path(review),
                               class: 'stretched-link text-decoration-none text-reset',
@@ -78,7 +71,6 @@
                   <% end %>
                 </td>
 
-                <!-- 作成者セルは別扱い（クリック可能） -->
                 <td class="align-middle d-none d-md-table-cell">
                   <% if review.user.present? %>
                     <% display_name = review.user.nickname.presence || review.user.name.presence || review.user.email.presence || '不明' %>
@@ -88,7 +80,6 @@
                   <% end %>
                 </td>
 
-                <!-- いいねボタン（部分テンプレート） -->
                 <td class="align-middle text-center">
                   <div class="d-inline-block like-<%= review.id %>">
                     <%= render 'public/likes/btn', review: review %>
@@ -101,11 +92,11 @@
       </div>
 
       <div class="d-flex justify-content-center mt-3">
-        <%= paginate(@reviews) if defined?(Kaminari) || defined?(WillPaginate) rescue '' %>
+        <%= paginate(@liked_reviews) if defined?(Kaminari) || defined?(WillPaginate) rescue '' %>
       </div>
     <% else %>
       <div class="alert alert-info">
-        現在、表示するレビューはありません。
+        このユーザーのいいねはまだありません。
       </div>
     <% end %>
   </div>

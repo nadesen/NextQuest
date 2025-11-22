@@ -2,6 +2,10 @@ class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
   has_many :review_comments, dependent: :destroy
+  # ユーザーが行ったいいねを保持
+  has_many :likes, dependent: :destroy
+  # ユーザーがいいねしたレビュー一覧取得用
+  has_many :liked_reviews, through: :likes, source: :review
 
   validates :name, presence: true, length: { maximum: 30 }
   validates :nickname, presence: true, length: { maximum: 50 }

@@ -12,6 +12,7 @@ Rails.application.routes.draw do
   # ユーザー側のルーティング設定
   scope module: :public do    
     resources :tags, only: [:show]
+    get 'my_likes', to: 'users#my_likes', as: :my_likes
 
     # ユーザーとプロフィール関連
     resources :users, only: [:index, :show, :edit, :update, :destroy] do
@@ -43,6 +44,12 @@ Rails.application.routes.draw do
       end
 
       resources :review_comments, only: [:create, :destroy]
+
+      # review に付随するいいね（create/destroy）と、いいねしたユーザー一覧(index）を受ける
+      member do
+        post 'likes', to: 'likes#create'    # /reviews/:review_id/likes (POST)
+        delete 'likes', to: 'likes#destroy' # /reviews/:review_id/likes (DELETE) - favorites のパターンに合わせる
+      end
     end
 
     # トピック作成フォーム

@@ -38,7 +38,6 @@
           <div class="card-body">
             <div class="mb-3">
               <strong class="me-2">評価:</strong>
-              <%# 簡易的に数字表示。星表示にしたい場合はJS/CSSで拡張可 %>
               <span class="badge bg-warning text-dark"><%= @review.rating %> / 5</span>
               <span class="ms-3 text-muted">いいね: <%= @review.likes_count.to_i %></span>
             </div>
@@ -61,13 +60,15 @@
               投稿日時: <%= @review.created_at.strftime('%Y/%m/%d %H:%M') if @review.created_at %>
             </small>
             <div>
-              <%# いいね機能のリンク（既存の likes コントローラを使う場合に合わせてください） %>
-              <span class="me-2"><i class="bi bi-hand-thumbs-up"></i> <%= @review.likes_count.to_i %></span>
+              <%# いいねボタン（部分テンプレートで差し替え） %>
+              <span class="me-2 like-<%= @review.id %>">
+                <%= render 'public/likes/btn', review: @review %>
+              </span>
             </div>
           </div>
         </div>
 
-        <!-- コメントセクション: partial を利用 -->
+        <!-- 以下、コメントセクション等は既存のまま -->
         <div class="card mb-4">
           <div class="card-body">
             <div class="d-flex justify-content-between align-items-center mb-3">
