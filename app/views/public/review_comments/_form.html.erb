@@ -1,5 +1,7 @@
 <%# render partial with locals: review: @review, review_comment: @review_comment %>
-<%= form_with(model: [review, review_comment], local: false) do |f| %>
-  <%= f.text_area :comment, rows: 5, placeholder: "ここにコメントを記載", class: "w-100 comment-textarea" %>
+<%= form_with(model: [review, review_comment], local: false, html: { id: "new-review-comment-#{review.id}" }) do |f| %>
+  <div id="comment-errors-<%= review.id %>"></div>
+
+  <%= f.text_area :comment, rows: 5, class: "form-control w-100 comment-textarea", maxlength: 1000, placeholder: "コメントを入力（最大1000文字）" %>
   <%= f.submit "送信する", class: "btn btn-md btn-outline-primary mt-2 pull-right" %>
 <% end %>

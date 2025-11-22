@@ -6,7 +6,7 @@
           <%= link_to user_path(comment.user) do %>
             <%= comment.user.nickname %>
           <% end %>
-          <div class="small text-muted mt-1"><%= comment.created_at.strftime('%Y/%m/%d %H:%M') if comment.created_at %></div>
+          <div class="small text-muted mt-1"><%= comment.created_at.in_time_zone(Time.zone).strftime('%Y/%m/%d %H:%M') if comment.created_at %></div>
         </td>
         <td>
           <div><%= simple_format(h(comment.comment)) %></div>
