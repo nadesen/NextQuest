@@ -24,6 +24,11 @@
               <% if user_signed_in? && current_user.id == @user.id %>
                 <%= link_to '編集 (退会処理もこちら)', edit_user_path(@user), class: 'btn btn-outline-primary' %>
               <% end %>
+
+              <%# マイページから「いいね一覧」へ行けるように追加 %>
+              <div class="mt-2">
+                <%= link_to 'いいね一覧', likes_user_path(@user), class: 'btn btn-outline-secondary' %>
+              </div>
             </div>
           </div>
         </div>

@@ -1,6 +1,6 @@
 class Public::UsersController < ApplicationController
-  before_action :require_login, only: [:edit, :update, :destroy, :my_page]
-  before_action :set_user, only: [:show, :edit, :update, :destroy]
+  before_action :require_login, only: [:edit, :update, :destroy, :my_page, :my_likes]
+  before_action :set_user, only: [:show, :edit, :update, :destroy, :likes]
   before_action :authorize_user!, only: [:edit, :update, :destroy]
 
   def show
@@ -13,6 +13,16 @@ class Public::UsersController < ApplicationController
                             .includes(:review)
                             .order(created_at: :desc)
                             .limit(10)
+  end
+
+  # GET /users/:id/likes
+  # そのユーザーがいいねしたレビュー一覧を表示
+  def likes
+    # @user は set_user で取得済み
+    @liked_reviews = Review.joins("INNER JOIN likes ON likes.likeable_id = reviews.id")
+                           .where(likes: { user_id: @user.id })
+                           .includes(:platform, :genre)
+                           .order('likes.created_at DESC')
   end
 
   def edit; end

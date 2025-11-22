@@ -1,0 +1,2 @@
+// jQuery を想定している実装
+$('.like-<%= @review.id %>').html("<%= j(render 'public/likes/btn', review: @review) %>");
