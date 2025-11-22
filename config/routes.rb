@@ -12,13 +12,15 @@ Rails.application.routes.draw do
   # ユーザー側のルーティング設定
   scope module: :public do    
     resources :tags, only: [:show]
-    get 'my_likes', to: 'users#my_likes', as: :my_likes
 
     # ユーザーとプロフィール関連
     resources :users, only: [:index, :show, :edit, :update, :destroy] do
       member do
-        get :followings
-        get :followers
+        get :followings, to: 'follows#followings'
+        get :followers, to: 'follows#followers'
+        post :follow, to: 'follows#create'       # POST /users/:id/follow
+        delete :unfollow, to: 'follows#destroy' # DELETE /users/:id/unfollow
+        
         get :likes
         get :reviews, to: 'reviews#user_reviews' # /users/:id/reviews
       end
