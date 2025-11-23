@@ -24,7 +24,7 @@
               <th scope="col">プラットフォーム</th>
               <th scope="col">ジャンル</th>
               <th scope="col">ゲームタイトル</th>
-              <th scope="col" class="text-nowrap">プレイ時間</th>
+              <th scope="col" class="text-nowrap">評価</th>
               <th scope="col" class="d-none d-md-table-cell">作成者</th>
               <th scope="col" class="text-nowrap">いいね</th>
             </tr>
@@ -73,8 +73,8 @@
                 <td class="text-nowrap position-relative">
                   <%= link_to review_path(review),
                               class: 'stretched-link text-decoration-none text-reset',
-                              aria: { label: "レビュー #{review.title} の詳細を表示（プレイ時間）" } do %>
-                    <%= h(review.play_time.presence || '未記入') %>
+                              aria: { label: "レビュー #{review.title} の詳細を表示（評価）" } do %>
+                    <%= render 'public/reviews/static_rate', review: review %>
                   <% end %>
                 </td>
 

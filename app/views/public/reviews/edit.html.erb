@@ -38,7 +38,8 @@
           <div class="row g-3 mb-3">
             <div class="col-md-4">
               <%= f.label :rating, '評価 (1-5)', class: 'form-label' %>
-              <%= f.number_field :rating, in: 1..5, class: 'form-control' %>
+              <%= f.hidden_field :rating, id: :review_star, class: 'form-control', value: (@review.rating || '') %>
+              <div id="edit_raty"></div>
             </div>
             <div class="col-md-8">
               <%= f.label :play_time, 'プレイ時間', class: 'form-label' %>
@@ -74,3 +75,21 @@
     </div>
   </div>
 </div>
+
+<script>
+$(document).on('turbolinks:load', function() {
+  var elem = document.querySelector('#edit_raty');
+  if (elem == null) return;
+
+  elem.innerHTML = "";
+  var opt = {
+    starOn: "<%= asset_path('star-on.png') %>",
+    starOff: "<%= asset_path('star-off.png') %>",
+    starHalf: "<%= asset_path('star-half.png') %>",
+    scoreName: 'review[rating]',
+    score: <%= (@review.rating || 0).to_f %>,
+    half: true
+  };
+  raty(elem, opt);
+});
+</script>

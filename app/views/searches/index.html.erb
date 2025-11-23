@@ -177,7 +177,7 @@
                     <th>プラットフォーム</th>
                     <th>ジャンル</th>
                     <th>ゲームタイトル</th>
-                    <th class="text-nowrap">プレイ時間</th>
+                    <th class="text-nowrap">評価</th>
                     <th class="d-none d-md-table-cell">作成者</th>
                   </tr>
                 </thead>
@@ -241,10 +241,10 @@
                       <!-- プレイ時間セル（クリックで review show） -->
                       <td class="text-nowrap position-relative">
                         <% if review_show_path.present? %>
-                          <%= link_to review_show_path,
+                          <%= link_to review_path(review),
                                       class: 'stretched-link text-decoration-none text-reset',
-                                      aria: { label: "#{review.title} のレビューを表示（プレイ時間）" } do %>
-                            <%= h(review.play_time.presence || '未記入') %>
+                                      aria: { label: "レビュー #{review.title} の詳細を表示（評価）" } do %>
+                            <%= render 'public/reviews/static_rate', review: review %>
                           <% end %>
                         <% else %>
                           <%= h(review.play_time.presence || '未記入') %>

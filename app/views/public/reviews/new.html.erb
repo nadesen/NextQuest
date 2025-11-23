@@ -31,7 +31,8 @@
 
         <div class="mb-3">
           <%= f.label :rating, '評価 (1-5)', class: 'form-label' %>
-          <%= f.number_field :rating, in: 1..5, class: 'form-control' %>
+          <%= f.hidden_field :rating, id: :review_star, class: 'form-control' %>
+          <div id="post_raty"></div>
         </div>
 
         <div class="mb-3">
@@ -52,3 +53,20 @@
     </div>
   </div>
 </div>
+
+<script>
+$(document).on('turbolinks:load', function() {
+  var elem = document.querySelector('#post_raty');
+  if (elem == null) return;
+
+  elem.innerHTML = "";
+  var opt = {
+    starOn: "<%= asset_path('star-on.png') %>",
+    starOff: "<%= asset_path('star-off.png') %>",
+    starHalf: "<%= asset_path('star-half.png') %>",
+    scoreName: 'review[rating]',
+    half: true
+  };
+  raty(elem, opt);
+});
+</script>

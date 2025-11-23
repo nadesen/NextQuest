@@ -1,0 +1,26 @@
+<% if review.nil? || review.id.nil? %>
+  <div class="form-group" id="star">
+    <%= f.label :star %>
+    <%= f.hidden_field :star, id: :review_star, class: 'form-control' %>
+    <div id="post_raty"></div>
+  </div>
+  <script>
+    $(document).on('turbolinks:load', function() {
+      var elem = document.querySelector('#post_raty');
+      if (elem == null) return;
+
+      elem.innerHTML = "";
+      var opt = {
+        starOn: "<%= asset_path('star-on.png') %>",
+        starOff: "<%= asset_path('star-off.png') %>",
+        starHalf: "<%= asset_path('star-half.png') %>",
+        scoreName: 'review[star]'
+      };
+      raty(elem, opt);
+    });
+  </script>
+<% else %>
+  <div class="form-group">
+    <%= render "static_rate", review: review %>
+  </div>
+<% end %>

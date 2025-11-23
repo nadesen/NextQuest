@@ -1,0 +1,18 @@
+<div id="rate_<%= review.id %>" class="static-rate d-inline-block"></div>
+<script>
+$(document).on('turbolinks:load', function() {
+  var elem = document.querySelector('#rate_<%= review.id %>');
+  if (elem == null) return;
+
+  elem.innerHTML = "";
+  var opt = {
+    starOn: "<%= asset_path('star-on.png') %>",
+    starOff: "<%= asset_path('star-off.png') %>",
+    starHalf: "<%= asset_path('star-half.png') %>",
+    score: <%= (review.rating || 0).to_f %>,
+    readOnly: true,
+    half: true
+  };
+  raty(elem, opt);
+});
+</script>
