@@ -1,0 +1,9 @@
+<div class="mb-2">
+  <% sort_params = { title: 'タイトル名', created_at: '作成日', posts_count: 'コメント数' } %>
+  <% sort_params.each do |key, label| %>
+    <% selected = (params[:sort] == key.to_s) %>
+    <% direction = selected ? (params[:direction] == 'asc' ? 'desc' : 'asc') : 'asc' %>
+    <%= link_to "#{label}#{selected ? (params[:direction] == 'asc' ? '↑' : '↓') : ''}", url_for(sort: key, direction: direction), class: (selected ? "fw-bold text-primary" : "") %>
+    <% unless key == :posts_count %>｜<% end %>
+  <% end %>
+</div>

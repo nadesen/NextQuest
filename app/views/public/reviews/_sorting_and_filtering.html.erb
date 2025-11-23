@@ -1,0 +1,35 @@
+<!-- 順番入れ替えフォーム -->
+<div class="mb-2">
+  <% sort_params = { created_at: '投稿順', title: 'タイトル順', likes_count: 'いいね数順' } %>
+  <% sort_params.each do |key, label| %>
+    <% selected = (params[:sort] == key.to_s) %>
+    <% direction = selected ? (params[:direction] == 'asc' ? 'desc' : 'asc') : 'desc' %>
+    <%= link_to "#{label}#{selected ? (params[:direction] == 'asc' ? '↑' : '↓') : ''}", url_for(sort: key, direction: direction), class: (selected ? "fw-bold text-primary" : "") %>
+    <% unless key == :likes_count %>｜<% end %>
+  <% end %>
+</div>
+
+<!-- 絞り込みフォーム -->
+<div class="mb-3">
+  <%= form_with url: reviews_path, method: :get, local: true do |f| %>
+    <div class="row g-2 align-items-center">
+      <div class="col-auto">
+        <%= f.label :platform_id, 'プラットフォーム', class: 'form-label mb-0 me-1' %>
+        <%= f.select :platform_id, options_for_select(@platforms.map { |p| [p.name, p.id] }, params[:platform_id]), { include_blank: '指定なし' }, class: 'form-select form-select-sm' %>
+      </div>
+      <div class="col-auto">
+        <%= f.label :genre_id, 'ジャンル', class: 'form-label mb-0 me-1' %>
+        <%= f.select :genre_id, options_for_select(@genres.map { |g| [g.name, g.id] }, params[:genre_id]), { include_blank: '指定なし' }, class: 'form-select form-select-sm' %>
+      </div>
+      <div class="col-auto">
+        <%# 並び順のパラメータもhiddenで引き継ぐ %>
+        <%= hidden_field_tag :sort, params[:sort] %>
+        <%= hidden_field_tag :direction, params[:direction] %>
+        <%= f.submit '絞り込む', class: 'btn btn-sm btn-secondary' %>
+        <% if params[:platform_id].present? || params[:genre_id].present? %>
+          <%= link_to 'リセット', reviews_path, class: 'btn btn-sm btn-outline-secondary ms-2' %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>

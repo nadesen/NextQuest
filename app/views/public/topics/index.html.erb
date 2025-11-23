@@ -17,20 +17,22 @@
     </div>
 
     <% if @topics.present? %>
+      <!-- ソート部分テンプレートのレンダリング -->
+      <%= render 'public/topics/sorting', forum: @forum %>
+      <!-- トピック一覧テーブル -->
       <div class="table-responsive">
         <table class="table table-hover align-middle">
           <thead class="table-light">
             <tr>
-              <th scope="col">トピック</th>
+              <th scope="col">コミュニティトピック</th>
               <th scope="col" class="d-none d-md-table-cell">作成者</th>
-              <th scope="col" class="text-center">投稿数</th>
-              <th scope="col" class="text-end d-none d-md-table-cell">最終更新</th>
+              <th scope="col" class="text-center">コメント数</th>
+              <th scope="col" class="text-end d-none d-md-table-cell">作成日</th>
             </tr>
           </thead>
           <tbody>
             <% @topics.each do |topic| %>
               <tr>
-                <!-- position-relative を付けたセル内に stretched-link を置くと行全体がクリック可能になる -->
                 <td class="align-middle position-relative">
                   <%= link_to forum_topic_path(@forum, topic),
                               class: 'stretched-link text-decoration-none text-reset',
@@ -58,7 +60,7 @@
                 </td>
 
                 <td class="align-middle text-end d-none d-md-table-cell">
-                  <small class="text-muted"><%= time_ago_in_words(topic.updated_at) %> 前</small>
+                  <small class="text-muted"><%= topic.created_at.strftime("%Y/%m/%d") %></small>
                 </td>
               </tr>
             <% end %>

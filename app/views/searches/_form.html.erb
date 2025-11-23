@@ -3,9 +3,9 @@
     <!-- 検索語をフォーム表示時に残す -->
     <%= f.text_field :content, value: params[:content], placeholder: '検索ワードを入力' %>
 
-    <%= f.select :model, options_for_select({ "User" => "user", "Topic" => "topic", "Review" => "review" }, selected: params[:model]) %>
+    <%= f.select :model, options_for_select({ "ユーザー" => "user", "コミュニティ" => "topic", "レビュー" => "review" }, selected: params[:model]) %>
 
-    <%= f.select :method, options_for_select({ "完全一致" => "perfect", "前方一致" => "forward", "後方一致" => "backward", "部分一致" => "partial" }, selected: params[:method]) %>
+    <%= f.select :method, options_for_select({ "部分一致" => "partial", "完全一致" => "perfect", "前方一致" => "forward", "後方一致" => "backward" }, selected: params[:method]) %>
 
     <%= f.submit '検索' %>
   <% end %>

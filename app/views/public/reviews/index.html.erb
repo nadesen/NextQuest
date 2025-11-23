@@ -16,6 +16,9 @@
     </div>
 
     <% if @reviews.present? %>
+      <!-- ソート・フィルター部分テンプレートのレンダリング -->
+      <%= render 'public/reviews/sorting_and_filtering' %>
+      <! -- レビュー一覧テーブル -->
       <div class="table-responsive">
         <table class="table table-hover align-middle">
           <thead class="table-light">
@@ -104,6 +107,9 @@
         <%= paginate(@reviews) if defined?(Kaminari) || defined?(WillPaginate) rescue '' %>
       </div>
     <% else %>
+      <!-- ソート・フィルター部分テンプレートのレンダリング -->
+      <%= render 'public/reviews/sorting_and_filtering' %>
+      
       <div class="alert alert-info">
         現在、表示するレビューはありません。
       </div>

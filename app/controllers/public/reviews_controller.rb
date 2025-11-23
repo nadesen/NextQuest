@@ -4,7 +4,31 @@ class Public::ReviewsController < ApplicationController
   before_action :set_review, only: %i[show edit update destroy]
 
   def index
-    @reviews = Review.includes(:platform, :genre, :user).order(created_at: :desc)
+    permitted_sorts = %w[created_at title likes_count]
+    sort = permitted_sorts.include?(params[:sort]) ? params[:sort] : "created_at"
+    direction = params[:direction] == 'asc' ? 'asc' : 'desc'
+  
+    @platforms = Platform.order(id: :asc)
+    @genres = Genre.order(:name)
+  
+    @reviews = Review.includes(:platform, :genre, :user)
+    # 絞り込み (プラットフォームID)
+    if params[:platform_id].present?
+      @reviews = @reviews.where(platform_id: params[:platform_id])
+    end
+    # 絞り込み (ジャンルID)
+    if params[:genre_id].present?
+      @reviews = @reviews.where(genre_id: params[:genre_id])
+    end
+  
+    # 並び替え
+    if sort == 'likes_count'
+      @reviews = @reviews.left_joins(:likes).group("reviews.id").order("COUNT(likes.id) #{direction}")
+    else
+      @reviews = @reviews.order("#{sort} #{direction}")
+    end
+  
+    @reviews = @reviews.page(params[:page]) if defined?(Kaminari) || defined?(WillPaginate)
   end
 
   def show
