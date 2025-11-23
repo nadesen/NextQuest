@@ -8,7 +8,28 @@ class Public::TopicsController < ApplicationController
 
   # GET /forums/:forum_id/topics
   def index
-    @topics = @forum.topics.order(pinned: :desc, updated_at: :desc)
+    # 並び替え対象の確認（不正な値はデフォルトにする）
+    sort = %w[title created_at posts_count].include?(params[:sort]) ? params[:sort] : 'created_at'
+    direction = params[:direction] == 'asc' ? 'asc' : 'desc'
+
+    # pinned は常に優先してソート（先頭に表示）
+    base_scope = @forum.topics.order(pinned: :desc)
+
+    # 並び替え句を組み立てる
+    order_clause =
+      case sort
+      when 'title'
+        "title #{direction}"
+      when 'created_at'
+        "created_at #{direction}"
+      when 'posts_count'
+        # posts_count を使う想定（counter_cache が設定されていること）
+        "posts_count #{direction}"
+      else
+        "created_at #{direction}"
+      end
+
+    @topics = base_scope.order(Arel.sql(order_clause))
     @topics = @topics.page(params[:page]) if defined?(Kaminari) || defined?(WillPaginate)
   end
 

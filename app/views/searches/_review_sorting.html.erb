@@ -1,0 +1,9 @@
+<div class="mb-2 ms-2">
+  <% sort_params = { created_at: '投稿日順', title: 'タイトル順', likes_count: 'いいね数順' } %>
+  <% sort_params.each do |key, label| %>
+    <% selected = (params[:review_sort] == key.to_s) %>
+    <% direction = selected ? (params[:review_direction] == 'asc' ? 'desc' : 'asc') : 'desc' %>
+    <%= link_to "#{label}#{selected ? (params[:review_direction] == 'asc' ? '↑' : '↓') : ''}", url_for(request.params.merge(review_sort: key, review_direction: direction)), class: (selected ? "fw-bold text-primary" : "") %>
+    <% unless key == :likes_count %>｜<% end %>
+  <% end %>
+</div>

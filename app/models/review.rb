@@ -13,7 +13,7 @@ class Review < ApplicationRecord
 
   validates :title, presence: true
   validates :play_time, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
-  validates :rating, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 1, less_than_or_equal_to: 5 }
+  validates :rating, presence: true, numericality: { greater_than_or_equal_to: 0.5, less_than_or_equal_to: 5 }
   validates :content, presence: true, length: { maximum: 2000 }
   
   def self.search_for(content, method)

@@ -4,7 +4,7 @@ class CreateReviews < ActiveRecord::Migration[6.1]
       t.integer :user_id, null: false
       t.integer :platform_id, null: false
       t.integer :genre_id, null: false
-      t.integer :rating, null: false                    # 評価点数
+      t.float :rating, null: false                      # 評価点数
       t.string :title, null: false                      # レビュータイトル
       t.text :content, null: false                      # レビュー内容
       t.string :play_time                                # プレイ時間

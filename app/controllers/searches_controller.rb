@@ -13,26 +13,45 @@ class SearchesController < ApplicationController
     @topics = []
     @reviews = []
 
+    topic_sort = %w[title created_at posts_count].include?(params[:topic_sort]) ? params[:topic_sort] : "created_at"
+    topic_direction = params[:topic_direction] == 'asc' ? 'asc' : 'desc'
+  
+    review_sort = %w[created_at title likes_count].include?(params[:review_sort]) ? params[:review_sort] : "created_at"
+    review_direction = params[:review_direction] == 'asc' ? 'asc' : 'desc'
+  
     case @model
     when 'user'
-      # User.search_for を実装済みならそのまま呼ぶ
       @users = User.search_for(@content, @method)
     when 'topic'
       @topics = Topic.search_for(@content, @method)
+                 .order("#{topic_sort} #{topic_direction}")
     when 'review'
-      @reviews = Review.search_for(@content, @method)
+      if review_sort == 'likes_count'
+        @reviews = Review.search_for(@content, @method)
+                    .left_joins(:likes)
+                    .group("reviews.id")
+                    .order("COUNT(likes.id) #{review_direction}")
+      else
+        @reviews = Review.search_for(@content, @method)
+                    .order("#{review_sort} #{review_direction}")
+      end
     when 'all'
-      # 全対象検索（必要なら）
-      @users   = User.search_for(@content, @method)
-      @topics  = Topic.search_for(@content, @method)
-      @reviews = Review.search_for(@content, @method)
+      @users = User.search_for(@content, @method)
+      @topics = Topic.search_for(@content, @method)
+                 .order("#{topic_sort} #{topic_direction}")
+      if review_sort == 'likes_count'
+        @reviews = Review.search_for(@content, @method)
+                    .left_joins(:likes)
+                    .group("reviews.id")
+                    .order("COUNT(likes.id) #{review_direction}")
+      else
+        @reviews = Review.search_for(@content, @method)
+                    .order("#{review_sort} #{review_direction}")
+      end
     else
-      # 不正な model パラメータは空の結果でフォールバック
       Rails.logger.info("[SearchesController] unknown model param: #{@model.inspect}")
     end
-
-    # ここで index ビューに渡す（あなたが作成した index.html.erb を使う）
-    # 必要ならページネーションのために .page(params[:page]) を追加してください
+  
     render :index
   end
 end

@@ -16,6 +16,9 @@
     </div>
 
     <% if @reviews.present? %>
+      <!-- ソート・フィルター部分テンプレートのレンダリング -->
+      <%= render 'public/reviews/sorting_and_filtering' %>
+      <! -- レビュー一覧テーブル -->
       <div class="table-responsive">
         <table class="table table-hover align-middle">
           <thead class="table-light">
@@ -24,7 +27,7 @@
               <th scope="col">プラットフォーム</th>
               <th scope="col">ジャンル</th>
               <th scope="col">ゲームタイトル</th>
-              <th scope="col" class="text-nowrap">プレイ時間</th>
+              <th scope="col" class="text-nowrap">評価</th>
               <th scope="col" class="d-none d-md-table-cell">作成者</th>
               <th scope="col" class="text-nowrap">いいね</th>
             </tr>
@@ -73,8 +76,8 @@
                 <td class="text-nowrap position-relative">
                   <%= link_to review_path(review),
                               class: 'stretched-link text-decoration-none text-reset',
-                              aria: { label: "レビュー #{review.title} の詳細を表示（プレイ時間）" } do %>
-                    <%= h(review.play_time.presence || '未記入') %>
+                              aria: { label: "レビュー #{review.title} の詳細を表示（評価）" } do %>
+                    <%= render 'public/reviews/static_rate', review: review %>
                   <% end %>
                 </td>
 
@@ -104,6 +107,9 @@
         <%= paginate(@reviews) if defined?(Kaminari) || defined?(WillPaginate) rescue '' %>
       </div>
     <% else %>
+      <!-- ソート・フィルター部分テンプレートのレンダリング -->
+      <%= render 'public/reviews/sorting_and_filtering' %>
+      
       <div class="alert alert-info">
         現在、表示するレビューはありません。
       </div>

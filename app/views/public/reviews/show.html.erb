@@ -36,10 +36,12 @@
 
         <div class="card mb-4 shadow-sm">
           <div class="card-body">
-            <div class="mb-3">
-              <strong class="me-2">評価:</strong>
-              <span class="badge bg-warning text-dark"><%= @review.rating %> / 5</span>
-              <span class="ms-3 text-muted">いいね: <%= @review.likes_count.to_i %></span>
+            <div class="mb-3 d-flex align-items-center">
+              <strong class="me-2">評価：</strong>
+            
+              <div class="me-3 d-inline-block">
+                <%= render 'public/reviews/static_rate', review: @review %>
+              </div>
             </div>
 
             <div class="mb-3">
