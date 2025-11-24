@@ -1,0 +1,6 @@
+<%# locals: topic, posts %>
+<ul class="list-group">
+  <% (posts || topic.posts.order(created_at: :asc)).each do |post| %>
+    <%= render partial: 'public/topics/post', locals: { post: post } %>
+  <% end %>
+</ul>

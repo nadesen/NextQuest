@@ -7,35 +7,27 @@
         <div class="card-body">
           <h2 class="card-title"><%= @topic.title %></h2>
           <div class="mb-2 text-muted small">
-            <%# フォーラムへのリンク（トピック一覧へ） %>
             フォーラム:
             <%= link_to @forum.title, forum_topics_path(@forum) %>
             &nbsp;・&nbsp;
 
-            <%# 作成者のニックネームのみ表示する（存在しない場合は '匿名'） %>
             作成者:
             <% creator = @topic.respond_to?(:creator) ? @topic.creator : @topic.user %>
             <% if creator.present? %>
               <% display_name = creator.nickname.presence || creator.name.presence || 'ユーザー' %>
-              <%= link_to h(display_name), user_path(creator), class: 'fw-medium text-decoration-none', aria: { label: "#{display_name} さんのユーザーページへ" } %>
+              <%= link_to h(display_name), user_path(creator), class: 'fw-medium text-decoration-none' %>
             <% else %>
               <span class="text-muted">匿名</span>
             <% end %>
             &nbsp;・&nbsp;
 
-            <%# 日付を yyyy/mm/dd 形式で表示 %>
             <%= @topic.created_at.in_time_zone(Time.zone).strftime('%Y/%m/%d') %>
-            &nbsp;・&nbsp;
-
-            <span class="badge bg-secondary">閲覧 <%= @topic.views_count %></span>
-            <span class="badge bg-secondary">投稿 <%= @topic.posts_count %></span>
           </div>
 
           <% if @topic.description.present? %>
             <p class="card-text"><%= simple_format(@topic.description) %></p>
           <% end %>
 
-          <%# 作成者のみ編集・削除ボタンを表示 %>
           <% can_edit = user_signed_in? && (
                 (creator.present? && creator == current_user) ||
                 (@topic.respond_to?(:creator_id) && @topic.creator_id == current_user&.id) ||
@@ -44,10 +36,8 @@
 
           <% if can_edit %>
             <div class="mt-3">
-              <%# ボタンを横並びにする: d-flex と gap-2 を使用（Bootstrap 5） %>
               <div class="d-flex gap-2">
                 <%= link_to '編集', edit_forum_topic_path(@forum, @topic), class: 'btn btn-sm btn-outline-primary' %>
-
                 <%= form_with url: forum_topic_path(@forum, @topic), method: :delete, local: true, html: { class: 'd-inline' } do %>
                   <%= submit_tag '削除', data: { confirm: 'トピックを削除してもよろしいですか？' }, class: 'btn btn-sm btn-danger' %>
                 <% end %>
@@ -59,22 +49,21 @@
 
       <!-- 投稿一覧 -->
       <div class="mb-4">
-        <h4 class="mb-3">投稿</h4>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h4 class="mb-0">投稿</h4>
+          <div class="topic-posts-counter small text-muted">
+            <%= render 'public/posts/counter', topic: @topic %>
+          </div>
+        </div>
 
-        <% if @posts.present? && @posts.any? %>
-          <ul class="list-group">
-            <%= render partial: 'post', collection: @posts, as: :post %>
-          </ul>
+        <div class="topic-posts-index mb-3">
+          <%= render 'public/posts/index', topic: @topic, posts: (@posts || @topic.posts.order(created_at: :asc)) %>
+        </div>
 
-          <%# ページネーション（Kaminari/WillPaginate を使っている場合） %>
-          <% if defined?(Kaminari) || defined?(WillPaginate) %>
-            <div class="mt-3">
-              <%= paginate @posts if defined?(Kaminari) %>
-              <%# will_paginate の場合: = will_paginate @posts %>
-            </div>
-          <% end %>
-        <% else %>
-          <div class="alert alert-light">まだ投稿がありません。最初の投稿をしませんか？</div>
+        <% if defined?(Kaminari) && @posts.respond_to?(:total_pages) %>
+          <div class="mt-3">
+            <%= paginate @posts %>
+          </div>
         <% end %>
       </div>
 
@@ -83,8 +72,7 @@
         <h4 class="mb-3">返信・投稿する</h4>
 
         <% if user_signed_in? %>
-          <!-- namespaced (Public::PostsController) partial is stored at app/views/public/posts/_form.html.erb -->
-          <%= render 'public/posts/form', forum: @forum, topic: @topic %>
+          <%= render 'public/posts/form', forum: @forum, topic: @topic, post: (@post || Post.new) %>
         <% else %>
           <div class="alert alert-info">
             投稿するには <%= link_to 'ログイン', new_user_session_path %> が必要です。

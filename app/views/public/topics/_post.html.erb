@@ -6,15 +6,17 @@
     </div>
 
     <div class="text-end">
-      <%# 削除ボタンは投稿の作成者のみ表示（編集ボタンは削除） %>
       <% if current_user && (
             (post.respond_to?(:creator_id) && post.creator_id == current_user.id) ||
             (post.respond_to?(:user) && post.user == current_user)
           ) %>
 
-        <%= form_with url: forum_topic_post_path(post.topic.forum, post.topic, post), method: :delete, local: true, html: { class: 'd-inline' } do %>
-          <%= submit_tag '削除', data: { confirm: '本当に削除しますか？' }, class: 'btn btn-sm btn-outline-danger' %>
-        <% end %>
+        <%# Ajax 削除: remote: true を使うと Rails UJS 経由で destroy.js.erb が返ります %>
+        <%= link_to '削除', forum_topic_post_path(post.topic.forum, post.topic, post),
+                    method: :delete,
+                    remote: true,
+                    data: { confirm: '本当に削除しますか？' },
+                    class: 'btn btn-sm btn-outline-danger' %>
       <% end %>
     </div>
   </div>

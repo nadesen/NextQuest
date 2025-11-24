@@ -1,0 +1,6 @@
+// 投稿後にフォームを空にする
+$('.post-textarea').val("");
+
+// 投稿数と投稿一覧を差し替える
+$('.topic-posts-counter').html("<%= j(render 'public/posts/counter', topic: @topic) %>");
+$('.topic-posts-index').html("<%= j(render 'public/posts/index', topic: @topic, posts: @posts) %>");

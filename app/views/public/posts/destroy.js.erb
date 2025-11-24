@@ -1,0 +1,3 @@
+// 投稿削除後に投稿数と一覧を差し替える
+$('.topic-posts-counter').html("<%= j(render 'public/posts/counter', topic: @topic) %>");
+$('.topic-posts-index').html("<%= j(render 'public/posts/index', topic: @topic, posts: @posts) %>");

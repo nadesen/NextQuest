@@ -1,7 +1,6 @@
 class Public::TopicsController < ApplicationController
   before_action :set_forum, except: %i[new create]
   before_action :set_topic, only: %i[show edit update destroy]
-  # new/create/show/edit/update/destroy に対してログイン必須に統一
   before_action :require_login, only: %i[new create show edit update destroy]
   before_action :prevent_guest_posting!, only: %i[new create]
   before_action :authorize_topic_owner!, only: %i[edit update destroy]
@@ -35,8 +34,16 @@ class Public::TopicsController < ApplicationController
 
   # GET /forums/:forum_id/topics/:id
   def show
-    @posts = @topic.posts.order(created_at: :asc)
-    @posts = @posts.page(params[:page]) if defined?(Kaminari) || defined?(WillPaginate)
+    def show
+      @posts = @topic.posts.order(created_at: :asc)
+      # ページネーションライブラリ（Kaminari / WillPaginate）がある場合は page を使う
+      if defined?(Kaminari) || defined?(WillPaginate)
+        @posts = @posts.page(params[:page])
+      end
+    
+      # 非同期投稿用フォームで利用する空の Post を用意
+      @post = Post.new
+    end
   end
 
   # GET /topics/new  (全フォーラム共通) または /forums/:forum_id/topics/new

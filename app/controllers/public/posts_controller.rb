@@ -1,26 +1,44 @@
 class Public::PostsController < ApplicationController
   before_action :set_forum_and_topic, only: %i[create destroy edit update]
   before_action :set_post, only: %i[destroy edit update]
-  # create/destroy/edit/update を保護
   before_action :require_login, only: %i[create destroy edit update]
   before_action :authorize_post_owner!, only: %i[destroy edit update]
 
+  # POST /forums/:forum_id/topics/:topic_id/posts
   def create
     @post = @topic.posts.build(post_params)
     @post.creator_id = current_user.id if @post.respond_to?(:creator_id)
+
     if @post.save
-      redirect_to forum_topic_path(@forum, @topic), notice: '投稿しました'
+      # 最新の投稿一覧を用意して JS で差し替える
+      @posts = @topic.posts.order(created_at: :asc)
+      @posts = @posts.page(params[:page]) if defined?(Kaminari) || defined?(WillPaginate)
+      respond_to do |format|
+        format.js
+        format.html { redirect_to forum_topic_path(@forum, @topic), notice: '投稿しました' }
+      end
     else
-      @posts = @topic.posts.order(created_at: :asc).page(params[:page]) if defined?(Kaminari)
-      flash.now[:alert] = '投稿に失敗しました'
-      render 'public/topics/show'
+      @posts = @topic.posts.order(created_at: :asc)
+      @posts = @posts.page(params[:page]) if defined?(Kaminari) || defined?(WillPaginate)
+      respond_to do |format|
+        format.js { render status: :unprocessable_entity }
+        format.html do
+          flash.now[:alert] = '投稿に失敗しました'
+          render 'public/topics/show'
+        end
+      end
     end
   end
 
   # DELETE /forums/:forum_id/topics/:topic_id/posts/:id
   def destroy
     @post.destroy
-    redirect_to forum_topic_path(@forum, @topic), notice: '投稿を削除しました。'
+    @posts = @topic.posts.order(created_at: :asc)
+    @posts = @posts.page(params[:page]) if defined?(Kaminari) || defined?(WillPaginate)
+    respond_to do |format|
+      format.js
+      format.html { redirect_to forum_topic_path(@forum, @topic), notice: '投稿を削除しました。' }
+    end
   end
 
   private
@@ -35,7 +53,6 @@ class Public::PostsController < ApplicationController
   end
 
   def post_params
-    # Post モデルのカラム名に合わせて許可するパラメータを調整してください
     params.require(:post).permit(:content)
   end
 
