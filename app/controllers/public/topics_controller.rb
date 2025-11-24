@@ -34,15 +34,29 @@ class Public::TopicsController < ApplicationController
 
   # GET /forums/:forum_id/topics/:id
   def show
-    def show
-      @posts = @topic.posts.order(created_at: :asc)
-      # ページネーションライブラリ（Kaminari / WillPaginate）がある場合は page を使う
-      if defined?(Kaminari) || defined?(WillPaginate)
-        @posts = @posts.page(params[:page])
+    @posts = @topic.posts.order(created_at: :asc)
+    @posts = @posts.page(params[:page]) if defined?(Kaminari) || defined?(WillPaginate)
+    # 非同期投稿用フォームで利用する空の Post を用意
+    @post = Post.new
+
+    # 投稿権限判定（作成者 / admin / 承認済メンバーのみ投稿可）
+    @can_post = false
+    if user_signed_in?
+      @can_post = true if current_user.respond_to?(:admin?) && current_user.admin?
+
+      # 作成者判定：関連オブジェクトで比較できればそれを使い、無ければ creator_id / user_id で比較する
+      creator = @topic.respond_to?(:creator) ? @topic.creator : @topic.user
+      if creator.present?
+        @can_post = true if creator == current_user
+      else
+        @can_post = true if @topic.respond_to?(:creator_id) && @topic.creator_id == current_user&.id
+        @can_post = true if @topic.respond_to?(:user_id) && @topic.user_id == current_user&.id
       end
-    
-      # 非同期投稿用フォームで利用する空の Post を用意
-      @post = Post.new
+
+      # 承認済メンバーかどうか（作成者や admin でなければチェック）
+      if !@can_post && @topic.respond_to?(:topic_memberships)
+        @can_post = @topic.topic_memberships.approved.exists?(user_id: current_user.id)
+      end
     end
   end
 

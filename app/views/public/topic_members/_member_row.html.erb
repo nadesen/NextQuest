@@ -1,0 +1,23 @@
+<li class="list-group-item d-flex justify-content-between align-items-center">
+  <div>
+    <strong><%= h(tm.user.nickname.presence || tm.user.name.presence || 'ユーザー') %></strong>
+    <small class="text-muted ms-2">申請日: <%= tm.created_at.strftime('%Y/%m/%d %H:%M') %></small>
+    <% if tm.status == 'approved' && tm.approved_by %>
+      <small class="text-muted ms-2">（承認者: <%= h(tm.approved_by.nickname.presence || tm.approved_by.name.presence || '管理者') %>）</small>
+    <% end %>
+  </div>
+
+  <div class="btn-group btn-group-sm" role="group">
+    <% if pending %>
+      <%= button_to '承認', forum_topic_topic_member_path(forum, topic, tm), method: :patch, params: { status: 'approved' }, class: 'btn btn-sm btn-success', data: { confirm: 'この申請を承認しますか？' } %>
+      <%= button_to '拒否', forum_topic_topic_member_path(forum, topic, tm), method: :patch, params: { status: 'rejected' }, class: 'btn btn-sm btn-outline-danger', data: { confirm: 'この申請を拒否しますか？' } %>
+      <%= form_with url: forum_topic_topic_membership_path(forum, topic, tm), method: :delete, local: true do %>
+        <%= submit_tag '削除', class: 'btn btn-sm btn-outline-secondary', data: { confirm: '申請を削除しますか？' } %>
+      <% end %>
+    <% else %>
+      <%= form_with url: forum_topic_topic_membership_path(forum, topic, tm), method: :delete, local: true do %>
+        <%= submit_tag '追放 / 退会', class: 'btn btn-sm btn-outline-danger', data: { confirm: 'メンバーを追放または退会させますか？' } %>
+      <% end %>
+    <% end %>
+  </div>
+</li>

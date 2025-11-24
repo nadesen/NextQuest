@@ -7,6 +7,10 @@ class User < ApplicationRecord
   # ユーザーがいいねしたレビュー一覧取得用
   has_many :liked_reviews, through: :likes, source: :review
 
+  # メンバーシップ機能用
+  has_many :topic_memberships, dependent: :destroy
+  has_many :joined_topics, through: :topic_memberships, source: :topic
+
   # --- フォロー機能 ---
   has_many :following_relationships,
             class_name: 'Follow',
@@ -28,6 +32,16 @@ class User < ApplicationRecord
 
   validates :name, presence: true, length: { maximum: 30 }
   validates :nickname, presence: true, length: { maximum: 50 }
+
+  # ゲストユーザー用の定数
+  GUEST_USER_EMAIL = "guest@example.com"
+
+  def self.guest
+    find_or_create_by!(email: GUEST_USER_EMAIL) do |user|
+      user.password = SecureRandom.urlsafe_base64
+      user.name = "guestuser"
+    end
+  end
 
   # suspended が true の場合はログイン不可にする
   def active_for_authentication?

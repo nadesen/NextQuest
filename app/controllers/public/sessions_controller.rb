@@ -9,6 +9,12 @@ class Public::SessionsController < Devise::SessionsController
     user_path(resource) rescue root_path
   end
 
+  def guest_sign_in
+    user = User.guest
+    sign_in user
+    redirect_to user_path(user), notice: "ゲストでログインしました。"
+  end
+
   private
 
   def ensure_login_params_present

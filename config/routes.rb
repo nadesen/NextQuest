@@ -9,6 +9,11 @@ Rails.application.routes.draw do
     registrations: "public/registrations",
     sessions: 'public/sessions'
   }
+  # ゲストログイン用
+  devise_scope :user do
+    post "users/guest_sign_in", to: "users/sessions#guest_sign_in"
+  end
+  
   # ユーザー側のルーティング設定
   scope module: :public do    
     resources :tags, only: [:show]
@@ -61,12 +66,14 @@ Rails.application.routes.draw do
     resources :forums, only: [:index, :show] do
       resources :topics, only: [:index, :show, :new, :create, :edit, :update, :destroy] do
         resources :posts, only: [:index, :create, :edit, :update, :destroy]
-        resources :subscriptions, only: [:create]
+
+        # ユーザーが申請（create）／申請取消（destroy: 自分の申請を取消 or owner が削除/追放）
+        resources :topic_memberships, only: [:create, :destroy]
+
+        # 作成者・管理者用のメンバー一覧と承認（members#index, members#update）
+        resources :topic_members, only: [:index, :update], path: 'members', controller: 'topic_members'
       end
     end
-
-    # サブスクリプションの削除パス
-    resources :subscriptions, only: [:destroy]
   end
 
   # 管理者用

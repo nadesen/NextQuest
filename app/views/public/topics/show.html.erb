@@ -44,6 +44,11 @@
               </div>
             </div>
           <% end %>
+
+          <%# 作成者/管理者はメンバー一覧へ遷移できるリンクを表示 %>
+          <% if current_user && ((current_user.respond_to?(:admin?) && current_user.admin?) || (creator.present? && creator == current_user)) %>
+            <%= link_to 'メンバー一覧', forum_topic_topic_members_path(@forum, @topic), class: 'btn btn-sm btn-outline-secondary mt-3' %>
+          <% end %>
         </div>
       </div>
 
@@ -71,8 +76,14 @@
       <div class="mb-5">
         <h4 class="mb-3">返信・投稿する</h4>
 
-        <% if user_signed_in? %>
+        <% if @can_post %>
           <%= render 'public/posts/form', forum: @forum, topic: @topic, post: (@post || Post.new) %>
+        <% elsif user_signed_in? %>
+          <div class="alert alert-warning">
+            このコミュニティに投稿するには参加が必要です。
+            <%# 参加申請ボタン（TopicMembership の create を想定） %>
+            <%= button_to '参加申請を送る', forum_topic_topic_memberships_path(@forum, @topic), method: :post, class: 'btn btn-sm btn-primary ms-2' %>
+          </div>
         <% else %>
           <div class="alert alert-info">
             投稿するには <%= link_to 'ログイン', new_user_session_path %> が必要です。

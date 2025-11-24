@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2025_11_23_052545) do
+ActiveRecord::Schema.define(version: 2025_11_24_114114) do
 
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
@@ -138,6 +138,20 @@ ActiveRecord::Schema.define(version: 2025_11_23_052545) do
     t.index ["genre_id"], name: "index_reviews_on_genre_id"
     t.index ["platform_id"], name: "index_reviews_on_platform_id"
     t.index ["user_id"], name: "index_reviews_on_user_id"
+  end
+
+  create_table "topic_memberships", force: :cascade do |t|
+    t.integer "topic_id", null: false
+    t.integer "user_id", null: false
+    t.string "status", default: "pending", null: false
+    t.integer "approved_by_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["approved_by_id"], name: "index_topic_memberships_on_approved_by_id"
+    t.index ["status"], name: "index_topic_memberships_on_status"
+    t.index ["topic_id", "user_id"], name: "index_topic_memberships_on_topic_id_and_user_id", unique: true
+    t.index ["topic_id"], name: "index_topic_memberships_on_topic_id"
+    t.index ["user_id"], name: "index_topic_memberships_on_user_id"
   end
 
   create_table "topics", force: :cascade do |t|

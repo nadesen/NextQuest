@@ -6,17 +6,20 @@
     </div>
 
     <div class="text-end">
+      <%# 削除ボタンは投稿の作成者または admin のみ表示 %>
       <% if current_user && (
+            (post.respond_to?(:creator) && post.creator == current_user) ||
             (post.respond_to?(:creator_id) && post.creator_id == current_user.id) ||
-            (post.respond_to?(:user) && post.user == current_user)
+            (post.respond_to?(:user) && post.user == current_user) ||
+            (post.respond_to?(:user_id) && post.user_id == current_user.id) ||
+            (current_user.respond_to?(:admin?) && current_user.admin?)
           ) %>
 
-        <%# Ajax 削除: remote: true を使うと Rails UJS 経由で destroy.js.erb が返ります %>
-        <%= link_to '削除', forum_topic_post_path(post.topic.forum, post.topic, post),
-                    method: :delete,
-                    remote: true,
-                    data: { confirm: '本当に削除しますか？' },
-                    class: 'btn btn-sm btn-outline-danger' %>
+        <%= button_to '削除',
+                      forum_topic_post_path(post.topic.forum, post.topic, post),
+                      method: :delete,
+                      data: { confirm: '本当に削除しますか？' },
+                      class: 'btn btn-sm btn-outline-danger' %>
       <% end %>
     </div>
   </div>
