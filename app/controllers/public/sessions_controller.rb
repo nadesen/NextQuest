@@ -5,14 +5,18 @@ class Public::SessionsController < Devise::SessionsController
   before_action :ensure_login_params_present, only: :create
 
   def after_sign_in_path_for(resource)
-    flash[:notice] = "ログインしました"
-    user_path(resource) rescue root_path
+    if resource.respond_to?(:guest_user?) && resource.guest_user?
+      forums_path # ゲストはマイページ不可
+    else
+      flash[:notice] = "ログインしました"
+      user_path(resource) rescue root_path
+    end
   end
-
+  
   def guest_sign_in
     user = User.guest
     sign_in user
-    redirect_to user_path(user), notice: "ゲストでログインしました。"
+    redirect_to forums_path, notice: "ゲストでログインしました。"
   end
 
   private

@@ -2,6 +2,7 @@ class Public::ReviewsController < ApplicationController
   # new/create/show/edit/update/destroy を保護
   before_action :require_login, only: %i[new create show edit update destroy]
   before_action :set_review, only: %i[show edit update destroy]
+  before_action :forbid_guest_user!, only: %i[new create edit update destroy]
 
   def index
     permitted_sorts = %w[created_at title likes_count]

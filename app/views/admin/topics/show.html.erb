@@ -21,7 +21,19 @@
 
           <div class="d-flex justify-content-between align-items-center">
             <div class="small text-muted">
-              作成者: <%= @topic.creator&.nickname || "User##{@topic.creator_id}" %> ・ 投稿数: <%= @topic.posts_count %>
+              作成者:
+              <% if @topic.creator.present? %>
+                <% name = @topic.creator.nickname || "User##{@topic.creator_id}" %>
+                <%# 管理画面のユーザー詳細 (admin_user_path) が存在すればそちらへ、なければ通常のユーザー詳細へフォールバックします %>
+                <% begin %>
+                  <%= link_to name, [:admin, @topic.creator], class: 'text-decoration-none' %>
+                <% rescue ActionController::UrlGenerationError, NameError %>
+                  <%= link_to name, @topic.creator, class: 'text-decoration-none' %>
+                <% end %>
+              <% else %>
+                <span class="text-muted">User#<%= @topic.creator_id %></span>
+              <% end %>
+              ・ 投稿数: <%= @topic.posts_count %>
             </div>
 
             <div class="d-flex align-items-center">

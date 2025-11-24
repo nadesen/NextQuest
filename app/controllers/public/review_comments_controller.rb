@@ -1,5 +1,6 @@
 class  Public::ReviewCommentsController < ApplicationController
   before_action :authenticate_user!
+  before_action :forbid_guest_user!, only: [:create, :destroy]
 
   def create
     @review = Review.find(params[:review_id])

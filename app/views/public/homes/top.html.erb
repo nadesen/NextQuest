@@ -19,7 +19,7 @@
             <div class="d-flex flex-wrap gap-2">
               <%= link_to '新規登録', new_user_registration_path, class: 'btn btn-primary' %>
               <%= link_to 'ログイン', new_user_session_path, class: 'btn btn-outline-primary' %>
-              <%= button_to 'ゲストログイン', guest_sign_in_users_path, method: :post, form: { class: 'd-inline' }, class: 'btn btn-secondary', data: { turbo: false } %>
+              <%= button_to 'ゲストログイン', users_guest_sign_in_path, method: :post, form: { class: 'd-inline' }, class: 'btn btn-secondary', data: { turbo: false } %>
             </div>
           <% else %>
             <% is_guest = current_user.respond_to?(:guest?) ? current_user.guest? : false %>

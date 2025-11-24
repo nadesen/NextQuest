@@ -4,6 +4,7 @@ class Public::TopicsController < ApplicationController
   before_action :require_login, only: %i[new create show edit update destroy]
   before_action :prevent_guest_posting!, only: %i[new create]
   before_action :authorize_topic_owner!, only: %i[edit update destroy]
+  before_action :forbid_guest_user!, only: [:new, :create, :edit, :update, :destroy]
 
   # GET /forums/:forum_id/topics
   def index

@@ -11,7 +11,7 @@ Rails.application.routes.draw do
   }
   # ゲストログイン用
   devise_scope :user do
-    post "users/guest_sign_in", to: "users/sessions#guest_sign_in"
+    post "users/guest_sign_in", to: "public/sessions#guest_sign_in"
   end
   
   # ユーザー側のルーティング設定
@@ -28,9 +28,6 @@ Rails.application.routes.draw do
         
         get :likes
         get :reviews, to: 'reviews#user_reviews' # /users/:id/reviews
-      end
-      collection do
-        post :guest_sign_in, to: 'users#guest_sign_in' # /users/guest_sign_in
       end
     end
 
@@ -88,7 +85,9 @@ Rails.application.routes.draw do
     resources :platforms, only: [:index, :new, :create, :edit, :update, :destroy]
     resources :genres, only: [:index, :new, :create, :edit, :update, :destroy]
     resources :forums, only: [:index, :new, :create, :edit, :update, :destroy]
-    resources :topics, only: [:index, :show, :update, :destroy]
+    resources :topics, only: [:index, :show, :update, :destroy] do
+      resources :members, only: [:index, :update, :destroy], controller: 'topic_members'
+    end
     resources :posts, only: [:index, :show, :update, :destroy]
     resources :actions, only: [:create] # admin actions / audit log
     resources :reviews, only: [:index, :show, :edit, :update, :destroy]

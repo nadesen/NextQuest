@@ -62,7 +62,13 @@
                 </td>
                 <td>
                   <% if topic.creator.present? %>
-                    <%= topic.creator.respond_to?(:nickname) ? h(topic.creator.nickname) : "User##{topic.creator_id}" %>
+                    <% name = topic.creator.respond_to?(:nickname) ? h(topic.creator.nickname) : "User##{topic.creator_id}" %>
+                    <%# 管理画面のユーザー詳細 (admin_user_path) が存在すればそちらへ、なければ通常のユーザー詳細へフォールバックします %>
+                    <% begin %>
+                      <%= link_to name, [:admin, topic.creator], class: 'text-decoration-none' %>
+                    <% rescue ActionController::UrlGenerationError, NameError %>
+                      <%= link_to name, topic.creator, class: 'text-decoration-none' %>
+                    <% end %>
                   <% else %>
                     <span class="text-muted">User#<%= topic.creator_id %></span>
                   <% end %>
@@ -79,7 +85,7 @@
                 <td><%= l(topic.created_at, format: :short) rescue topic.created_at.to_s %></td>
                 <td class="text-end">
 
-                  <%# ロック／アンロック切替ボタン（PATCHで update を利用） %>
+                  <%# ロック or アンロック切替ボタン（PATCHで update を利用） %>
                   <% if topic.locked? %>
                     <%= button_to 'ロック解除', admin_topic_path(topic),
                           method: :patch,

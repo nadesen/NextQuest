@@ -87,9 +87,13 @@
             <hr>
 
             <% if user_signed_in? %>
-              <div>
-                <%= render 'public/review_comments/form', review: @review, review_comment: (@review_comment || ReviewComment.new) %>
-              </div>
+              <% unless current_user&.guest_user? %>
+                <div>
+                  <%= render 'public/review_comments/form', review: @review, review_comment: (@review_comment || ReviewComment.new) %>
+                </div>
+              <% else %>
+                <div class="text-center text-muted">ゲストユーザーはコメントできません。</div>
+              <% end %>
             <% else %>
               <div class="text-center">
                 <%= link_to 'ログインしてコメントする', new_user_session_path, class: 'btn btn-outline-primary' %>
@@ -102,7 +106,9 @@
         <div class="d-flex justify-content-between">
           <%= link_to '一覧に戻る', reviews_path, class: 'btn btn-outline-secondary' %>
           <% if user_signed_in? %>
-            <%= link_to '新規レビュー作成', new_review_path, class: 'btn btn-primary' %>
+            <% unless current_user&.guest_user? %>
+              <%= link_to '新規レビュー作成', new_review_path, class: 'btn btn-primary' %>
+            <% end %>
           <% end %>
         </div>
       </div>
