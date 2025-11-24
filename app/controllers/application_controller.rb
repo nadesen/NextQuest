@@ -60,4 +60,11 @@ class ApplicationController < ActionController::Base
   def after_sign_in_path_for(resource_or_scope)
     stored_location_for(resource_or_scope) || session.delete(:user_return_to) || super
   end
+  
+  # ゲストユーザーは編集・投稿・コメントなどを禁止
+  def forbid_guest_user!
+    if current_user&.respond_to?(:guest_user?) && current_user.guest_user?
+      redirect_to root_path, alert: "ゲストユーザーはこの操作を行えません。"
+    end
+  end
 end

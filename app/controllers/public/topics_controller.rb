@@ -1,10 +1,10 @@
 class Public::TopicsController < ApplicationController
   before_action :set_forum, except: %i[new create]
   before_action :set_topic, only: %i[show edit update destroy]
-  # new/create/show/edit/update/destroy に対してログイン必須に統一
   before_action :require_login, only: %i[new create show edit update destroy]
   before_action :prevent_guest_posting!, only: %i[new create]
   before_action :authorize_topic_owner!, only: %i[edit update destroy]
+  before_action :forbid_guest_user!, only: [:new, :create, :edit, :update, :destroy]
 
   # GET /forums/:forum_id/topics
   def index
@@ -37,6 +37,28 @@ class Public::TopicsController < ApplicationController
   def show
     @posts = @topic.posts.order(created_at: :asc)
     @posts = @posts.page(params[:page]) if defined?(Kaminari) || defined?(WillPaginate)
+    # 非同期投稿用フォームで利用する空の Post を用意
+    @post = Post.new
+
+    # 投稿権限判定（作成者 / admin / 承認済メンバーのみ投稿可）
+    @can_post = false
+    if user_signed_in?
+      @can_post = true if current_user.respond_to?(:admin?) && current_user.admin?
+
+      # 作成者判定：関連オブジェクトで比較できればそれを使い、無ければ creator_id / user_id で比較する
+      creator = @topic.respond_to?(:creator) ? @topic.creator : @topic.user
+      if creator.present?
+        @can_post = true if creator == current_user
+      else
+        @can_post = true if @topic.respond_to?(:creator_id) && @topic.creator_id == current_user&.id
+        @can_post = true if @topic.respond_to?(:user_id) && @topic.user_id == current_user&.id
+      end
+
+      # 承認済メンバーかどうか（作成者や admin でなければチェック）
+      if !@can_post && @topic.respond_to?(:topic_memberships)
+        @can_post = @topic.topic_memberships.approved.exists?(user_id: current_user.id)
+      end
+    end
   end
 
   # GET /topics/new  (全フォーラム共通) または /forums/:forum_id/topics/new

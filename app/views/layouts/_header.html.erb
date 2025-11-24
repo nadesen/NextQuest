@@ -69,11 +69,11 @@
               </li>
               <li class="nav-item">
                 <%# POST のため method: :post を付けています。button_to を使いたい場合は置き換えてください。 %>
-                <%= link_to 'ゲストログイン', guest_sign_in_users_path, method: :post, class: 'nav-link', data: { turbo: false } %>
+                <%= link_to 'ゲストログイン', users_guest_sign_in_path, method: :post, class: 'nav-link', data: { turbo: false } %>
               </li>
             <% else %>
               <%# ログイン中（ゲストか通常ユーザーかを分岐） %>
-              <% is_guest = current_user.respond_to?(:guest?) ? current_user.guest? : false %>
+              <% is_guest = current_user.respond_to?(:guest_user?) ? current_user.guest_user? : false %>
               <% if is_guest %>
                 <li class="nav-item">
                   <%= link_to 'コミュニティ一覧', forums_path, class: 'nav-link' %>

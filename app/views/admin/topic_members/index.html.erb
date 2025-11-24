@@ -1,0 +1,39 @@
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-9 col-md-10">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="h5 mb-0">メンバー管理 — <%= h(@topic.title) %></h2>
+        <div>
+          <%= link_to 'トピックに戻る', admin_topic_path(@topic), class: 'btn btn-sm btn-link' %>
+        </div>
+      </div>
+
+      <div class="card mb-3">
+        <div class="card-body">
+          <h3 class="h6">承認待ち申請</h3>
+          <% if @pending_memberships.any? %>
+            <ul class="list-group mb-3">
+              <% @pending_memberships.each do |tm| %>
+                <%= render 'admin/topic_members/member_row', tm: tm, pending: true, topic: @topic %>
+              <% end %>
+            </ul>
+          <% else %>
+            <div class="text-muted">承認待ちはありません。</div>
+          <% end %>
+
+          <h3 class="h6 mt-4">メンバー一覧（承認済み）</h3>
+          <% if @approved_memberships.any? %>
+            <ul class="list-group">
+              <% @approved_memberships.each do |tm| %>
+                <%= render 'admin/topic_members/member_row', tm: tm, pending: false, topic: @topic %>
+              <% end %>
+            </ul>
+          <% else %>
+            <div class="text-muted">承認済みメンバーがいません。</div>
+          <% end %>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

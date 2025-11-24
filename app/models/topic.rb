@@ -8,6 +8,12 @@ class Topic < ApplicationRecord
 
   # トピックに紐づく投稿
   has_many :posts, dependent: :destroy, inverse_of: :topic, counter_cache: :posts_count
+  
+  # トピックのメンバーシップ（申請・参加管理）
+  has_many :topic_memberships, dependent: :destroy
+  has_many :all_members, through: :topic_memberships, source: :user
+  # 実際に参加承認されたメンバーだけを members として扱う
+  has_many :members, -> { where(topic_memberships: { status: 'approved' }) }, through: :topic_memberships, source: :user
 
   # バリデーション
   validates :title, presence: true

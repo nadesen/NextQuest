@@ -1,0 +1,19 @@
+<li class="list-group-item d-flex justify-content-between align-items-center">
+  <div>
+    <strong><%= h(tm.user&.nickname.presence || tm.user&.name.presence || "User##{tm.user_id}") %></strong>
+    <small class="text-muted ms-2">申請日: <%= tm.created_at.strftime('%Y/%m/%d %H:%M') %></small>
+    <% if tm.status == 'approved' && tm.approved_by %>
+      <small class="text-muted ms-2">（承認者: <%= h(tm.approved_by.nickname.presence || tm.approved_by.name.presence || '管理者') %>）</small>
+    <% end %>
+  </div>
+
+  <div class="btn-group btn-group-sm" role="group">
+    <% if pending %>
+      <%= button_to '承認', admin_topic_member_path(topic, tm), method: :patch, params: { status: 'approved' }, class: 'btn btn-sm btn-success', data: { confirm: 'この申請を承認しますか？' } %>
+      <%= button_to '拒否', admin_topic_member_path(topic, tm), method: :patch, params: { status: 'rejected' }, class: 'btn btn-sm btn-outline-danger', data: { confirm: 'この申請を拒否しますか？' } %>
+      <%= button_to '削除', admin_topic_member_path(topic, tm), method: :delete, class: 'btn btn-sm btn-outline-secondary', data: { confirm: '申請を削除しますか？' } %>
+    <% else %>
+      <%= button_to '追放 / 退会', admin_topic_member_path(topic, tm), method: :delete, class: 'btn btn-sm btn-outline-danger', data: { confirm: 'メンバーを追放または退会させますか？' } %>
+    <% end %>
+  </div>
+</li>

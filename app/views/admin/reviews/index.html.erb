@@ -30,7 +30,18 @@
               <tr>
                 <td><%= review.id %></td>
                 <td><%= truncate(review.title, length: 50) %></td>
-                <td><%= review.user&.nickname.presence || "User##{review.user_id}" %></td>
+                <td>
+                  <% if review.user.present? %>
+                    <% name = review.user.nickname.presence || "User##{review.user_id}" %>
+                    <% begin %>
+                      <%= link_to name, [:admin, review.user], class: "text-decoration-none" %>
+                    <% rescue ActionController::UrlGenerationError, NameError %>
+                      <%= link_to name, review.user, class: "text-decoration-none" %>
+                    <% end %>
+                  <% else %>
+                    <span class="text-muted">User#<%= review.user_id %></span>
+                  <% end %>
+                </td>
                 <td><%= review.platform&.name %></td>
                 <td><%= review.genre&.name %></td>
                 <td><%= review.rating %></td>

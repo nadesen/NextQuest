@@ -15,7 +15,20 @@
       <div class="d-flex justify-content-between align-items-start mb-3">
         <div>
           <h5 class="mb-2"><%= @review.title %></h5>
-          <p class="text-muted mb-2">投稿者: <%= @review.user&.nickname || @review.user_id %> ・ 評価: <%= @review.rating %></p>
+          <p class="text-muted mb-2">
+            投稿者:
+            <% if @review.user.present? %>
+              <% name = @review.user.nickname.presence || "User##{@review.user_id}" %>
+              <% begin %>
+                <%= link_to name, [:admin, @review.user], class: "text-decoration-none" %>
+              <% rescue ActionController::UrlGenerationError, NameError %>
+                <%= link_to name, @review.user, class: "text-decoration-none" %>
+              <% end %>
+            <% else %>
+              <span class="text-muted">User#<%= @review.user_id %></span>
+            <% end %>
+            ・ 評価: <%= @review.rating %>
+          </p>
         </div>
         <div class="text-end">
           <% if @review.approved? %>
