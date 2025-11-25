@@ -18,7 +18,7 @@
             <div>
               <h5 class="mb-1"><%= forum.title %></h5>
               <p class="mb-1 text-muted"><%= truncate(forum.description, length: 120) if forum.description.present? %></p>
-              <small class="text-muted">ID: <%= forum.id %> ・ トピック: <%= h(forum.actual_topics_count) %> ・ 投稿: <%= forum.posts_count %></small>
+              <small class="text-muted">ID: <%= forum.id %> ・ トピック: <%= h(forum.actual_topics_count) %></small>
             </div>
             <div class="text-end">
               <%# 追加：各フォーラムのトピック一覧へ（edit の左） %>

@@ -1,5 +1,5 @@
 class Admin::ReviewsController < ApplicationController
-  before_action :authenticate_admin!
+  before_action :redirect_non_admin_to_public_root
   before_action :set_review, only: [:show, :edit, :update, :destroy]
   before_action :load_collections, only: [:edit, :update]
 
@@ -27,6 +27,12 @@ class Admin::ReviewsController < ApplicationController
   end
 
   private
+
+  def redirect_non_admin_to_public_root
+    unless current_admin
+      redirect_to root_path and return
+    end
+  end
 
   def set_review
     @review = Review.find(params[:id])

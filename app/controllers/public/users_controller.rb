@@ -3,6 +3,7 @@ class Public::UsersController < ApplicationController
   before_action :set_user, only: [:show, :edit, :update, :destroy, :likes]
   before_action :authorize_user!, only: [:edit, :update, :destroy]
   before_action :ensure_guest_user, only: [:edit]
+  before_action :redirect_guest_user_from_mypage, only: [:show]
 
   def show
     @user = User.find(params[:id])
@@ -131,6 +132,13 @@ class Public::UsersController < ApplicationController
       else
         redirect_to user_path(@user), alert: '権限がありません。'
       end
+    end
+  end
+
+  def redirect_guest_user_from_mypage
+    # ログイン中、かつゲスト、かつマイページ参照時
+    if user_signed_in? && current_user.email == "guest@example.com" && params[:id].to_i == current_user.id
+      redirect_to root_path, alert: "ゲストユーザーはマイページは利用できません。"
     end
   end
 

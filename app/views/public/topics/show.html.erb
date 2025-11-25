@@ -6,18 +6,17 @@
       <div class="card mb-4">
         <div class="card-body">
           <h2 class="card-title"><%= @topic.title %></h2>
-          <div class="mb-2 text-muted small">
+          <div class="mb-2 text-white small">
             フォーラム:
             <%= link_to @forum.title, forum_topics_path(@forum) %>
             &nbsp;・&nbsp;
 
             作成者:
-            <% creator = @topic.respond_to?(:creator) ? @topic.creator : @topic.user %>
-            <% if creator.present? %>
-              <% display_name = creator.nickname.presence || creator.name.presence || 'ユーザー' %>
-              <%= link_to h(display_name), user_path(creator), class: 'fw-medium text-decoration-none' %>
+            <% if @topic.author_link? %>
+              <% display_name = @topic.author_name %>
+              <%= link_to h(display_name), user_path(@topic.author), class: 'fw-medium text-decoration-none' %>
             <% else %>
-              <span class="text-muted">匿名</span>
+              <span class="text-muted"><%= h(@topic.author_name) %></span>
             <% end %>
             &nbsp;・&nbsp;
 
@@ -29,7 +28,7 @@
           <% end %>
 
           <% can_edit = user_signed_in? && (
-                (creator.present? && creator == current_user) ||
+                (@topic.author.present? && @topic.author == current_user) ||
                 (@topic.respond_to?(:creator_id) && @topic.creator_id == current_user&.id) ||
                 (@topic.respond_to?(:user_id) && @topic.user_id == current_user&.id)
               ) %>
@@ -46,7 +45,7 @@
           <% end %>
 
           <%# 作成者/管理者はメンバー一覧へ遷移できるリンクを表示 %>
-          <% if current_user && ((current_user.respond_to?(:admin?) && current_user.admin?) || (creator.present? && creator == current_user)) %>
+          <% if current_user && ((current_user.respond_to?(:admin?) && current_user.admin?) || (@topic.author.present? && @topic.author == current_user)) %>
             <%= link_to 'メンバー一覧', forum_topic_topic_members_path(@forum, @topic), class: 'btn btn-sm btn-outline-secondary mt-3' %>
           <% end %>
         </div>
@@ -56,7 +55,7 @@
       <div class="mb-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
           <h4 class="mb-0">コミュニティチャット</h4>
-          <div class="topic-posts-counter small text-muted">
+          <div class="topic-posts-counter small text-white">
             <%= render 'public/posts/counter', topic: @topic %>
           </div>
         </div>

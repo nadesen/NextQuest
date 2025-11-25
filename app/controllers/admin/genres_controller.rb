@@ -1,5 +1,5 @@
 class Admin::GenresController < ApplicationController
-  before_action :authenticate_admin!
+  before_action :redirect_non_admin_to_public_root
   before_action :set_genre, only: [:edit, :update, :destroy]
 
   def index
@@ -35,6 +35,12 @@ class Admin::GenresController < ApplicationController
   end
 
   private
+
+  def redirect_non_admin_to_public_root
+    unless current_admin
+      redirect_to root_path and return
+    end
+  end
 
   def set_genre
     @genre = Genre.find(params[:id])

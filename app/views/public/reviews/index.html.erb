@@ -83,11 +83,10 @@
 
                 <!-- 作成者セルは別扱い（クリック可能） -->
                 <td class="align-middle d-none d-md-table-cell">
-                  <% if review.user.present? %>
-                    <% display_name = review.user.nickname.presence || review.user.name.presence || review.user.email.presence || '不明' %>
-                    <%= link_to h(display_name), user_path(review.user), class: 'text-decoration-none' %>
+                  <% if review.author_link? %>
+                    <%= link_to h(review.author_name), user_path(review.author), class: 'text-decoration-none' %>
                   <% else %>
-                    <span class="text-muted">不明</span>
+                    <span class="text-muted"><%= h(review.author_name) %></span>
                   <% end %>
                 </td>
 

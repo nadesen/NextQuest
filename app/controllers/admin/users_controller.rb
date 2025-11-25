@@ -1,5 +1,5 @@
 class Admin::UsersController < ApplicationController
-  before_action :authenticate_admin!
+  before_action :redirect_non_admin_to_public_root
   before_action :set_user, only: [:show, :edit, :update, :destroy]
 
   def index
@@ -26,6 +26,12 @@ class Admin::UsersController < ApplicationController
 
   def set_user
     @user = User.find(params[:id])
+  end
+
+  def redirect_non_admin_to_public_root
+    unless current_admin
+      redirect_to root_path and return
+    end
   end
 
   def user_params

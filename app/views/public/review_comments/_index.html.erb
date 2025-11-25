@@ -3,9 +3,14 @@
     <% review.review_comments.each do |comment| %>
       <tr>
         <td>
-          <%= link_to user_path(comment.user) do %>
-            <%= comment.user.nickname %>
+          <% if comment.author_link? %>
+            <%= link_to user_path(comment.author) do %>
+              <%= h(comment.author_name) %>
+            <% end %>
+          <% else %>
+            <span class="text-muted"><%= h(comment.author_name) %></span>
           <% end %>
+
           <div class="small text-muted mt-1"><%= comment.created_at.in_time_zone(Time.zone).strftime('%Y/%m/%d %H:%M') if comment.created_at %></div>
         </td>
         <td>

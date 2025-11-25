@@ -91,6 +91,7 @@ Rails.application.routes.draw do
     resources :posts, only: [:index, :show, :update, :destroy]
     resources :actions, only: [:create] # admin actions / audit log
     resources :reviews, only: [:index, :show, :edit, :update, :destroy]
+    resources :review_comments, only: [:destroy]
   end
 
   # ActionCable

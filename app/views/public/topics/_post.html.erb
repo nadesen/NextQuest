@@ -1,7 +1,7 @@
 <li class="list-group-item">
   <div class="d-flex justify-content-between">
     <div>
-      <strong><%= h(post.creator&.nickname.presence || post.user&.nickname.presence || '匿名') %></strong>
+      <strong><%= h(post.author_name) %></strong>
       <small class="text-muted ms-2"><%= post.created_at.in_time_zone(Time.zone).strftime('%Y/%m/%d %H:%M') %></small>
     </div>
 
@@ -24,7 +24,7 @@
     </div>
   </div>
 
-  <div class="mt-2">
+  <div class="mt-2 text-white">
     <%= simple_format(h(post.content || post.body || '')) %>
   </div>
 </li>

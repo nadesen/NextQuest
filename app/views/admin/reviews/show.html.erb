@@ -61,4 +61,50 @@
       </div>
     </div>
   </div>
+
+  <%# === コメント表示エリア === %>
+  <div class="card shadow-sm mt-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <strong class="mb-0">コメント一覧</strong>
+      <small class="text-muted">全 <%= @review.review_comments.count %> 件</small>
+    </div>
+    <div class="card-body p-0">
+      <% if @review.review_comments.any? %>
+        <div class="list-group list-group-flush">
+          <% @review.review_comments.each do |comment| %>
+            <div class="list-group-item d-flex justify-content-between align-items-start">
+              <div class="me-3" style="min-width: 56px;">
+                <div class="fw-bold small">
+                  <% if comment.user.present? %>
+                    <% name = comment.user.respond_to?(:nickname) ? comment.user.nickname : "User##{comment.user_id}" %>
+                    <% begin %>
+                      <%= link_to name, [:admin, comment.user], class: 'text-decoration-none' %>
+                    <% rescue ActionController::UrlGenerationError, NameError %>
+                      <%= link_to name, comment.user, class: 'text-decoration-none' %>
+                    <% end %>
+                  <% else %>
+                    <span class="text-muted">User#<%= comment.user_id %></span>
+                  <% end %>
+                </div>
+                <div class="small text-muted">
+                  <%= l(comment.created_at, format: :short) rescue comment.created_at.to_s %>
+                </div>
+              </div>
+              <div class="flex-fill">
+                <%= simple_format(comment.comment) %>
+              </div>
+              <div class="ms-3 text-end">
+                <%= link_to '削除', admin_review_comment_path(comment),
+                      method: :delete,
+                      data: { confirm: 'このコメントを削除しますか？' },
+                      class: 'btn btn-sm btn-danger' %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="p-4 text-center text-muted">コメントがありません。</div>
+      <% end %>
+    </div>
+  </div>
 </div>

@@ -1,87 +1,84 @@
-<section class="bg-light py-5">
-  <div class="container">
-    <div class="row align-items-center">
-      <!-- 左: サイトタイトル / 概要 -->
-      <div class="col-lg-8">
-        <h1 class="display-5 fw-bold mb-3">ゲームレビュー＆コミュニティプラットフォーム</h1>
-        <p class="lead">
-        近年、ゲームタイトルの供給量が爆発的に増えた結果、ユーザーは膨大な情報の中から、自分に合うゲームを探すことに多大な時間と手間をかけています。<br>
-
-        特に、インディーズやニッチな良作は、大手メディアのレビューだけでは多種多様なゲーマーの「リアルな評価」を知ることが難しく、埋もれてしまいがちです。<br>
-        
-        このような情報過多に疲弊し、「せっかく買ったのに合わなかった」というゲーム探しの失敗を避けたいユーザーのためには、信頼できるゲーマー仲間の意見や、詳細なレビューを多角的に集約する場所が必要です。<br>
-        
-        本サイトは、ユーザー同士の率直な意見交換を通じて、ゲーム探しの失敗を減らし、あなたにとって最適な「次の運命の一本」に出会える場を提供することで、この課題を解決します。<br>
-
-        <!-- 状態に応じたアクションボタン -->
-        <div class="mt-4">
+<section class="top-hero d-flex align-items-center justify-content-center" style="background: url('<%= asset_path('トップページ画像_Gemini_Generated_Image.png') %>') center center / 55% 100% no-repeat;">
+  <div class="container position-relative z-2">
+    <div class="row justify-content-center">
+      <div class="col-lg-10 text-center">
+        <h5 class="fw-bold mb-4"><strong>ゲームレビュー＆コミュニティプラットフォーム</strong></h5>
+        <p class="lead mb-4 top-description text-left">
+          　近年、ゲームタイトルの供給量が爆発的に増えた結果、ユーザーは膨大な情報の中から、自分に合うゲームを探すことに多大な時間と手間をかけています。<br>
+          　特に、インディーズやニッチな良作は、大手メディアのレビューだけでは多種多様なゲーマーの「リアルな評価」を知ることが難しく、埋もれてしまいがちです。<br>
+          　このような情報過多に疲弊し、「せっかく買ったのに合わなかった」というゲーム探しの失敗を避けたいユーザーのためには、信頼できるゲーマー仲間の意見や、詳細なレビューを多角的に集約する場所が必要です。<br>
+          　本サイトは、ユーザー同士の率直な意見交換を通じて、ゲーム探しの失敗を減らし、あなたにとって最適な「次の運命の一本」に出会える場を提供することで、この課題を解決します。<br>
+        </p>
+        <div class="mt-4 mb-5 d-flex flex-wrap justify-content-center gap-2">
           <% unless user_signed_in? %>
-            <div class="d-flex flex-wrap gap-2">
-              <%= link_to '新規登録', new_user_registration_path, class: 'btn btn-primary' %>
-              <%= link_to 'ログイン', new_user_session_path, class: 'btn btn-outline-primary' %>
-              <%= button_to 'ゲストログイン', users_guest_sign_in_path, method: :post, form: { class: 'd-inline' }, class: 'btn btn-secondary', data: { turbo: false } %>
-            </div>
+            <%= link_to '新規登録', new_user_registration_path, class: 'btn btn-primary' %>
+            <%= link_to 'ログイン', new_user_session_path, class: 'btn btn-outline-primary' %>
+            <%= button_to 'ゲストログイン', users_guest_sign_in_path, method: :post, form: { class: 'd-inline' }, class: 'btn btn-secondary', data: { turbo: false } %>
           <% else %>
             <% is_guest = current_user.respond_to?(:guest?) ? current_user.guest? : false %>
             <% if is_guest %>
-              <div class="d-flex flex-wrap gap-2">
-                <%= link_to 'コミュニティ一覧', forums_path, class: 'btn btn-primary' %>
-                <%= link_to 'レビュー一覧', reviews_path, class: 'btn btn-outline-primary' %>
-              </div>
+              <%= link_to 'コミュニティ一覧', forums_path, class: 'btn btn-primary' %>
+              <%= link_to 'レビュー一覧', reviews_path, class: 'btn btn-outline-primary' %>
             <% else %>
-              <div class="d-flex flex-wrap gap-2">
-                <%= link_to 'コミュニティ一覧', forums_path, class: 'btn btn-primary' %>
-                <%= link_to '新規コミュニティ作成', new_topic_path, class: 'btn btn-outline-primary' %>
-                <%= link_to 'レビュー一覧', reviews_path, class: 'btn btn-success' %>
-                <%= link_to '新規レビュー作成', new_review_path, class: 'btn btn-outline-success' %>
-              </div>
+              <%= link_to 'コミュニティ一覧', forums_path, class: 'btn btn-primary' %>
+              <%= link_to '新規コミュニティ作成', new_topic_path, class: 'btn btn-outline-primary' %>
+              <%= link_to 'レビュー一覧', reviews_path, class: 'btn btn-success' %>
+              <%= link_to '新規レビュー作成', new_review_path, class: 'btn btn-outline-success' %>
             <% end %>
           <% end %>
         </div>
       </div>
-
-      <!-- 右: ビジュアル（任意のイメージ／プレースホルダ） -->
-      <div class="col-lg-4 text-center mt-4 mt-lg-0">
-        <!-- ここにロゴ画像やヒーローイメージを置くと良いです。assets に hero.png 等を配置してください。 -->
-        <% if defined?(Rails.application.assets) && Rails.application.assets.respond_to?(:find_asset) && Rails.application.assets.find_asset('hero.png') %>
-          <%= image_tag 'hero.png', class: 'img-fluid rounded shadow', alt: 'Hero image' %>
-        <% else %>
-          <div class="border rounded p-4 bg-white shadow-sm">
-            <svg width="160" height="120" viewBox="0 0 160 120" xmlns="http://www.w3.org/2000/svg" class="mb-2" aria-hidden="true">
-              <rect width="160" height="120" fill="#f8f9fa"></rect>
-              <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#6c757d" font-size="12">Hero Image</text>
-            </svg>
-            <p class="small text-muted mb-0">ゲーム探しをサポートするコミュニティ & レビュー集約サイト</p>
-          </div>
-        <% end %>
-      </div>
     </div>
   </div>
 </section>
 
-<!-- 下部に簡易的なサマリー / プレースホルダ（新着レビュー・注目トピック等を後で差し替え可能） -->
-<section class="py-5">
-  <div class="container">
-    <div class="row g-4">
-      <div class="col-md-6">
-        <div class="card h-100">
-          <div class="card-body">
-            <h5 class="card-title">新着レビュー</h5>
-            <p class="card-text text-muted">最新のレビューをここに表示します。レビュー一覧ページで詳細を確認できます。</p>
-            <%= link_to 'レビュー一覧へ', reviews_path, class: 'btn btn-sm btn-outline-secondary' %>
+<% if user_signed_in? %>
+  <section class="py-5">
+    <div class="container">
+      <div class="row g-4">
+        <!-- 新着コミュニティトピック -->
+        <div class="col-md-6">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title">新着コミュニティトピック</h5>
+              <% if @latest_topics.present? %>
+                <ul class="list-unstyled mb-3">
+                  <% @latest_topics.each do |topic| %>
+                    <li>
+                      <%= link_to topic.title, forum_topic_path(topic.forum_id, topic.id), class: "text-decoration-none fw-bold" %>
+                      <span class="text-muted small ms-2"><%= l(topic.created_at, format: :short) %></span>
+                    </li>
+                  <% end %>
+                </ul>
+              <% else %>
+                <div class="text-muted">新着トピックはありません。</div>
+              <% end %>
+              <%= link_to 'コミュニティ一覧へ', forums_path, class: 'btn btn-sm btn-outline-secondary' %>
+            </div>
           </div>
         </div>
-      </div>
-
-      <div class="col-md-6">
-        <div class="card h-100">
-          <div class="card-body">
-            <h5 class="card-title">注目トピック</h5>
-            <p class="card-text text-muted">盛り上がっているコミュニティのトピックや注目の投稿をここに表示します。</p>
-            <%= link_to 'コミュニティ一覧へ', forums_path, class: 'btn btn-sm btn-outline-secondary' %>
+        <!-- 新着レビュー -->
+        <div class="col-md-6">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title">新着レビュー</h5>
+              <% if @latest_reviews.present? %>
+                <ul class="list-unstyled mb-3">
+                  <% @latest_reviews.each do |review| %>
+                    <li>
+                      <%= link_to review.title, review_path(review), class: "text-decoration-none fw-bold" %>
+                      <span class="text-muted small ms-2"><%= l(review.created_at, format: :short) %></span>
+                    </li>
+                  <% end %>
+                </ul>
+              <% else %>
+                <div class="text-muted">新着レビューはありません。</div>
+              <% end %>
+              <%= link_to 'レビュー一覧へ', reviews_path, class: 'btn btn-sm btn-outline-secondary' %>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
+<% end %>
