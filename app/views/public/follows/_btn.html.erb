@@ -2,9 +2,9 @@
 <% if user.present? && user != current_user && user_signed_in? %>
   <% unless current_user.email == "guest@example.com" %>
     <% if current_user.following?(user) %>
-      <%= link_to "フォロー外す", unfollow_user_path(user), method: :delete, class: "btn btn-info" %>
+      <%= link_to "フォロー外す", unfollow_user_path(user), method: :delete, class: "btn btn-info text-white" %>
     <% else %>
-      <%= link_to "フォローする", follow_user_path(user), method: :post, class: "btn btn-success" %>
+      <%= link_to "フォローする", follow_user_path(user), method: :post, class: "btn btn-success text-white" %>
     <% end %>
   <% end %>
 <% end %>

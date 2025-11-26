@@ -152,3 +152,10 @@ header, .navbar {
 footer {
   margin-top: 50px; 
 }
+
+.table td.profile-col {
+  max-width: 700px;
+}
+.table th.profile-col {
+  width: 700px;
+}

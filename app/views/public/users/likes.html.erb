@@ -76,7 +76,7 @@
                     <% display_name = review.user.nickname.presence || review.user.name.presence || review.user.email.presence || '不明' %>
                     <%= link_to h(display_name), user_path(review.user), class: 'text-decoration-none' %>
                   <% else %>
-                    <span class="text-muted">不明</span>
+                    <span class="text-muted">削除されたユーザー</span>
                   <% end %>
                 </td>
 

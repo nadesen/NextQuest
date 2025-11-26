@@ -17,7 +17,7 @@
               <thead class="table-light">
                 <tr>
                   <th>ニックネーム</th>
-                  <th>プロフィール</th>
+                  <th class="profile-col">プロフィール</th>
                   <th class="text-end">操作</th>
                 </tr>
               </thead>
@@ -32,7 +32,7 @@
                       <% end %>
                     </td>
 
-                    <td class="position-relative">
+                    <td class="profile-col position-relative">
                       <% if user.respond_to?(:profile_text) && user.profile_text.present? %>
                         <%= link_to user_path(user),
                                     class: 'stretched-link text-decoration-none text-reset',
