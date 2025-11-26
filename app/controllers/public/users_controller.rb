@@ -7,14 +7,52 @@ class Public::UsersController < ApplicationController
 
   def show
     @user = User.find(params[:id])
-    @topics = fetch_user_topics(@user.id, limit: 20)
-    @posts  = fetch_user_posts(@user.id, limit: 20)
-    @reviews = fetch_user_reviews(@user.id, limit: 20)
-    # joins(:review) によって review が存在するコメントのみを取得します。
-    @review_comments = @user.review_comments.joins(:review)
-                            .includes(:review)
-                            .order(created_at: :desc)
-                            .limit(10)
+
+    # 各一覧はページネーションを入れる（表示上限 5）
+    # 複数の paginate を同一ページに置くためにページパラメータ名を個別に分ける:
+    # topics_page, posts_page, reviews_page, review_comments_page
+
+    # トピック
+    topics_relation = fetch_user_topics(@user.id)
+    if defined?(Kaminari)
+      @topics = topics_relation.page(params[:topics_page]).per(5)
+    elsif defined?(WillPaginate)
+      @topics = topics_relation.paginate(page: params[:topics_page], per_page: 5)
+    else
+      @topics = topics_relation.limit(5)
+    end
+
+    # ポスト
+    posts_relation = fetch_user_posts(@user.id)
+    if defined?(Kaminari)
+      @posts = posts_relation.page(params[:posts_page]).per(5)
+    elsif defined?(WillPaginate)
+      @posts = posts_relation.paginate(page: params[:posts_page], per_page: 5)
+    else
+      @posts = posts_relation.limit(5)
+    end
+
+    # レビュー
+    reviews_relation = fetch_user_reviews(@user.id)
+    if defined?(Kaminari)
+      @reviews = reviews_relation.page(params[:reviews_page]).per(5)
+    elsif defined?(WillPaginate)
+      @reviews = reviews_relation.paginate(page: params[:reviews_page], per_page: 5)
+    else
+      @reviews = reviews_relation.limit(5)
+    end
+
+    # レビューへのコメント（review が存在するコメントのみ取得）
+    review_comments_relation = @user.review_comments.joins(:review)
+                                    .includes(:review)
+                                    .order(created_at: :desc)
+    if defined?(Kaminari)
+      @review_comments = review_comments_relation.page(params[:review_comments_page]).per(5)
+    elsif defined?(WillPaginate)
+      @review_comments = review_comments_relation.paginate(page: params[:review_comments_page], per_page: 5)
+    else
+      @review_comments = review_comments_relation.limit(5)
+    end
   end
 
   # GET /users/:id/likes
@@ -54,66 +92,79 @@ class Public::UsersController < ApplicationController
 
   private
 
-  def fetch_user_topics(user_id, limit: 20)
+  # fetch_user_* は可能な限り ActiveRecord::Relation を返すようにしておく（paginate 対応）
+  def fetch_user_topics(user_id, limit: nil)
     return Topic.none unless defined?(Topic)
-    if @user.respond_to?(:topics)
-      @user.topics.includes(:forum).order(created_at: :desc).limit(limit)
-    else
-      cols = Topic.column_names rescue []
-      if cols.include?('user_id')
-        Topic.where(user_id: user_id).includes(:forum).order(created_at: :desc).limit(limit)
-      elsif cols.include?('creator_id')
-        Topic.where(creator_id: user_id).includes(:forum).order(created_at: :desc).limit(limit)
-      elsif cols.include?('author_id')
-        Topic.where(author_id: user_id).includes(:forum).order(created_at: :desc).limit(limit)
-      elsif Topic.reflect_on_association(:posts) && defined?(Post) && (Post.column_names.include?('user_id') rescue false)
-        Topic.joins(:posts).where(posts: { user_id: user_id }).distinct.includes(:forum).order('topics.created_at DESC').limit(limit)
+    relation =
+      if @user.respond_to?(:topics)
+        @user.topics.includes(:forum).order(created_at: :desc)
       else
-        Topic.none
+        cols = Topic.column_names rescue []
+        if cols.include?('user_id')
+          Topic.where(user_id: user_id).includes(:forum).order(created_at: :desc)
+        elsif cols.include?('creator_id')
+          Topic.where(creator_id: user_id).includes(:forum).order(created_at: :desc)
+        elsif cols.include?('author_id')
+          Topic.where(author_id: user_id).includes(:forum).order(created_at: :desc)
+        elsif Topic.reflect_on_association(:posts) && defined?(Post) && (Post.column_names.include?('user_id') rescue false)
+          Topic.joins(:posts).where(posts: { user_id: user_id }).distinct.includes(:forum).order('topics.created_at DESC')
+        else
+          Topic.none
+        end
       end
-    end
+
+    relation = relation.limit(limit) if limit.present?
+    relation
   rescue => e
     Rails.logger.warn("[UsersController#fetch_user_topics] #{e.message}")
     Topic.none
   end
 
-  def fetch_user_posts(user_id, limit: 20)
-    return [] unless defined?(Post)
-    if @user.respond_to?(:posts)
-      @user.posts.includes(:topic).order(created_at: :desc).limit(limit)
-    else
-      cols = Post.column_names rescue []
-      if cols.include?('user_id')
-        Post.where(user_id: user_id).includes(:topic).order(created_at: :desc).limit(limit)
-      elsif cols.include?('author_id')
-        Post.where(author_id: user_id).includes(:topic).order(created_at: :desc).limit(limit)
-      elsif cols.include?('creator_id')
-        Post.where(creator_id: user_id).includes(:topic).order(created_at: :desc).limit(limit)
+  def fetch_user_posts(user_id, limit: nil)
+    return Post.none unless defined?(Post)
+    relation =
+      if @user.respond_to?(:posts)
+        @user.posts.includes(:topic).order(created_at: :desc)
       else
-        Post.none
+        cols = Post.column_names rescue []
+        if cols.include?('user_id')
+          Post.where(user_id: user_id).includes(:topic).order(created_at: :desc)
+        elsif cols.include?('author_id')
+          Post.where(author_id: user_id).includes(:topic).order(created_at: :desc)
+        elsif cols.include?('creator_id')
+          Post.where(creator_id: user_id).includes(:topic).order(created_at: :desc)
+        else
+          Post.none
+        end
       end
-    end
+
+    relation = relation.limit(limit) if limit.present?
+    relation
   rescue => e
     Rails.logger.warn("[UsersController#fetch_user_posts] #{e.message}")
     Post.none
   end
 
-  def fetch_user_reviews(user_id, limit: 20)
-    return [] unless defined?(Review)
-    if @user.respond_to?(:reviews)
-      @user.reviews.includes(:platform, :genre).order(created_at: :desc).limit(limit)
-    else
-      cols = Review.column_names rescue []
-      if cols.include?('user_id')
-        Review.where(user_id: user_id).includes(:platform, :genre).order(created_at: :desc).limit(limit)
-      elsif cols.include?('author_id')
-        Review.where(author_id: user_id).includes(:platform, :genre).order(created_at: :desc).limit(limit)
-      elsif cols.include?('creator_id')
-        Review.where(creator_id: user_id).includes(:platform, :genre).order(created_at: :desc).limit(limit)
+  def fetch_user_reviews(user_id, limit: nil)
+    return Review.none unless defined?(Review)
+    relation =
+      if @user.respond_to?(:reviews)
+        @user.reviews.includes(:platform, :genre).order(created_at: :desc)
       else
-        Review.none
+        cols = Review.column_names rescue []
+        if cols.include?('user_id')
+          Review.where(user_id: user_id).includes(:platform, :genre).order(created_at: :desc)
+        elsif cols.include?('author_id')
+          Review.where(author_id: user_id).includes(:platform, :genre).order(created_at: :desc)
+        elsif cols.include?('creator_id')
+          Review.where(creator_id: user_id).includes(:platform, :genre).order(created_at: :desc)
+        else
+          Review.none
+        end
       end
-    end
+
+    relation = relation.limit(limit) if limit.present?
+    relation
   rescue => e
     Rails.logger.warn("[UsersController#fetch_user_reviews] #{e.message}")
     Review.none

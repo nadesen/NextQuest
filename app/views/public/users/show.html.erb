@@ -8,7 +8,16 @@
           <!-- トピック一覧 -->
           <div class="card mb-3">
             <div class="card-header">
-              トピック（最近 <%= @topics.size %> 件）
+              <%# ページネーション対応の「全件数」を表示（Kaminari / WillPaginate / fallback） %>
+              <% topics_total =
+                   if defined?(@topics) && @topics.respond_to?(:total_count)
+                     @topics.total_count
+                   elsif defined?(@topics) && @topics.respond_to?(:total_entries)
+                     @topics.total_entries
+                   else
+                     @topics.size
+                   end %>
+              トピック（全 <%= topics_total %> 件）
             </div>
             <div class="card-body p-0">
               <% if @topics.any? %>
@@ -25,7 +34,15 @@
                     <tbody>
                       <% @topics.each do |topic| %>
                         <tr>
-                          <td class="text-nowrap"><%= topic.created_at.in_time_zone(Time.zone).strftime('%Y/%m/%d') %></td>
+                          <td class="text-nowrap">
+                            <% if topic.created_at %>
+                              <%= topic.created_at.in_time_zone(Time.zone).strftime('%Y/%m/%d') %>
+                              <br>
+                              <small class="text-white"><%= topic.created_at.in_time_zone(Time.zone).strftime('%H:%M') %></small>
+                            <% else %>
+                              —
+                            <% end %>
+                          </td>
                           <td><%= h(topic.title) %></td>
                           <td class="d-none d-md-table-cell"><%= h(topic.try(:forum).try(:title) || '—') %></td>
                           <td class="text-end text-nowrap">
@@ -39,6 +56,10 @@
                     </tbody>
                   </table>
                 </div>
+
+                <div class="d-flex justify-content-center mt-2">
+                  <%= paginate @topics, theme: 'bootstrap4', param_name: 'topics_page' %>
+                </div>
               <% else %>
                 <div class="p-3 text-muted">まだトピックの投稿はありません。</div>
               <% end %>
@@ -47,7 +68,15 @@
 
           <!-- ポスト一覧 -->
           <div class="card mb-3">
-            <div class="card-header">投稿（Post）（最近 <%= @posts.size %> 件）</div>
+            <% posts_total =
+                 if defined?(@posts) && @posts.respond_to?(:total_count)
+                   @posts.total_count
+                 elsif defined?(@posts) && @posts.respond_to?(:total_entries)
+                   @posts.total_entries
+                 else
+                   @posts.size
+                 end %>
+            <div class="card-header">投稿（Post）（全 <%= posts_total %> 件）</div>
             <div class="card-body p-0">
               <% if @posts.any? %>
                 <div class="table-responsive">
@@ -63,7 +92,15 @@
                     <tbody>
                       <% @posts.each do |post| %>
                         <tr>
-                          <td class="text-nowrap"><%= post.created_at.in_time_zone(Time.zone).strftime('%Y/%m/%d') %></td>
+                          <td class="text-nowrap">
+                            <% if post.created_at %>
+                              <%= post.created_at.in_time_zone(Time.zone).strftime('%Y/%m/%d') %>
+                              <br>
+                              <small class="text-white"><%= post.created_at.in_time_zone(Time.zone).strftime('%H:%M') %></small>
+                            <% else %>
+                              —
+                            <% end %>
+                          </td>
                           <td><%= h(truncate(post.content.to_s, length: 80)) %></td>
                           <td class="d-none d-md-table-cell"><%= h(post.try(:topic).try(:title) || '—') %></td>
                           <td class="text-end text-nowrap">
@@ -81,6 +118,10 @@
                     </tbody>
                   </table>
                 </div>
+
+                <div class="d-flex justify-content-center mt-2">
+                  <%= paginate @posts, theme: 'bootstrap4', param_name: 'posts_page' %>
+                </div>
               <% else %>
                 <div class="p-3 text-muted">まだ投稿はありません。</div>
               <% end %>
@@ -89,7 +130,15 @@
 
           <!-- レビュー一覧 -->
           <div class="card mb-3">
-            <div class="card-header">レビュー（最近 <%= @reviews.size %> 件）</div>
+            <% reviews_total =
+                 if defined?(@reviews) && @reviews.respond_to?(:total_count)
+                   @reviews.total_count
+                 elsif defined?(@reviews) && @reviews.respond_to?(:total_entries)
+                   @reviews.total_entries
+                 else
+                   @reviews.size
+                 end %>
+            <div class="card-header">レビュー（全 <%= reviews_total %> 件）</div>
             <div class="card-body p-0">
               <% if @reviews.any? %>
                 <div class="table-responsive">
@@ -107,7 +156,15 @@
                     <tbody>
                       <% @reviews.each do |review| %>
                         <tr>
-                          <td class="text-nowrap"><%= review.created_at.in_time_zone(Time.zone).strftime('%Y/%m/%d') %></td>
+                          <td class="text-nowrap">
+                            <% if review.created_at %>
+                              <%= review.created_at.in_time_zone(Time.zone).strftime('%Y/%m/%d') %>
+                              <br>
+                              <small class="text-white"><%= review.created_at.in_time_zone(Time.zone).strftime('%H:%M') %></small>
+                            <% else %>
+                              —
+                            <% end %>
+                          </td>
                           <td><%= h(review.platform&.name.presence || '—') %></td>
                           <td><%= h(review.genre&.name.presence || '—') %></td>
                           <td><%= h(review.title) %></td>
@@ -123,6 +180,10 @@
                     </tbody>
                   </table>
                 </div>
+
+                <div class="d-flex justify-content-center mt-2">
+                  <%= paginate @reviews, theme: 'bootstrap4', param_name: 'reviews_page' %>
+                </div>
               <% else %>
                 <div class="p-3 text-muted">まだレビューはありません。</div>
               <% end %>
@@ -131,7 +192,15 @@
 
           <!-- レビューへのコメント一覧（テーブル形式） -->
           <div class="card mb-3">
-            <div class="card-header">レビューへのコメント（最近 <%= @review_comments.size %> 件）</div>
+            <% rc_total =
+                 if defined?(@review_comments) && @review_comments.respond_to?(:total_count)
+                   @review_comments.total_count
+                 elsif defined?(@review_comments) && @review_comments.respond_to?(:total_entries)
+                   @review_comments.total_entries
+                 else
+                   @review_comments.size
+                 end %>
+            <div class="card-header">レビューへのコメント（全 <%= rc_total %> 件）</div>
             <div class="card-body p-0">
               <% if @review_comments.any? %>
                 <div class="table-responsive">
@@ -147,7 +216,15 @@
                     <tbody>
                       <% @review_comments.each do |rc| %>
                         <tr>
-                          <td class="text-nowrap"><%= rc.created_at.in_time_zone(Time.zone).strftime('%Y/%m/%d') %></td>
+                          <td class="text-nowrap">
+                            <% if rc.created_at %>
+                              <%= rc.created_at.in_time_zone(Time.zone).strftime('%Y/%m/%d') %>
+                              <br>
+                              <small class="text-white"><%= rc.created_at.in_time_zone(Time.zone).strftime('%H:%M') %></small>
+                            <% else %>
+                              —
+                            <% end %>
+                          </td>
                           <td>
                             <%= link_to h(rc.review.title), review_path(rc.review), class: 'text-decoration-none' %>
                             <div class="small text-muted">
@@ -163,6 +240,10 @@
                       <% end %>
                     </tbody>
                   </table>
+                </div>
+
+                <div class="d-flex justify-content-center mt-2">
+                  <%= paginate @review_comments, theme: 'bootstrap4', param_name: 'review_comments_page' %>
                 </div>
               <% else %>
                 <div class="p-3 text-muted">レビューに対するコメントはまだありません。</div>
