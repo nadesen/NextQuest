@@ -27,6 +27,17 @@
 
   <div class="card shadow-sm">
     <div class="card-body p-0">
+      <!-- 並び替え -->
+      <div class="mb-2">
+        <% sort_params = { id: 'ID順', title: 'タイトル順', creator_id: '作成者順', posts_count: '投稿数順', created_at: '作成日順' } %>
+        <% sort_params.each do |key, label| %>
+          <% selected = (params[:sort] == key.to_s) %>
+          <% direction = selected ? (params[:direction] == 'asc' ? 'desc' : 'asc') : 'desc' %>
+          <%= link_to "#{label}#{selected ? (params[:direction] == 'asc' ? '↑' : '↓') : ''}", url_for(params.to_unsafe_h.merge(sort: key, direction: direction, page: nil)), class: (selected ? "fw-bold text-primary" : "") %>
+          <% unless key == :created_at %>｜<% end %>
+        <% end %>
+      </div>
+
       <div class="table-responsive">
         <table class="table table-hover mb-0 align-middle">
           <thead class="table-light">
@@ -36,7 +47,6 @@
               <th>フォーラム</th>
               <th>作成者</th>
               <th>投稿数</th>
-              <th>閲覧数</th>
               <th>状態</th>
               <th>作成日</th>
               <th class="text-end">操作<br>(ロック切替のみ、機能未実装)</th>
@@ -74,7 +84,6 @@
                   <% end %>
                 </td>
                 <td><%= topic.posts_count %></td>
-                <td><%= topic.views_count %></td>
                 <td>
                   <% if topic.locked? %>
                     <span class="badge bg-danger">ロック</span>

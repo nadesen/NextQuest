@@ -29,7 +29,12 @@ class Public::ReviewsController < ApplicationController
       @reviews = @reviews.order("#{sort} #{direction}")
     end
   
-    @reviews = @reviews.page(params[:page]) if defined?(Kaminari) || defined?(WillPaginate)
+    # ページネーション（表示上限を30件に設定）
+    if defined?(Kaminari)
+      @reviews = @reviews.page(params[:page]).per(30)
+    elsif defined?(WillPaginate)
+      @reviews = @reviews.paginate(page: params[:page], per_page: 30)
+    end
   end
 
   def show

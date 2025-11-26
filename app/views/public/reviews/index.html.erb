@@ -18,7 +18,7 @@
     <% if @reviews.present? %>
       <!-- ソート・フィルター部分テンプレートのレンダリング -->
       <%= render 'public/reviews/sorting_and_filtering' %>
-      <! -- レビュー一覧テーブル -->
+      <!-- レビュー一覧テーブル -->
       <div class="table-responsive">
         <table class="table table-hover align-middle">
           <thead class="table-light">
@@ -103,7 +103,7 @@
       </div>
 
       <div class="d-flex justify-content-center mt-3">
-        <%= paginate(@reviews) if defined?(Kaminari) || defined?(WillPaginate) rescue '' %>
+        <%= paginate @reviews, theme: 'bootstrap4' %>
       </div>
     <% else %>
       <!-- ソート・フィルター部分テンプレートのレンダリング -->

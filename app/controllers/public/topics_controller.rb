@@ -30,7 +30,13 @@ class Public::TopicsController < ApplicationController
       end
 
     @topics = base_scope.order(Arel.sql(order_clause))
-    @topics = @topics.page(params[:page]) if defined?(Kaminari) || defined?(WillPaginate)
+
+    # ページネーション（表示上限を30件に設定）
+    if defined?(Kaminari)
+      @topics = @topics.page(params[:page]).per(30)
+    elsif defined?(WillPaginate)
+      @topics = @topics.paginate(page: params[:page], per_page: 30)
+    end
   end
 
   # GET /forums/:forum_id/topics/:id

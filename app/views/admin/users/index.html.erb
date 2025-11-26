@@ -11,6 +11,17 @@
 
   <div class="card shadow-sm">
     <div class="card-body p-0">
+      <!-- 並び替え -->
+      <div class="mb-2">
+        <% sort_params = { id: 'ID順', name: '名前順', nickname: 'ニックネーム順', created_at: '作成日順' } %>
+        <% sort_params.each do |key, label| %>
+          <% selected = (params[:sort] == key.to_s) %>
+          <% direction = selected ? (params[:direction] == 'asc' ? 'desc' : 'asc') : 'asc' %>
+          <%= link_to "#{label}#{selected ? (params[:direction] == 'asc' ? '↑' : '↓') : ''}", url_for(sort: key, direction: direction), class: (selected ? "fw-bold text-primary" : "") %>
+          <% unless key == :created_at %>｜<% end %>
+        <% end %>
+      </div>
+      
       <div class="table-responsive">
         <table class="table table-hover mb-0">
           <thead class="table-light">

@@ -3,7 +3,10 @@ class Admin::UsersController < ApplicationController
   before_action :set_user, only: [:show, :edit, :update, :destroy]
 
   def index
-    @users = User.order(id: :asc).page(params[:page]).per(20)
+    permitted_sorts = %w[id name nickname created_at]
+    sort = permitted_sorts.include?(params[:sort]) ? params[:sort] : "id"
+    direction = params[:direction] == 'desc' ? 'desc' : 'asc'
+    @users = User.order("#{sort} #{direction}").page(params[:page]).per(20)
   end
 
   def show; end
