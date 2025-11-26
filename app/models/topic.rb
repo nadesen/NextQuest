@@ -39,6 +39,35 @@ class Topic < ApplicationRecord
     end
   end
 
+  # 実在する作成者(User)オブジェクトがあればそれを返す
+  def author
+    if respond_to?(:creator) && creator.present?
+      creator
+    elsif respond_to?(:user) && user.present?
+      user
+    else
+      nil
+    end
+  end
+
+  # 表示用の作成者名を返す
+  def author_name
+    if author.present?
+      author.nickname.presence || author.name.presence || 'ユーザー'
+    elsif respond_to?(:creator_id) && creator_id.present?
+      '削除されたユーザー'
+    elsif respond_to?(:user_id) && user_id.present?
+      '削除されたユーザー'
+    else
+      '匿名'
+    end
+  end
+
+  # プロフィールへリンクを張って良いか
+  def author_link?
+    author.present?
+  end
+
   private
 
   def forum_must_exist

@@ -38,4 +38,27 @@ class Review < ApplicationRecord
     end
   end
 
+  # 実在する作成者(User)オブジェクトがあればそれを返す
+  def author
+    user if respond_to?(:user) && user.present?
+  end
+
+  # 表示用の作成者名を返す
+  # - author が存在すれば nickname/name等を優先して返す
+  # - author が無くても user_id が残っていれば「削除されたユーザー」を返す
+  # - それ以外は「不明」
+  def author_name
+    if author.present?
+      author.nickname.presence || author.name.presence || 'ユーザー'
+    elsif respond_to?(:user_id) && user_id.present?
+      '削除されたユーザー'
+    else
+      '不明'
+    end
+  end
+
+  # 表示時にプロフィールへのリンクを付けてよいか（User オブジェクトが存在する場合のみ true）
+  def author_link?
+    author.present?
+  end
 end

@@ -1,5 +1,5 @@
 class Admin::PlatformsController < ApplicationController
-  before_action :authenticate_admin!
+  before_action :redirect_non_admin_to_public_root
   before_action :set_platform, only: [:edit, :update, :destroy]
 
   def index
@@ -35,6 +35,12 @@ class Admin::PlatformsController < ApplicationController
   end
 
   private
+
+  def redirect_non_admin_to_public_root
+    unless current_admin
+      redirect_to root_path and return
+    end
+  end
 
   def set_platform
     @platform = Platform.find(params[:id])

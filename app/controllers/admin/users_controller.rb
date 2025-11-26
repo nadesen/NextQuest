@@ -1,9 +1,12 @@
 class Admin::UsersController < ApplicationController
-  before_action :authenticate_admin!
+  before_action :redirect_non_admin_to_public_root
   before_action :set_user, only: [:show, :edit, :update, :destroy]
 
   def index
-    @users = User.order(id: :asc).page(params[:page]).per(20)
+    permitted_sorts = %w[id name nickname created_at]
+    sort = permitted_sorts.include?(params[:sort]) ? params[:sort] : "id"
+    direction = params[:direction] == 'desc' ? 'desc' : 'asc'
+    @users = User.order("#{sort} #{direction}").page(params[:page]).per(20)
   end
 
   def show; end
@@ -26,6 +29,12 @@ class Admin::UsersController < ApplicationController
 
   def set_user
     @user = User.find(params[:id])
+  end
+
+  def redirect_non_admin_to_public_root
+    unless current_admin
+      redirect_to root_path and return
+    end
   end
 
   def user_params

@@ -15,7 +15,7 @@
     <div class="small text-muted"><%= l(post.created_at, format: :short) rescue post.created_at.to_s %></div>
   </div>
 
-  <div class="flex-fill">
+  <div class="flex-fill text-white">
     <div class="mb-2"><%= simple_format(post.content) %></div>
     <% if post.edited? %>
       <small class="text-muted">編集済み</small>

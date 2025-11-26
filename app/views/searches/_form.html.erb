@@ -1,12 +1,14 @@
 <% if user_signed_in? %>
-  <%= form_with url: search_path, method: :get, local: true do |f| %>
-    <!-- 検索語をフォーム表示時に残す -->
-    <%= f.text_field :content, value: params[:content], placeholder: '検索ワードを入力' %>
+  <div class="search-form-wrapper">
+    <%= form_with url: search_path, method: :get, local: true do |f| %>
+      <!-- 検索語をフォーム表示時に残す -->
+      <%= f.text_field :content, value: params[:content], placeholder: '検索ワードを入力' %>
 
-    <%= f.select :model, options_for_select({ "ユーザー" => "user", "コミュニティ" => "topic", "レビュー" => "review" }, selected: params[:model]) %>
+      <%= f.select :model, options_for_select({ "ユーザー" => "user", "コミュニティ" => "topic", "レビュー" => "review" }, selected: params[:model]) %>
 
-    <%= f.select :method, options_for_select({ "部分一致" => "partial", "完全一致" => "perfect", "前方一致" => "forward", "後方一致" => "backward" }, selected: params[:method]) %>
+      <%= f.select :method, options_for_select({ "部分一致" => "partial", "完全一致" => "perfect", "前方一致" => "forward", "後方一致" => "backward" }, selected: params[:method]) %>
 
-    <%= f.submit '検索' %>
-  <% end %>
+      <%= f.submit '検索' %>
+    <% end %>
+  </div>
 <% end %>

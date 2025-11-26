@@ -1,4 +1,68 @@
 @use '~bootstrap/scss/bootstrap';
+// ベースカラー
+body, .register-form-wrapper, .list-group-item {
+  background: #0C1824; // ネイビー調
+  color: #ADE8FF;      // 明るいシアン系文字色
+  font-family: 'Noto Sans JP', 'Montserrat', 'Arial', sans-serif;
+  letter-spacing: 0.03em;
+}
+
+// 見出し（h1, h2, h3 など）
+h1, h2, h3, h4 {
+  color: #7FF5FF; // アクアブルー
+  text-shadow: 0 2px 14px #233f56, 0 1px 0 #19315f;
+  font-family: 'Montserrat', 'Noto Sans JP', sans-serif;
+}
+
+// リンク色
+a {
+  color: #4fbfda;
+  text-decoration: none;
+  transition: color .17s;
+  &:hover, &:focus {
+    color: #A39FFF;
+    text-decoration: underline;
+  }
+}
+
+// ボタンベース
+.btn {
+  margin-right: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+.btn-primary {
+  background: linear-gradient(90deg, #5BCAFF 0%, #9F7BFF 100%);
+  border: none;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(12,24,36,0.12);
+}
+.btn-outline-primary {
+  color: #9F7BFF;
+  border-color: #9F7BFF;
+  background: transparent;
+}
+.btn-success {
+  background: linear-gradient(90deg, #53FFC3 0%, #5BCAFF 100%);
+  color: #233f56;
+  border: none;
+}
+.btn-outline-success {
+  color: #53FFC3;
+  border-color: #53FFC3;
+  background: transparent;
+}
+.btn-outline-secondary {
+  color: #fff;
+}
+
+// カード・セクション
+.card, .tbody, .modal-content, .dropdown-menu {
+  background: rgba(19,31,48,0.97);
+  color: #EAF6FF;
+  border-radius: 1em;
+  box-shadow: 0 2px 32px rgba(0,0,0,.10);
+}
 
 .flash {
   padding: 10px;
@@ -15,4 +79,76 @@
 .flash.alert {
   background-color: #f8d7da; /* 赤系（エラー） */
   color: #721c24;
+}
+
+// その他共通
+::-webkit-scrollbar {
+  background: #10182a;
+  width: 7px;
+}
+::-webkit-scrollbar-thumb {
+  background: #7FF5FF;
+  border-radius: 4px;
+}
+
+
+// ---- header/navbar style ----
+header, .navbar {
+  background: linear-gradient(90deg, #142145 0%, #233c64 100%);
+  color: #ADE8FF;
+  box-shadow: 0 4px 24px rgba(12,24,36,0.09);
+  border-bottom: 1px solid #244076;
+}
+
+.navbar-light .navbar-brand,
+.navbar .navbar-brand {
+  color: #7FF5FF !important;
+  font-family: 'Montserrat', 'Noto Sans JP', sans-serif;
+  font-weight: bold;
+  font-size: 1.5em;
+  letter-spacing: 0.06em;
+  text-shadow: 0 1px 10px #3376ec;
+}
+
+.navbar-light .navbar-nav .nav-link,
+.navbar .nav-link {
+  color: #ADE8FF !important;
+  font-size: 1.08em;
+  padding: 0.48em 1.1em;
+  transition: background .18s, color .18s;
+}
+
+.navbar-light .navbar-nav .nav-link:hover,
+.navbar-light .navbar-nav .nav-link:focus,
+.navbar .nav-link:hover,
+.navbar .nav-link:focus {
+  color: #71A2F7 !important; // hover時、明るいブルー
+  background: rgba(69,163,255,0.14);
+  border-radius: 7px;
+}
+
+.navbar-light .navbar-nav .active > .nav-link,
+.navbar .navbar-nav .active > .nav-link {
+  color: #36f4db !important;
+  background: rgba(20,65,120,0.18);
+  border-radius: 7px;
+}
+
+.navbar-toggler {
+  background: #19315f;
+  border-color: #7FF5FF;
+  border-radius: 6px;
+}
+.navbar-toggler-icon {
+  background-image: none;
+  color: #7FF5FF;
+  font-size: 1.3em;
+}
+
+.search-form-wrapper {
+  margin-top: 10px;
+}
+
+footer {
+  margin-top: 50px; 
 }

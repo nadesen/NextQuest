@@ -9,7 +9,7 @@
             <tr>
               <th scope="col">フォーラム名</th>
               <th scope="col">説明</th>
-              <th scope="col" class="text-end">トピック数</th>
+              <th scope="col" class="text-center">トピック数</th>
             </tr>
           </thead>
           <tbody>
@@ -28,7 +28,7 @@
                   <%= h(truncate(forum.description.to_s, length: 200)) %>
                 </td>
 
-                <td class="align-middle text-end">
+                <td class="align-middle text-center">
                   <span class="badge bg-secondary"><%= h(forum.actual_topics_count) %></span>
                 </td>
               </tr>

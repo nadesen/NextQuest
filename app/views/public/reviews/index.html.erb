@@ -18,7 +18,7 @@
     <% if @reviews.present? %>
       <!-- ソート・フィルター部分テンプレートのレンダリング -->
       <%= render 'public/reviews/sorting_and_filtering' %>
-      <! -- レビュー一覧テーブル -->
+      <!-- レビュー一覧テーブル -->
       <div class="table-responsive">
         <table class="table table-hover align-middle">
           <thead class="table-light">
@@ -83,11 +83,10 @@
 
                 <!-- 作成者セルは別扱い（クリック可能） -->
                 <td class="align-middle d-none d-md-table-cell">
-                  <% if review.user.present? %>
-                    <% display_name = review.user.nickname.presence || review.user.name.presence || review.user.email.presence || '不明' %>
-                    <%= link_to h(display_name), user_path(review.user), class: 'text-decoration-none' %>
+                  <% if review.author_link? %>
+                    <%= link_to h(review.author_name), user_path(review.author), class: 'text-decoration-none' %>
                   <% else %>
-                    <span class="text-muted">不明</span>
+                    <span class="text-muted"><%= h(review.author_name) %></span>
                   <% end %>
                 </td>
 
@@ -104,7 +103,7 @@
       </div>
 
       <div class="d-flex justify-content-center mt-3">
-        <%= paginate(@reviews) if defined?(Kaminari) || defined?(WillPaginate) rescue '' %>
+        <%= paginate @reviews, theme: 'bootstrap4' %>
       </div>
     <% else %>
       <!-- ソート・フィルター部分テンプレートのレンダリング -->

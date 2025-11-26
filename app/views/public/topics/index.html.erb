@@ -46,12 +46,10 @@
                 </td>
 
                 <td class="align-middle d-none d-md-table-cell">
-                  <% creator = (topic.respond_to?(:creator) ? topic.creator : topic.user) %>
-                  <% if creator.present? %>
-                    <% display_name = creator.nickname.presence || creator.name.presence || creator.username.presence || creator.email.presence || '匿名' %>
-                    <%= link_to h(display_name), user_path(creator), class: 'text-decoration-none' %>
+                  <% if topic.author_link? %>
+                    <%= link_to h(topic.author_name), user_path(topic.author), class: 'text-decoration-none' %>
                   <% else %>
-                    <span class="text-muted">匿名</span>
+                    <span class="text-muted"><%= h(topic.author_name) %></span>
                   <% end %>
                 </td>
 
@@ -60,7 +58,7 @@
                 </td>
 
                 <td class="align-middle text-end d-none d-md-table-cell">
-                  <small class="text-muted"><%= topic.created_at.strftime("%Y/%m/%d") %></small>
+                  <small class="text-white"><%= topic.created_at.strftime("%Y/%m/%d") %></small>
                 </td>
               </tr>
             <% end %>
@@ -69,7 +67,7 @@
       </div>
 
       <div class="d-flex justify-content-center mt-3">
-        <%= paginate(@topics) if defined?(Kaminari) || defined?(WillPaginate) || respond_to?(:paginate) rescue '' %>
+        <%= paginate @topics, theme: 'bootstrap4' %>
       </div>
     <% else %>
       <div class="alert alert-info">

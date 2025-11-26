@@ -1,0 +1,56 @@
+// --- テーブル本体の見やすさ向上 ---
+.table {
+  background: transparent; // Bootstrapデフォルトなら何も指定しない
+}
+
+.table tbody tr {
+  background: rgba(18,32,44,0.93); // 明るめネイビー(濃いグレー寄り) 少し透明感
+  color: #EAF6FF;                  // かなり明るい青白
+  border-bottom: 1px solid #244076;
+}
+
+/* 奇数行をやや色分けしたい場合（ストライプ） */
+.table tbody tr:nth-child(odd) {
+  background: rgba(28, 48, 72, 0.97); // 少しだけ濃い
+}
+
+/* ヘッダーセル（thead） */
+.table thead {
+  background: linear-gradient(90deg, #223250 0%, #2c4061 100%);
+  color: #7FF5FF;
+  border-bottom: 2px solid #3578c7;
+}
+
+.table thead th {
+  color: #7FF5FF;
+  border-bottom: 2px solid #3578c7;
+  font-weight: bold;
+  letter-spacing: 0.05em;
+  background: inherit;
+}
+
+.table td {
+  vertical-align: middle !important;
+  color: #EAF6FF;
+}
+.table th {
+  color: #7FF5FF;
+}
+
+.table .btn-outline-primary {
+  border: 1px solid #7FF5FF;
+  color: #7FF5FF;
+  background: transparent;
+}
+.table .btn-outline-primary:hover {
+  background: #163557;
+  color: #ADE8FF;
+}
+
+/* テーブル内リンク色調整 */
+.table a {
+  color: #5BCAFF;
+}
+.table a:hover {
+  color: #A39FFF;
+}

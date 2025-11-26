@@ -16,16 +16,15 @@
             <%# 投稿者表示（ニックネームのみ） %>
             <div class="mb-1 small text-muted">
               投稿者:
-              <% if @review.user.present? %>
-                <% display_name = @review.user.nickname.presence || @review.user.name.presence || 'ユーザー' %>
-                <%= link_to h(display_name), user_path(@review.user), class: 'fw-medium text-decoration-none' %>
+              <% if @review.author_link? %>
+                <%= link_to h(@review.author_name), user_path(@review.author), class: 'fw-medium text-decoration-none' %>
               <% else %>
-                <span class="text-muted">不明</span>
+                <span class="text-muted"><%= h(@review.author_name) %></span>
               <% end %>
             </div>
 
             <%# 編集・削除は投稿者のみ表示（任意） %>
-            <% if user_signed_in? && current_user.id == @review.user_id %>
+            <% if user_signed_in? && @review.user_id.present? && current_user.id == @review.user_id %>
               <div class="d-flex justify-content-end">
                 <%= link_to '編集', edit_review_path(@review), class: 'btn btn-sm btn-outline-secondary me-2' %>
                 <%= button_to '削除', review_path(@review), method: :delete, data: { confirm: '本当に削除しますか？' }, class: 'btn btn-sm btn-danger' %>
