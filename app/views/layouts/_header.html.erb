@@ -3,15 +3,7 @@
     <div class="container">
       <!-- 左: ロゴ -->
       <%= link_to root_path, class: 'navbar-brand d-flex align-items-center' do %>
-        <%# ロゴを app/assets/images に置いてください。無ければテキストでフォールバックします %>
-        <% image_name = 'NextQuest_ロゴ_Gemini_Generated_Image.png' %>
-        <% has_asset = (defined?(Rails.application.assets) && Rails.application.assets.respond_to?(:find_asset) && Rails.application.assets.find_asset(image_name)) || (respond_to?(:asset_exists?) && asset_exists?(image_name)) %>
-      
-        <% if has_asset %>
-          <%= image_tag image_name, alt: 'NextQuest', style: 'height:60px; width:auto;', class: 'me-2' %>
-        <% else %>
-          <span class="me-2 h5 mb-0">NextQuest</span>
-        <% end %>
+        <%= image_tag 'NextQuest_ロゴ_Gemini_Generated_Image.png', alt: 'NextQuest', style: 'height:60px; width:auto;', class: 'me-2' %>
       <% end %>
 
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
