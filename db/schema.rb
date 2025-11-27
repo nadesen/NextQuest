@@ -135,6 +135,7 @@ ActiveRecord::Schema.define(version: 2025_11_24_114114) do
     t.integer "likes_count", default: 0, null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.float "star", default: 0.0, null: false
     t.index ["genre_id"], name: "index_reviews_on_genre_id"
     t.index ["platform_id"], name: "index_reviews_on_platform_id"
     t.index ["user_id"], name: "index_reviews_on_user_id"
