@@ -11,7 +11,7 @@ module NextQuest
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 6.1
     config.i18n.default_locale = :ja
-
+    config.paths.add 'lib', eager_load: true
     # 日本時間をアプリケーションのデフォルトタイムゾーンにする
     config.time_zone = 'Tokyo'
     # DB は UTC に保存したままにする（推奨）

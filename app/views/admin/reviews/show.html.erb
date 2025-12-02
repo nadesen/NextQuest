@@ -91,6 +91,13 @@
                 </div>
               </div>
               <div class="flex-fill">
+                <!-- 感情分析スコアをコメントごとに表示 -->
+                <% if comment.respond_to?(:score) && comment.score.present? %>
+                  <span class="sentiment-score small text-muted d-block mb-2">
+                    感情分析スコア: <%= number_with_precision(comment.score.to_f, precision: 2) %>
+                  </span>
+                <% end %>
+
                 <%= simple_format(comment.comment) %>
               </div>
               <div class="ms-3 text-end">

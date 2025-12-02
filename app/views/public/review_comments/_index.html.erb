@@ -14,6 +14,13 @@
           <div class="small text-muted mt-1"><%= comment.created_at.in_time_zone(Time.zone).strftime('%Y/%m/%d %H:%M') if comment.created_at %></div>
         </td>
         <td>
+          <!-- 感情分析スコアを表示（comment.score を参照） -->
+          <% if comment.respond_to?(:score) && comment.score.present? %>
+            <span class="sentiment-score small text-muted d-block mb-2">
+              コメント感情分析スコア: <%= comment.score %>
+            </span>
+          <% end %>
+
           <div><%= simple_format(h(comment.comment)) %></div>
         </td>
         <td>

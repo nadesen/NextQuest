@@ -6,6 +6,7 @@ class  Public::ReviewCommentsController < ApplicationController
     @review = Review.find(params[:review_id])
     @comment = current_user.review_comments.new(review_comment_params)
     @comment.review = @review
+    @comment.score = Language.get_data(@comment.comment)
 
     if @comment.save
       respond_to do |format|
