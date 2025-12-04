@@ -15,7 +15,15 @@
             <%= link_to 'ログイン', new_user_session_path, class: 'btn btn-outline-primary' %>
             <%= button_to 'ゲストログイン', users_guest_sign_in_path, method: :post, form: { class: 'd-inline' }, class: 'btn btn-secondary', data: { turbo: false } %>
           <% else %>
-            <% is_guest = current_user.respond_to?(:guest?) ? current_user.guest? : false %>
+            <%# ヘッダーと同様のゲスト判定を使用。guest_user? がなければ guest? をフォールバックで確認します %>
+            <% is_guest = if current_user.respond_to?(:guest_user?)
+                            current_user.guest_user?
+                          elsif current_user.respond_to?(:guest?)
+                            current_user.guest?
+                          else
+                            false
+                          end %>
+
             <% if is_guest %>
               <%= link_to 'コミュニティ一覧', forums_path, class: 'btn btn-primary' %>
               <%= link_to 'レビュー一覧', reviews_path, class: 'btn btn-outline-primary' %>
