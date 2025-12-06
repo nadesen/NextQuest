@@ -1,10 +1,11 @@
 <div class="py-5">
   <div class="container">
+    <% display_name = (@user.nickname.presence || @user.name || 'ユーザー') %>
     <div class="row">
       <!-- 投稿一覧 -->
       <div class="col-md-8">
         <div class="mb-4">
-          <h4 class="h6 mb-3">あなたの投稿</h4>
+          <h4 class="h6 mb-3"><%= "#{h(display_name)}さんの投稿" %></h4>
           <!-- トピック一覧 -->
           <div class="card mb-3">
             <div class="card-header">
@@ -61,7 +62,7 @@
                   <%= paginate @topics, theme: 'bootstrap4', param_name: 'topics_page' %>
                 </div>
               <% else %>
-                <div class="p-3 text-muted">まだトピックの投稿はありません。</div>
+                <div class="p-3 text-muted"><%= "#{h(display_name)}さんはまだトピックの投稿はありません。" %></div>
               <% end %>
             </div>
           </div>
@@ -123,7 +124,7 @@
                   <%= paginate @posts, theme: 'bootstrap4', param_name: 'posts_page' %>
                 </div>
               <% else %>
-                <div class="p-3 text-muted">まだ投稿はありません。</div>
+                <div class="p-3 text-muted"><%= "#{h(display_name)}さんはまだ投稿はありません。" %></div>
               <% end %>
             </div>
           </div>
@@ -185,7 +186,7 @@
                   <%= paginate @reviews, theme: 'bootstrap4', param_name: 'reviews_page' %>
                 </div>
               <% else %>
-                <div class="p-3 text-muted">まだレビューはありません。</div>
+                <div class="p-3 text-muted"><%= "#{h(display_name)}さんはまだレビューはありません。" %></div>
               <% end %>
             </div>
           </div>
@@ -246,7 +247,7 @@
                   <%= paginate @review_comments, theme: 'bootstrap4', param_name: 'review_comments_page' %>
                 </div>
               <% else %>
-                <div class="p-3 text-muted">レビューに対するコメントはまだありません。</div>
+                <div class="p-3 text-muted"><%= "#{h(display_name)}さんはレビューに対するコメントはまだありません。" %></div>
               <% end %>
             </div>
           </div>

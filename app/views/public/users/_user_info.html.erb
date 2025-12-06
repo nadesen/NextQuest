@@ -1,6 +1,7 @@
 <div class="card mb-4 shadow-sm">
   <div class="card-body">
-    <h3 class="h5 mb-2"><strong>ニックネーム:</strong><%= h(user.nickname.presence || user.name || 'ユーザー') %></h3>
+    <% display_name = (user.nickname.presence || 'ユーザー') %>
+    <h3 class="h5 mb-2"><strong>ニックネーム:</strong><%= h(user.nickname.presence || 'ユーザー') %></h3>
 
     <div class="mt-3">
       <h6 class="small text-muted mb-1"><strong>プロフィール</strong></h6>
@@ -25,36 +26,36 @@
       <div class="list-group">
         <a href="<%= followings_user_path(user) %>"
           class="list-group-item list-group-item-action user-stats-item d-flex justify-content-between align-items-center"
-          aria-label="フォロー中一覧へ">
+          aria-label="<%= "#{h(display_name)}さんのフォロー中一覧へ" %>">
           <div>
             <div class="fw-bold">フォロー中</div>
-            <div class="small text-muted">あなたがフォローしているユーザー</div>
+            <div class="small text-muted"><%= "#{h(display_name)}さんがフォローしているユーザー" %></div>
           </div>
-          <span class="badge bg-primary rounded-pill user-stats-badge text-white fw-semibold">
+          <span class="badge bg-primary rounded-pill user-stats-badge text-white fw-semibold" style="margin-left: 0.75rem;">
             <%= (user.respond_to?(:followings) ? user.followings.count : 0) %>
           </span>
         </a>
 
         <a href="<%= followers_user_path(user) %>"
           class="list-group-item list-group-item-action user-stats-item d-flex justify-content-between align-items-center"
-          aria-label="フォロワー一覧へ">
+          aria-label="<%= "#{h(display_name)}さんのフォロワー一覧へ" %>">
           <div>
             <div class="fw-bold">フォロワー</div>
-            <div class="small text-muted">あなたをフォローしているユーザー</div>
+            <div class="small text-muted"><%= "#{h(display_name)}さんをフォローしているユーザー" %></div>
           </div>
-          <span class="badge bg-primary rounded-pill user-stats-badge text-white fw-semibold">
+          <span class="badge bg-primary rounded-pill user-stats-badge text-white fw-semibold" style="margin-left: 0.75rem;">
             <%= (user.respond_to?(:followers) ? user.followers.count : 0) %>
           </span>
         </a>
 
         <a href="<%= likes_user_path(user) %>"
           class="list-group-item list-group-item-action user-stats-item d-flex justify-content-between align-items-center"
-          aria-label="いいね一覧へ">
+          aria-label="<%= "#{h(display_name)}さんのいいね一覧へ" %>">
           <div>
             <div class="fw-bold">いいね一覧</div>
-            <div class="small text-muted">いいねしたレビューを見る</div>
+            <div class="small text-muted"><%= "#{h(display_name)}さんがいいねしたレビューを見る" %></div>
           </div>
-          <span class="badge bg-primary rounded-pill user-stats-badge text-white fw-semibold">
+          <span class="badge bg-primary rounded-pill user-stats-badge text-white fw-semibold" style="margin-left: 0.75rem;">
             <%= (user.respond_to?(:likes) ? user.likes.count : 0) %>
           </span>
         </a>
