@@ -6,11 +6,12 @@
         <%= image_tag 'NextQuest_ロゴ_Gemini_Generated_Image.png', alt: 'NextQuest', style: 'height:60px; width:auto;', class: 'me-2' %>
       <% end %>
 
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+      <!-- ハンバーガーメニュー -->
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
 
-      <!-- 右: ナビリンク -->
+      <!-- ナビ: 小画面では縦に折りたたまれて表示 -->
       <div class="collapse navbar-collapse justify-content-end" id="mainNavbar">
         <ul class="navbar-nav align-items-lg-center">
 
@@ -30,7 +31,6 @@
             </li>
 
             <li class="nav-item">
-              <%# admin_reviews_path が未定義の場合はリンク先を無効表示にするためのフォールバック %>
               <% if respond_to?(:admin_reviews_path) %>
                 <%= link_to 'レビュー', admin_reviews_path, class: 'nav-link' %>
               <% else %>
@@ -51,7 +51,6 @@
             </li>
 
           <% else %>
-            <%# 未ログイン時 / ユーザーサインイン時の既存ナビ %>
             <% unless user_signed_in? %>
               <li class="nav-item">
                 <%= link_to '新規登録', new_user_registration_path, class: 'nav-link' %>
@@ -60,11 +59,9 @@
                 <%= link_to 'ログイン', new_user_session_path, class: 'nav-link' %>
               </li>
               <li class="nav-item">
-                <%# POST のため method: :post を付けています。button_to を使いたい場合は置き換えてください。 %>
                 <%= link_to 'ゲストログイン', users_guest_sign_in_path, method: :post, class: 'nav-link', data: { turbo: false } %>
               </li>
             <% else %>
-              <%# ログイン中（ゲストか通常ユーザーかを分岐） %>
               <% is_guest = current_user.respond_to?(:guest_user?) ? current_user.guest_user? : false %>
               <% if is_guest %>
                 <li class="nav-item">
