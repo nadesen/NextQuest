@@ -1,4 +1,5 @@
 .top-hero {
+  background: url('/assets/トップページ画像_Gemini_Generated_Image.png') center center / 55% 100% no-repeat;
   background-size: 55% 100% !important;
   background-position: center !important;
   background-repeat: no-repeat !important;
@@ -7,6 +8,48 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+@media (max-width: 768px) {
+  .top-hero {
+    background-size: cover !important;
+    background-position: center top !important;
+    min-height: 38vh;
+    padding-top: 6em;
+    padding-bottom: 1em;
+  }
+
+  .top-description {
+    max-width: 100%;
+    font-size: 1rem;
+    line-height: 1.7;
+    padding: 1em 0.7em;
+    margin: 0 auto 1em auto;
+    background: rgba(0,0,0,0.44);
+  }
+
+  .top-hero .container {
+    margin-top: 2%;
+  }
+}
+
+@media (max-width: 576px) {
+  .top-hero {
+    padding-top: 6em;
+    padding-bottom: 1.5em;
+    min-height: 35vh;
+  }
+  .top-description {
+    font-size: 0.96rem;
+    line-height: 1.6;
+    padding: 0.6em 0.5em;
+    margin: 0 auto 0.8em auto;
+    background: rgba(0,0,0,0.46);
+  }
+
+  .top-hero .container {
+    margin-top: 0.5em;
+  }
 }
 
 .top-hero .container {
