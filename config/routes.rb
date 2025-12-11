@@ -17,6 +17,7 @@ Rails.application.routes.draw do
   # ユーザー側のルーティング設定
   scope module: :public do    
     resources :tags, only: [:show]
+    resources :notifications, only: [:index, :update]
 
     # ユーザーとプロフィール関連
     resources :users, only: [:index, :show, :edit, :update, :destroy] do
