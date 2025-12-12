@@ -2,7 +2,10 @@ class Public::NotificationsController < ApplicationController
   before_action :authenticate_user!
 
   def index
-    @notifications = current_user.notifications.where(read: false).order(created_at: :desc).limit(30)
+    notifications = current_user.notifications.where(read: false).order(created_at: :desc)
+    @topic_notifications       = notifications.where(notif_type: "topic_post")
+    @review_comment_notifications = notifications.where(notif_type: "review_comment")
+    @followee_review_notifications = notifications.where(notif_type: "followee_review")
   end
 
   def update

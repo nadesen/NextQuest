@@ -2,6 +2,9 @@ class Post < ApplicationRecord
   belongs_to :topic, counter_cache: :posts_count
   belongs_to :creator, class_name: 'User', foreign_key: 'creator_id', optional: true
 
+  # トピックのメンバーに投稿作成を通知する
+  after_create :notify_topic_members
+
   validates :content, presence: true
 
   # 投稿者（creator または user）を返す（存在すれば User オブジェクト）
@@ -35,4 +38,20 @@ class Post < ApplicationRecord
   def author_link?
     author.present?
   end
+
+  def notify_topic_members
+    return unless topic.present?
+    notified_users = topic.members.to_a
+    notified_users << topic.creator if topic.respond_to?(:creator) && topic.creator.present?
+    notified_users.uniq!
+    notified_users.delete(self.author) if self.author.present?
+    notified_users.each do |member|
+      Notification.create!(
+        user: member,
+        notifiable: self,
+        notif_type: "topic_post"
+      )
+    end
+  end
+
 end
