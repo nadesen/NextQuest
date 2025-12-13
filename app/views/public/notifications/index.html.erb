@@ -59,6 +59,9 @@
             </tbody>
           </table>
         </div>
+        <div class="d-flex justify-content-center mt-2">
+          <%= paginate @topic_notifications, theme: 'bootstrap4', param_name: 'topic_page' %>
+        </div>
       <% else %>
         <div class="alert alert-secondary">トピック関連の新着通知はありません。</div>
       <% end %>
@@ -103,6 +106,9 @@
             </tbody>
           </table>
         </div>
+        <div class="d-flex justify-content-center mt-2">
+          <%= paginate @review_comment_notifications, theme: 'bootstrap4', param_name: 'review_comment_page' %>
+        </div>
       <% else %>
         <div class="alert alert-secondary">レビューコメントの新着通知はありません。</div>
       <% end %>
@@ -146,6 +152,9 @@
               <% end %>
             </tbody>
           </table>
+        </div>
+        <div class="d-flex justify-content-center mt-2">
+          <%= paginate @followee_review_notifications, theme: 'bootstrap4', param_name: 'followee_review_page' %>
         </div>
       <% else %>
         <div class="alert alert-secondary">フォローユーザー新規レビューの通知はありません。</div>

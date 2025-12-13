@@ -5,12 +5,16 @@ class Public::TopicMembershipsController < ApplicationController
 
   # POST /forums/:forum_id/topics/:topic_id/topic_memberships
   def create
-    # 既に申請や参加している場合は重複しないようにする
     tm = @topic.topic_memberships.find_by(user_id: current_user.id)
+  
     if tm.present?
-      redirect_back fallback_location: forum_topic_path(@forum, @topic), alert: '既に申請または参加しています。' and return
+      if tm.status == "rejected"
+        tm.destroy
+      else
+        redirect_back fallback_location: forum_topic_path(@forum, @topic), alert: "既に申請または参加しています。" and return
+      end
     end
-
+  
     tm = @topic.topic_memberships.build(user: current_user, status: 'pending')
     if tm.save
       redirect_back fallback_location: forum_topic_path(@forum, @topic), notice: '参加申請を送信しました。'
