@@ -1,0 +1,158 @@
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-10 col-md-12">
+
+      <h2 class="h5 mb-4">新着通知一覧</h2>
+
+      <!-- トピック関連通知 -->
+      <h4 class="h6 mt-4 mb-2">参加コミュニティ新着通知</h4>
+      <% if @topic_notifications.any? %>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead class="table-light">
+              <tr>
+                <th scope="col" class="text-nowrap">日時</th>
+                <th scope="col">トピック名</th>
+                <th scope="col">内容</th>
+                <th scope="col" class="text-end"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @topic_notifications.each do |notification| %>
+                <tr>
+                  <td class="text-nowrap">
+                    <% ymd = notification.created_at.in_time_zone(Time.zone).strftime('%Y/%m/%d') %>
+                    <% hm  = notification.created_at.in_time_zone(Time.zone).strftime('%H:%M') %>
+                    <%= ymd %>
+                    <br>
+                    <small class="text-nowrap"><%= hm %></small>
+                  </td>
+                  <td>
+                    <% 
+                      associated_topic = 
+                        case notification.notif_type
+                        when "topic_post"
+                          notification.notifiable.try(:topic)
+                        when "topic_membership_request"
+                          notification.notifiable.try(:topic)
+                        when "topic_membership_approved"
+                          notification.notifiable.try(:topic)
+                        when "topic_membership_rejected"
+                          notification.notifiable.try(:topic)
+                        else
+                          nil
+                        end
+                    %>
+                    <% if associated_topic %>
+                      <%= link_to (associated_topic.title || "トピック"), forum_topic_path(associated_topic.forum, associated_topic), class: "text-decoration-none" %>
+                    <% end %>
+                  </td>
+                  <td>
+                    <%= notification_message(notification) %>
+                  </td>
+
+                  <td class="text-end" style="white-space: nowrap;">
+                    <%= link_to '表示＆既読', notification_path(notification), method: :patch, class: 'btn btn-sm btn-primary text-white' %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <div class="alert alert-secondary">トピック関連の新着通知はありません。</div>
+      <% end %>
+
+      <!-- レビューコメント通知 -->
+      <h4 class="h6 mt-5 mb-2">レビューコメント通知</h4>
+      <% if @review_comment_notifications.any? %>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead class="table-light">
+              <tr>
+                <th scope="col" class="text-nowrap">日時</th>
+                <th scope="col">レビュー名</th>
+                <th scope="col">内容</th>
+                <th scope="col" class="text-end"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @review_comment_notifications.each do |notification| %>
+                <% comment = notification.notifiable %>
+                <tr>
+                  <td class="text-nowrap">
+                    <% ymd = notification.created_at.in_time_zone(Time.zone).strftime('%Y/%m/%d') %>
+                    <% hm  = notification.created_at.in_time_zone(Time.zone).strftime('%H:%M') %>
+                    <%= ymd %>
+                    <br>
+                    <small class="text-nowrap"><%= hm %></small>
+                  </td>
+                  <td>
+                    <% if comment&.review %>
+                      <%= link_to (comment.review.title || "レビュー"), review_path(comment.review), class: "text-decoration-none" %>
+                    <% end %>
+                  </td>
+                  <td>
+                    <%= notification_message(notification) %>
+                  </td>
+                  <td class="text-end">
+                    <%= link_to '表示＆既読', notification_path(notification), method: :patch, class: 'btn btn-sm btn-primary text-white' %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <div class="alert alert-secondary">レビューコメントの新着通知はありません。</div>
+      <% end %>
+
+      <!-- フォロー中ユーザー新規レビュー通知 -->
+      <h4 class="h6 mt-5 mb-2">フォローユーザーの新規レビュー通知</h4>
+      <% if @followee_review_notifications.any? %>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead class="table-light">
+              <tr>
+                <th scope="col" class="text-nowrap">日時</th>
+                <th scope="col">レビュー名</th>
+                <th scope="col">内容</th>
+                <th scope="col" class="text-end"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @followee_review_notifications.each do |notification| %>
+                <% review = notification.notifiable %>
+                <tr>
+                  <td class="text-nowrap">
+                    <% ymd = notification.created_at.in_time_zone(Time.zone).strftime('%Y/%m/%d') %>
+                    <% hm  = notification.created_at.in_time_zone(Time.zone).strftime('%H:%M') %>
+                    <%= ymd %>
+                    <br>
+                    <small class="text-nowrap"><%= hm %></small>
+                  </td>
+                  <td>
+                    <% if review %>
+                      <%= link_to (review.title || "レビュー"), review_path(review), class: "text-decoration-none" %>
+                    <% end %>
+                  </td>
+                  <td>
+                    <%= notification_message(notification) %>
+                  </td>
+                  <td class="text-end">
+                    <%= link_to '表示＆既読', notification_path(notification), method: :patch, class: 'btn btn-sm btn-primary text-white' %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <div class="alert alert-secondary">フォローユーザー新規レビューの通知はありません。</div>
+      <% end %>
+
+      <%= link_to 'マイページへ戻る', user_path(current_user), class: 'btn btn-outline-secondary mt-4' %>
+
+    </div>
+  </div>
+</div>

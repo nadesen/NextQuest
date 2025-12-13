@@ -30,6 +30,9 @@ class User < ApplicationRecord
             through: :follower_relationships,
             source: :follower
 
+  # --- 通知機能 ---
+  has_many :notifications, dependent: :destroy
+
   validates :name, presence: true, length: { maximum: 30 }
   validates :nickname, presence: true, length: { maximum: 50 }
 

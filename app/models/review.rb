@@ -11,6 +11,9 @@ class Review < ApplicationRecord
   # いいねをしたユーザー一覧を取得するための関連付け
   has_many :liked_users, through: :likes, source: :user
 
+  # フォローしているユーザーにレビュー作成を通知する
+  after_create :notify_followers
+
   validates :title, presence: true
   validates :play_time, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
   validates :rating, presence: true, numericality: { greater_than_or_equal_to: 0.5, less_than_or_equal_to: 5 }
@@ -61,4 +64,15 @@ class Review < ApplicationRecord
   def author_link?
     author.present?
   end
+
+  def notify_followers
+    user.followers.each do |follower|
+      Notification.create!(
+        user: follower,
+        notifiable: self,
+        notif_type: 'followee_review'
+      )
+    end
+  end
+  
 end
