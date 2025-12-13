@@ -22,6 +22,18 @@ class Public::TopicMembersController < ApplicationController
     tm.status = new_status
     tm.approved_by = current_user if new_status == 'approved'
     if tm.save
+        notif_type =
+        case new_status
+        when 'approved' then 'topic_membership_approved'
+        when 'rejected' then 'topic_membership_rejected'
+        end
+      if notif_type
+        Notification.create!(
+          user: tm.user,
+          notifiable: tm,
+          notif_type: notif_type
+        )
+      end
       notice = new_status == 'approved' ? '参加を承認しました。' : '参加を拒否しました。'
       redirect_back fallback_location: forum_topic_topic_members_path(@forum, @topic), notice: notice
     else
