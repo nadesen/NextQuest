@@ -72,16 +72,16 @@
       </div>
 
       <!-- 新規投稿フォーム -->
-      <% unless current_user&.guest_user? %>
+      <% if @topic.locked? && !(current_user&.respond_to?(:admin?) && current_user.admin?) %>
+        <div class="alert alert-warning">このトピックはロックされているためアクセス・投稿できません。</div>
+      <% elsif !current_user&.guest_user? %>
         <div class="mb-5">
           <h4 class="mb-3">返信・投稿する</h4>
-
           <% if @can_post %>
             <%= render 'public/posts/form', forum: @forum, topic: @topic, post: (@post || Post.new) %>
           <% elsif user_signed_in? %>
             <div class="alert alert-warning">
               このコミュニティに投稿するには参加が必要です。
-              <%# 参加申請ボタン（TopicMembership の create を想定） %>
               <%= button_to '参加申請を送る', forum_topic_topic_memberships_path(@forum, @topic), method: :post, class: 'btn btn-sm btn-primary ms-2' %>
             </div>
           <% else %>

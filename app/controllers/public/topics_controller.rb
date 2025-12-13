@@ -13,7 +13,7 @@ class Public::TopicsController < ApplicationController
     direction = params[:direction] == 'asc' ? 'asc' : 'desc'
 
     # pinned は常に優先してソート（先頭に表示）
-    base_scope = @forum.topics.order(pinned: :desc)
+    base_scope = @forum.topics.where(locked: false).order(pinned: :desc)
 
     # 並び替え句を組み立てる
     order_clause =
@@ -41,6 +41,12 @@ class Public::TopicsController < ApplicationController
 
   # GET /forums/:forum_id/topics/:id
   def show
+    # ロック判定
+    if @topic.locked? && !(current_user&.respond_to?(:admin?) && current_user.admin?)
+      redirect_to forum_topics_path(@forum), alert: 'このトピックはロックされているためアクセスできません。'
+      return
+    end
+
     @posts = @topic.posts.order(created_at: :asc)
     @posts = @posts.page(params[:page]) if defined?(Kaminari) || defined?(WillPaginate)
     # 非同期投稿用フォームで利用する空の Post を用意

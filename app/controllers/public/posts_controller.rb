@@ -8,6 +8,19 @@ class Public::PostsController < ApplicationController
 
   # POST /forums/:forum_id/topics/:topic_id/posts
   def create
+    # topicロック確認
+    if @topic.locked? && !(current_user&.respond_to?(:admin?) && current_user.admin?)
+      respond_to do |format|
+        format.html {
+          redirect_to forum_topic_path(@forum, @topic), alert: 'このトピックはロックされているため投稿できません。'
+        }
+        format.js {
+          render js: "alert('このトピックはロックされているため投稿できません。');", status: :forbidden
+        }
+      end
+      return
+    end
+
     @post = @topic.posts.build(post_params)
     @post.creator_id = current_user.id if @post.respond_to?(:creator_id)
 
