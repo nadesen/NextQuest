@@ -43,7 +43,7 @@ class Public::TopicsController < ApplicationController
   def show
     # ロック判定
     if @topic.locked? && !(current_user&.respond_to?(:admin?) && current_user.admin?)
-      redirect_to forum_topics_path(@forum), alert: 'このトピックはロックされているためアクセスできません。'
+      redirect_to forum_topics_path(@forum), alert: 'このトピックは管理者によりロックされているためアクセスできません。'
       return
     end
 

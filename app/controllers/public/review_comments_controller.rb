@@ -4,18 +4,26 @@ class  Public::ReviewCommentsController < ApplicationController
 
   def create
     @review = Review.find(params[:review_id])
+    # 管理者以外で未承認レビューはコメント禁止
+    unless @review.approved? || (current_user.respond_to?(:admin?) && current_user.admin?)
+      respond_to do |format|
+        format.html { redirect_to review_path(@review), alert: "承認されていないレビューにはコメントできません。" }
+        format.js { render js: "alert('承認されていないレビューにはコメントできません。');", status: :forbidden }
+      end
+      return
+    end
+  
     @comment = current_user.review_comments.new(review_comment_params)
     @comment.review = @review
     @comment.score = Language.get_data(@comment.comment)
-
+  
     if @comment.save
       respond_to do |format|
-        format.js   # create.js.erb を返す（成功時）
+        format.js
         format.html { redirect_to review_path(@review), notice: 'コメントを投稿しました' }
       end
     else
       respond_to do |format|
-        # 失敗時も create.js.erb をレンダリングする（JS 側で @comment.errors を処理するため）
         format.js { render :create, status: :unprocessable_entity }
         format.html do
           flash[:alert] = @comment.errors.full_messages.join(', ')

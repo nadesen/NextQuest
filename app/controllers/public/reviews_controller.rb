@@ -12,7 +12,8 @@ class Public::ReviewsController < ApplicationController
     @platforms = Platform.order(id: :asc)
     @genres = Genre.order(:name)
   
-    @reviews = Review.includes(:platform, :genre, :user)
+    @reviews = Review.where(approved: true).includes(:platform, :genre, :user)
+
     # 絞り込み (プラットフォームID)
     if params[:platform_id].present?
       @reviews = @reviews.where(platform_id: params[:platform_id])
@@ -38,8 +39,12 @@ class Public::ReviewsController < ApplicationController
   end
 
   def show
-    # @review は set_review でセット
     @review = Review.find(params[:id])
+    # 管理者以外で未承認はブロック
+    unless @review.approved? || (current_user.respond_to?(:admin?) && current_user.admin?)
+      redirect_to reviews_path, alert: "このレビューは管理者により非表示となっています。"
+      return
+    end
     @review_comment = ReviewComment.new
   end
 

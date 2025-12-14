@@ -75,4 +75,9 @@ class Review < ApplicationRecord
     end
   end
   
+  scope :approved, -> { where(approved: true) }
+
+  def self.public_count
+    approved.count
+  end
 end

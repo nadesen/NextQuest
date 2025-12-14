@@ -3,7 +3,7 @@ class Admin::ForumsController < ApplicationController
   before_action :set_forum, only: [:edit, :update, :destroy]
 
   def index
-    @forums = Forum.order(position: :asc, created_at: :desc).page(params[:page]).per(20)
+    @forums = Forum.order(position: :asc).page(params[:page]).per(20)
   end
 
   def new
