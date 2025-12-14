@@ -26,16 +26,23 @@ class Topic < ApplicationRecord
 
   def self.search_for(content, method)
     return none if content.blank?
-
-    case method
-    when 'perfect'
-      where(title: content)
-    when 'forward'
-      where('title LIKE ?', "#{sanitize_sql_like(content)}%")
-    when 'backward'
-      where('title LIKE ?', "%#{sanitize_sql_like(content)}")
-    else # partial
-      where('title LIKE ?', "%#{sanitize_sql_like(content)}%")
+  
+    pattern =
+      case method
+      when 'perfect'
+        content
+      when 'forward'
+        "#{sanitize_sql_like(content)}%"
+      when 'backward'
+        "%#{sanitize_sql_like(content)}"
+      else
+        "%#{sanitize_sql_like(content)}%"
+      end
+  
+    if method == 'perfect'
+      where('title = ? OR description = ?', content, content)
+    else
+      where('title LIKE ? OR description LIKE ?', pattern, pattern)
     end
   end
 

@@ -1,7 +1,15 @@
 <li class="list-group-item">
   <div class="d-flex justify-content-between">
     <div>
-      <strong><%= h(post.author_name) %></strong>
+      <% if post.respond_to?(:user) && post.user.present? %>
+        <%= link_to h(post.author_name), user_path(post.user), class: "fw-bold" %>
+      <% elsif post.respond_to?(:creator) && post.creator.present? %>
+        <%= link_to h(post.author_name), user_path(post.creator), class: "fw-bold" %>
+      <% elsif post.respond_to?(:author) && post.author.present? %>
+        <%= link_to h(post.author_name), user_path(post.author), class: "fw-bold" %>
+      <% else %>
+        <strong><%= h(post.author_name) %></strong>
+      <% end %>
       <small class="text-muted ms-2"><%= post.created_at.in_time_zone(Time.zone).strftime('%Y/%m/%d %H:%M') %></small>
     </div>
 

@@ -3,10 +3,10 @@
     <% review.review_comments.each do |comment| %>
       <tr>
         <td>
-          <% if comment.author_link? %>
-            <%= link_to user_path(comment.author) do %>
-              <%= h(comment.author_name) %>
-            <% end %>
+          <% if comment.respond_to?(:user) && comment.user.present? %>
+            <%= link_to h(comment.author_name), user_path(comment.user) %>
+          <% elsif comment.respond_to?(:author) && comment.author.present? %>
+            <%= link_to h(comment.author_name), user_path(comment.author) %>
           <% else %>
             <span class="text-muted"><%= h(comment.author_name) %></span>
           <% end %>

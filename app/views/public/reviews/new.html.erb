@@ -30,14 +30,14 @@
         </div>
 
         <div class="mb-3">
-          <%= f.label :rating, '評価 (1-5)', class: 'form-label' %>
+          <%= f.label :rating, '評価', class: 'form-label' %>
           <%= f.hidden_field :rating, id: :review_star, class: 'form-control' %>
           <div id="post_raty"></div>
         </div>
 
         <div class="mb-3">
           <%= f.label :play_time, 'プレイ時間', class: 'form-label' %>
-          <%= f.text_field :play_time, class: 'form-control', placeholder: '例: 10時間' %>
+          <%= f.text_field :play_time, class: 'form-control', placeholder: '例: 10時間の場合は 10 と記載してください。' %>
         </div>
 
         <div class="mb-3">
