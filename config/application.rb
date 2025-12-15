@@ -14,7 +14,7 @@ module NextQuest
     config.paths.add 'lib', eager_load: true
     # 日本時間をアプリケーションのデフォルトタイムゾーンにする
     config.time_zone = 'Tokyo'
-    # DB は UTC に保存したままにする（推奨）
+    # DB は UTC に保存したままにする
     config.active_record.default_timezone = :utc
 
     # Configuration for the application, engines, and railties goes here.
