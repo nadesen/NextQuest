@@ -36,6 +36,52 @@ genres = genre_names.map { |name| Genre.find_or_create_by!(name: name) }
 forums = forums_data.map { |forum| Forum.find_or_create_by!(title: forum[:title], description: forum[:description]) }
 
 # == ユーザーデータ（サンプル20名） ==
+jp_names = [
+  "佐藤 遼太",      # 1
+  "鈴木 美咲",      # 2
+  "高橋 優斗",      # 3
+  "田中 海斗",      # 4
+  "渡辺 剛志",      # 5
+  "伊藤 さやか",    # 6
+  "山本 京介",      # 7
+  "小林 夕莉",      # 8
+  "中村 翔太",      # 9
+  "加藤 沙羅",      # 10
+  "斎藤 剛",        # 11
+  "松本 音葉",      # 12
+  "林 陸",          # 13
+  "清水 奈緒",      # 14
+  "山田 直樹",      # 15
+  "池田 悠",        # 16
+  "森本 都",        # 17
+  "大野 雄太",      # 18
+  "石井 由梨",      # 19
+  "長谷川 琴音"     # 20
+]
+
+nicknames = [
+  "りょうりょう",
+  "misaki攻略Note",
+  "ゆうとまったり",
+  "KaitoFighter",
+  "ごしのレトロ",
+  "SayaMamaGamer",
+  "きょうすけ怖がり",
+  "kyosukeHorror",
+  "しょータの日課",
+  "ShoLogin123",
+  "ごう実況みる専",
+  "GoWatchLive",
+  "音リズムじん",
+  "otohaRhythm",
+  "りくしみゅ愛好",
+  "RikuSimMaster",
+  "みやこころころ",
+  "MiyakoComeback",
+  "ゆりスト愛",
+  "KotoneEduKids"
+]
+
 user_profiles = [
   "幼い頃からゲームが好きで、RPGやアクション、音楽ゲームまで幅広く楽しんでいます。最近のお気に入りは協力プレイが熱いタイトル！休日は友人とオンラインで盛り上がるのが至福です。",
   "攻略情報の発信やレビュー執筆が趣味。新作タイトルは発売日に必ずチェックし、感想をSNSに投稿しています。オフラインイベントにもよく参加します！",
@@ -70,8 +116,8 @@ user_count.times do |i|
   created = Time.current - base_time + ripple
 
   users << User.create!(
-    name: "ユーザー#{i}",
-    nickname: "にっくねーむ#{i}",
+    name: jp_names[i],
+    nickname: nicknames[i],
     email: "example#{i}@example.com",
     password: "example#{i}",
     password_confirmation: "example#{i}",
