@@ -31,23 +31,9 @@
                     <small class="text-nowrap"><%= hm %></small>
                   </td>
                   <td>
-                    <% 
-                      associated_topic = 
-                        case notification.notif_type
-                        when "topic_post"
-                          notification.notifiable.try(:topic)
-                        when "topic_membership_request"
-                          notification.notifiable.try(:topic)
-                        when "topic_membership_approved"
-                          notification.notifiable.try(:topic)
-                        when "topic_membership_rejected"
-                          notification.notifiable.try(:topic)
-                        else
-                          nil
-                        end
-                    %>
-                    <% if associated_topic %>
-                      <%= link_to (associated_topic.title || "トピック"), forum_topic_path(associated_topic.forum, associated_topic), class: "text-decoration-none" %>
+                    <% topic = notification.notifiable %>
+                    <% if topic %>
+                      <%= link_to (topic.title || "トピック"), forum_topic_path(topic.forum, topic), class: "text-decoration-none" %>
                     <% end %>
                   </td>
                   <td>
@@ -87,7 +73,7 @@
             </thead>
             <tbody>
               <% @review_comment_notifications.each do |notification| %>
-                <% comment = notification.notifiable %>
+                <% review = notification.notifiable %>
                 <tr>
                   <td class="text-nowrap">
                     <% ymd = notification.created_at.in_time_zone(Time.zone).strftime('%Y/%m/%d') %>
@@ -97,9 +83,7 @@
                     <small class="text-nowrap"><%= hm %></small>
                   </td>
                   <td>
-                    <% if comment&.review %>
-                      <%= link_to (comment.review.title || "レビュー"), review_path(comment.review), class: "text-decoration-none" %>
-                    <% end %>
+                    <%= link_to (review.title || "レビュー"), review_path(review), class: "text-decoration-none" %>
                   </td>
                   <td>
                     <%= notification_message(notification) %>

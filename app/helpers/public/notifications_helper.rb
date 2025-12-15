@@ -9,17 +9,13 @@ module Public::NotificationsHelper
       review = notification.notifiable
       "#{h(review.user&.nickname)}さんが新しいゲームレビューを投稿しました"
     when "topic_membership_request"
-      req = notification.notifiable
-      user_name = h(req&.user&.nickname || 'ユーザー')
-      topic_title = h(req&.topic&.title || '')
-      %Q(#{user_name}さんから<strong class="text-success">参加申請</strong>が届きました).html_safe
+      topic = notification.notifiable
+      %Q(<strong class="text-success">参加申請</strong>が届きました).html_safe
     when "topic_membership_approved"
-      req = notification.notifiable
-      topic_title = h(req&.topic&.title || '')
+      topic = notification.notifiable
       %Q(参加申請が<span class="text-success">承認</span>されました).html_safe
     when "topic_membership_rejected"
-      req = notification.notifiable
-      topic_title = h(req&.topic&.title || '')
+      topic = notification.notifiable
       %Q(参加申請が<span class="text-danger">拒否</span>されました).html_safe
     else
       "新着通知"

@@ -30,16 +30,16 @@ class Public::NotificationsController < ApplicationController
     # 通知の種類に応じてリダイレクト先を変更
     case notification.notif_type
     when "topic_membership_approved", "topic_membership_rejected"
-      tm = notification.notifiable
-      topic = tm&.topic
+      topic = notification.notifiable
       forum = topic&.forum
       if topic && forum
         redirect_to forum_topic_path(forum, topic) and return
       end
     when "topic_post"
-      post = notification.notifiable
-      if post&.respond_to?(:topic) && post.topic && post.topic.forum
-        redirect_to forum_topic_path(post.topic.forum, post.topic) and return
+      topic = notification.notifiable
+      forum = topic&.forum
+      if topic && forum
+        redirect_to forum_topic_path(forum, topic) and return
       end
     when "review_comment"
       comment = notification.notifiable
@@ -50,8 +50,7 @@ class Public::NotificationsController < ApplicationController
       review = notification.notifiable
       redirect_to review_path(review) and return if review
     when "topic_membership_request"
-      req = notification.notifiable
-      topic = req&.topic
+      topic = notification.notifiable
       forum = topic&.forum
       # トピックのメンバー一覧へ
       if topic && forum
