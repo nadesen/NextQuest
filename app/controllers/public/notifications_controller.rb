@@ -1,5 +1,6 @@
 class Public::NotificationsController < ApplicationController
   before_action :authenticate_user!
+  before_action :reject_guest_user!
 
   def index
     notifications = current_user.notifications.where(read: false).order(created_at: :desc)
@@ -76,6 +77,14 @@ class Public::NotificationsController < ApplicationController
       flash[:alert] = "この種類の通知は一括既読できません。"
     end
     redirect_back(fallback_location: notifications_path)
+  end
+
+  private
+
+  def reject_guest_user!
+    if current_user&.email == "guest@example.com"
+      redirect_to root_path, alert: "ゲストユーザーは通知機能を利用できません。"
+    end
   end
 
 end
