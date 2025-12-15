@@ -45,12 +45,16 @@ class Post < ApplicationRecord
     notified_users << topic.creator if topic.respond_to?(:creator) && topic.creator.present?
     notified_users.uniq!
     notified_users.delete(self.author) if self.author.present?
+  
+    # 「同じトピックに対する未読通知」が既にあれば作らない
     notified_users.each do |member|
-      Notification.create!(
-        user: member,
-        notifiable: self,
-        notif_type: "topic_post"
-      )
+      unless Notification.exists?(user: member, notifiable: topic, notif_type: "topic_post", read: false)
+        Notification.create!(
+          user: member,
+          notifiable: topic,
+          notif_type: "topic_post"
+        )
+      end
     end
   end
 

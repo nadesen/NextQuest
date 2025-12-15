@@ -30,12 +30,16 @@ class ReviewComment < ApplicationRecord
 
   def notify_review_owner
     owner = review.user
-    return if owner == user # 自分で自分のレビューにコメントした場合は通知不要
-    Notification.create!(
-      user: owner,
-      notifiable: self,
-      notif_type: 'review_comment'
-    )
+    return if owner == user # 自コメントは通知不要
+  
+    # 「同じレビューに対する未読通知」が既にあれば作らない
+    unless Notification.exists?(user: owner, notifiable: review, notif_type: "review_comment", read: false)
+      Notification.create!(
+        user: owner,
+        notifiable: review,
+        notif_type: "review_comment"
+      )
+    end
   end
 
 end

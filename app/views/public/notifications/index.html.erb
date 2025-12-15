@@ -5,7 +5,10 @@
       <h2 class="h5 mb-4">新着通知一覧</h2>
 
       <!-- トピック関連通知 -->
-      <h4 class="h6 mt-4 mb-2">参加コミュニティ新着通知</h4>
+      <h4 class="h6 mt-4 mb-2 d-flex align-items-center justify-content-between">
+        <span>参加コミュニティ新着通知</span>
+        <%= button_to '一括既読', batch_update_public_notifications_path(type: "topic"), method: :patch, class: 'btn btn-outline-primary btn-sm', data: { confirm: 'この欄の通知を全て既読にします。よろしいですか？' } if @topic_notifications.any?(&:readable_in_batch?) %>
+      </h4>
       <% if @topic_notifications.any? %>
         <div class="table-responsive">
           <table class="table table-hover align-middle">
@@ -67,7 +70,10 @@
       <% end %>
 
       <!-- レビューコメント通知 -->
-      <h4 class="h6 mt-5 mb-2">レビューコメント通知</h4>
+      <h4 class="h6 mt-5 mb-2 d-flex align-items-center justify-content-between">
+        <span>レビューコメント通知</span>
+        <%= button_to '一括既読', batch_update_public_notifications_path(type: "review_comment"), method: :patch, class: 'btn btn-outline-primary btn-sm', data: { confirm: 'この欄の通知を全て既読にします。よろしいですか？' } if @review_comment_notifications.any? %>
+      </h4>
       <% if @review_comment_notifications.any? %>
         <div class="table-responsive">
           <table class="table table-hover align-middle">
@@ -114,7 +120,10 @@
       <% end %>
 
       <!-- フォロー中ユーザー新規レビュー通知 -->
-      <h4 class="h6 mt-5 mb-2">フォローユーザーの新規レビュー通知</h4>
+      <h4 class="h6 mt-5 mb-2 d-flex align-items-center justify-content-between">
+        <span>フォローユーザーの新規レビュー通知</span>
+        <%= button_to '一括既読', batch_update_public_notifications_path(type: "followee_review"), method: :patch, class: 'btn btn-outline-primary btn-sm', data: { confirm: 'この欄の通知を全て既読にします。よろしいですか？' } if @followee_review_notifications.any? %>
+      </h4>
       <% if @followee_review_notifications.any? %>
         <div class="table-responsive">
           <table class="table table-hover align-middle">

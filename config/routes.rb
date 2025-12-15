@@ -95,6 +95,12 @@ Rails.application.routes.draw do
     resources :review_comments, only: [:destroy]
   end
 
+  namespace :public do
+    resources :notifications, only: [:index, :update] do
+      patch :batch_update, on: :collection
+    end
+  end
+
   # ActionCable
   mount ActionCable.server => '/cable'
 

@@ -21,7 +21,7 @@ class TopicMembership < ApplicationRecord
   private
 
   def notify_topic_owner_of_request
-    # トピックのオーナー
+    # トピックオーナーを特定
     owner =
       if topic.respond_to?(:creator) && topic.creator.present?
         topic.creator
@@ -30,13 +30,22 @@ class TopicMembership < ApplicationRecord
       else
         nil
       end
-
+  
     return if owner.nil? || owner.id == user_id # 自分自身には通知不要
-
-    Notification.create!(
+  
+    # すでに未読の同種通知があれば新規作成しない
+    unless Notification.exists?(
       user: owner,
-      notifiable: self,
-      notif_type: "topic_membership_request"
+      notifiable: topic,
+      notif_type: "topic_membership_request",
+      read: false
     )
+      Notification.create!(
+        user: owner,
+        notifiable: topic,
+        notif_type: "topic_membership_request"
+      )
+    end
   end
+
 end

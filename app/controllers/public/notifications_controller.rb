@@ -61,4 +61,22 @@ class Public::NotificationsController < ApplicationController
     # どれにも当てはまらない場合
     redirect_back fallback_location: notifications_path
   end
+
+  def batch_update
+    type = params[:type]
+    allowed_types = {
+      "topic" => ["topic_post"],
+      "review_comment" => ["review_comment"],
+      "followee_review" => ["followee_review"]
+    }
+    notif_types = allowed_types[type]
+    if notif_types
+      current_user.notifications.where(read: false, notif_type: notif_types).update_all(read: true)
+      flash[:notice] = "選択した通知をすべて既読にしました。"
+    else
+      flash[:alert] = "この種類の通知は一括既読できません。"
+    end
+    redirect_back(fallback_location: notifications_path)
+  end
+
 end

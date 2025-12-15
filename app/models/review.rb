@@ -67,11 +67,13 @@ class Review < ApplicationRecord
 
   def notify_followers
     user.followers.each do |follower|
-      Notification.create!(
-        user: follower,
-        notifiable: self,
-        notif_type: 'followee_review'
-      )
+      unless Notification.exists?(user: follower, notifiable: self, notif_type: "followee_review", read: false)
+        Notification.create!(
+          user: follower,
+          notifiable: self,
+          notif_type: "followee_review"
+        )
+      end
     end
   end
   
