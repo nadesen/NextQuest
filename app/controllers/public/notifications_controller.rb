@@ -31,7 +31,8 @@ class Public::NotificationsController < ApplicationController
     # 通知の種類に応じてリダイレクト先を変更
     case notification.notif_type
     when "topic_membership_approved", "topic_membership_rejected"
-      topic = notification.notifiable
+      tm = notification.notifiable
+      topic = tm.topic if tm.respond_to?(:topic)
       forum = topic&.forum
       if topic && forum
         redirect_to forum_topic_path(forum, topic) and return
