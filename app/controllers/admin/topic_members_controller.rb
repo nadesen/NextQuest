@@ -1,5 +1,5 @@
 class Admin::TopicMembersController < ApplicationController
-  before_action :authenticate_admin!
+  before_action :redirect_non_admin_to_public_root
   before_action :set_topic
 
   # GET /admin/topics/:topic_id/members
@@ -36,6 +36,11 @@ class Admin::TopicMembersController < ApplicationController
   end
 
   private
+  def redirect_non_admin_to_public_root
+    unless current_admin
+      redirect_to root_path and return
+    end
+  end
 
   def set_topic
     @topic = Topic.find(params[:topic_id])
