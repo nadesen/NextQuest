@@ -31,9 +31,11 @@
                     <small class="text-nowrap"><%= hm %></small>
                   </td>
                   <td>
-                    <% topic = notification.notifiable %>
+                    <% topic = notification_topic(notification) %>
                     <% if topic %>
-                      <%= link_to (topic.title || "トピック"), forum_topic_path(topic.forum, topic), class: "text-decoration-none" %>
+                      <%= link_to notification_topic_title(notification), notification_topic_path(notification), class: "text-decoration-none" %>
+                    <% else %>
+                      <span class="text-muted">(トピック情報なし)</span>
                     <% end %>
                   </td>
                   <td>

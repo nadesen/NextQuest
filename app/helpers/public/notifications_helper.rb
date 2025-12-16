@@ -21,4 +21,30 @@ module Public::NotificationsHelper
       "新着通知"
     end
   end
+
+  def notification_topic(notification)
+    notifiable = notification.notifiable
+
+    if notifiable.is_a?(Topic)
+      notifiable
+    elsif notifiable.respond_to?(:topic)
+      notifiable.topic
+    else
+      nil
+    end
+  end
+
+  # 通知が指す「トピック名（文字列）」を返す
+  def notification_topic_title(notification)
+    topic = notification_topic(notification)
+    topic&.title || "トピック"
+  end
+
+  # 通知に関連する「トピック詳細画面へのパス」も取得できるヘルパー
+  def notification_topic_path(notification)
+    topic = notification_topic(notification)
+    return nil unless topic && topic.forum
+
+    forum_topic_path(topic.forum, topic)
+  end
 end
