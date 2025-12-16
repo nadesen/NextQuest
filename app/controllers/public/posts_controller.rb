@@ -1,7 +1,7 @@
 class Public::PostsController < ApplicationController
   before_action :set_forum_and_topic, only: %i[create destroy edit update]
   before_action :set_post, only: %i[destroy edit update]
-  before_action :require_login, only: %i[create destroy edit update]
+  before_action :authenticate_user!, only: %i[create destroy edit update]
   before_action :authorize_post_owner!, only: %i[destroy edit update]
   before_action :authorize_posting!, only: %i[create]
   before_action :forbid_guest_user!, only: [:create, :edit, :update, :destroy]

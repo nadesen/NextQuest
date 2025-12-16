@@ -1,6 +1,6 @@
 class Public::ReviewsController < ApplicationController
   # new/create/show/edit/update/destroy を保護
-  before_action :require_login, only: %i[new create show edit update destroy]
+  before_action :authenticate_user!, only: %i[new create show edit update destroy index]
   before_action :set_review, only: %i[show edit update destroy]
   before_action :forbid_guest_user!, only: %i[new create edit update destroy]
 

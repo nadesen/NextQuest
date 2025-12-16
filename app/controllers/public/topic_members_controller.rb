@@ -1,6 +1,6 @@
 class Public::TopicMembersController < ApplicationController
   before_action :set_forum_and_topic
-  before_action :require_login
+  before_action :authenticate_user!
   before_action :ensure_owner_or_admin!
 
   # GET /forums/:forum_id/topics/:topic_id/members

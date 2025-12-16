@@ -1,5 +1,5 @@
 class Public::UsersController < ApplicationController
-  before_action :require_login, only: [:edit, :update, :destroy, :my_page, :my_likes]
+  before_action :authenticate_user!, only: [:show, :edit, :update, :destroy, :my_page, :my_likes, :likes]
   before_action :set_user, only: [:show, :edit, :update, :destroy, :likes]
   before_action :authorize_user!, only: [:edit, :update, :destroy]
   before_action :ensure_guest_user, only: [:edit]

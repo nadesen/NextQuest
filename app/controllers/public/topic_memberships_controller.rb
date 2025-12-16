@@ -1,6 +1,6 @@
 class Public::TopicMembershipsController < ApplicationController
   before_action :set_forum_and_topic
-  before_action :require_login
+  before_action :authenticate_user!
   before_action :forbid_guest_user!, only: [:create, :destroy]
 
   # POST /forums/:forum_id/topics/:topic_id/topic_memberships
