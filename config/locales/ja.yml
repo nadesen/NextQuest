@@ -49,3 +49,7 @@ ja:
       less_than: "は%{count}より小さい値にしてください"
       must_exist: "を選択してください"
       required: "が必要です"
+      not_saved:
+        one: "1つのエラーのため保存できませんでした"
+        other: "%{count}個のエラーのため保存できませんでした"
+      confirmation: "と%{attribute}の入力が一致しません"
