@@ -1,5 +1,6 @@
 class Forum < ApplicationRecord
   has_many :topics, dependent: :destroy
+  validates :title, presence: true, uniqueness: { case_sensitive: false }
 
   # ロックされておらず、削除もされていない実トピック数
   def actual_topics_count
