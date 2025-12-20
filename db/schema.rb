@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2025_12_10_051142) do
+ActiveRecord::Schema.define(version: 2025_12_20_000259) do
 
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
@@ -75,6 +75,7 @@ ActiveRecord::Schema.define(version: 2025_12_10_051142) do
     t.index ["creator_id"], name: "index_forums_on_creator_id"
     t.index ["position"], name: "index_forums_on_position"
     t.index ["public"], name: "index_forums_on_public"
+    t.index ["title"], name: "index_forums_on_title", unique: true
   end
 
   create_table "genres", force: :cascade do |t|
@@ -110,7 +111,7 @@ ActiveRecord::Schema.define(version: 2025_12_10_051142) do
     t.string "name", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["name"], name: "index_platforms_on_name"
+    t.index ["name"], name: "index_platforms_on_name", unique: true
   end
 
   create_table "posts", force: :cascade do |t|
