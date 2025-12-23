@@ -23,13 +23,13 @@ class Public::FollowsController < ApplicationController
 
   # GET /users/:id/followings
   def followings
-    user = User.find(params[:id])
-    @users = user.followings
+    @user = User.find(params[:id])
+    @users = @user.followings
   end
 
   # GET /users/:id/followers
   def followers
-    user = User.find(params[:id])
-    @users = user.followers
+    @user = User.find(params[:id])
+    @users = @user.followers
   end
 end
