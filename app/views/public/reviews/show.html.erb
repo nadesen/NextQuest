@@ -73,17 +73,11 @@
         <div class="card mb-4">
           <div class="card-body">
             <div class="d-flex justify-content-between align-items-center mb-3">
-              <h5 class="mb-0">コメント</h5>
+              <h5 class="mb-0">コメント投稿</h5>
               <div class="review-comments-counter small text-muted">
                 <%= render 'public/review_comments/counter', review: @review %>
               </div>
             </div>
-
-            <div class="review-comments-index mb-3">
-              <%= render 'public/review_comments/index', review: @review %>
-            </div>
-
-            <hr>
 
             <% if @review.approved? || (current_user.respond_to?(:admin?) && current_user.admin?) %>
               <% if user_signed_in? %>
@@ -102,6 +96,13 @@
             <% else %>
               <div class="alert alert-warning text-center">このレビューは承認されていないためコメントできません。</div>
             <% end %>
+
+            <hr>
+
+            <div class="review-comments-index mb-3">
+              <%= render 'public/review_comments/index', review: @review %>
+            </div>
+
           </div>
         </div>
         <!-- コメント(post)終わり -->
