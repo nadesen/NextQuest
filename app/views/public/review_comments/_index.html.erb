@@ -16,10 +16,12 @@
         </td>
         <td>
           <!-- 感情分析スコアを表示（comment.score を参照） -->
-          <% if comment.respond_to?(:score) && comment.score.present? %>
-            <span class="sentiment-score small text-muted d-block mb-2">
-              コメント感情分析スコア: <%= comment.score %>
-            </span>
+          <% if current_user.respond_to?(:admin?) && current_user.admin? %>
+            <% if comment.respond_to?(:score) && comment.score.present? %>
+              <span class="sentiment-score small text-muted d-block mb-2">
+                コメント感情分析スコア: <%= comment.score %>
+              </span>
+            <% end %>
           <% end %>
 
           <div><%= simple_format(h(comment.comment)) %></div>
