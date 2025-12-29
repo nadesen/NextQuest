@@ -1,7 +1,18 @@
 <h5 class="mb-3">コメント一覧</h5>
+
+<% total_comments =
+     if defined?(@review_comments) && @review_comments.respond_to?(:total_count)
+       @review_comments.total_count
+     elsif defined?(@review_comments) && @review_comments.respond_to?(:total_entries)
+       @review_comments.total_entries
+     else
+       @review_comments.size
+     end %>
+<div class="mb-2 small text-muted">全 <%= total_comments %> 件</div>
+
 <table class="table">
   <tbody>
-    <% review.review_comments.each do |comment| %>
+    <% @review_comments.each do |comment| %>
       <tr>
         <td>
           <% if comment.respond_to?(:user) && comment.user.present? %>
@@ -11,11 +22,9 @@
           <% else %>
             <span class="text-muted"><%= h(comment.author_name) %></span>
           <% end %>
-
           <div class="small text-muted mt-1"><%= comment.created_at.in_time_zone(Time.zone).strftime('%Y/%m/%d %H:%M') if comment.created_at %></div>
         </td>
         <td>
-          <!-- 感情分析スコアを表示（comment.score を参照） -->
           <% if current_user.respond_to?(:admin?) && current_user.admin? %>
             <% if comment.respond_to?(:score) && comment.score.present? %>
               <span class="sentiment-score small text-muted d-block mb-2">
@@ -23,7 +32,6 @@
               </span>
             <% end %>
           <% end %>
-
           <div><%= simple_format(h(comment.comment)) %></div>
         </td>
         <td>
@@ -35,3 +43,10 @@
     <% end %>
   </tbody>
 </table>
+
+<%# ページネーション %>
+<% if @review_comments.respond_to?(:total_pages) && @review_comments.total_pages > 1 %>
+  <div class="d-flex justify-content-center mt-2">
+    <%= paginate @review_comments, param_name: 'review_comments_page', theme: 'bootstrap4' %>
+  </div>
+<% end %>

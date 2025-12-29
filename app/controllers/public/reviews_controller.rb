@@ -46,6 +46,14 @@ class Public::ReviewsController < ApplicationController
       return
     end
     @review_comment = ReviewComment.new
+    
+    if defined?(Kaminari)
+      @review_comments = @review.review_comments.order(created_at: :asc).page(params[:review_comments_page]).per(200)
+    elsif defined?(WillPaginate)
+      @review_comments = @review.review_comments.order(created_at: :asc).paginate(page: params[:review_comments_page], per_page: 200)
+    else
+      @review_comments = @review.review_comments.order(created_at: :asc).limit(200)
+    end
   end
 
   def new
