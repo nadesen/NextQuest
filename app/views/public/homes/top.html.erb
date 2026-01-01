@@ -10,30 +10,7 @@
           　本サイトは、ユーザー同士の率直な意見交換を通じて、ゲーム探しの失敗を減らし、あなたにとって最適な「次の運命の一本」に出会える場を提供することで、この課題を解決します。<br>
         </p>
         <div class="mt-4 mb-5 d-flex flex-wrap justify-content-center gap-2">
-          <% unless user_signed_in? %>
-            <%= link_to '新規登録', new_user_registration_path, class: 'btn btn-primary' %>
-            <%= link_to 'ログイン', new_user_session_path, class: 'btn btn-outline-primary' %>
-            <%= button_to 'ゲストログイン', users_guest_sign_in_path, method: :post, form: { class: 'd-inline' }, class: 'btn btn-secondary', data: { turbo: false } %>
-          <% else %>
-            <%# ヘッダーと同様のゲスト判定を使用。guest_user? がなければ guest? をフォールバックで確認します %>
-            <% is_guest = if current_user.respond_to?(:guest_user?)
-                            current_user.guest_user?
-                          elsif current_user.respond_to?(:guest?)
-                            current_user.guest?
-                          else
-                            false
-                          end %>
-
-            <% if is_guest %>
-              <%= link_to 'コミュニティ一覧', forums_path, class: 'btn btn-primary' %>
-              <%= link_to 'レビュー一覧', reviews_path, class: 'btn btn-outline-primary' %>
-            <% else %>
-              <%= link_to 'コミュニティ一覧', forums_path, class: 'btn btn-primary' %>
-              <%= link_to '新規コミュニティ作成', new_topic_path, class: 'btn btn-outline-primary' %>
-              <%= link_to 'レビュー一覧', reviews_path, class: 'btn btn-success' %>
-              <%= link_to '新規レビュー作成', new_review_path, class: 'btn btn-outline-success' %>
-            <% end %>
-          <% end %>
+          <%= render partial: 'top_buttons' %>
         </div>
       </div>
     </div>
@@ -44,44 +21,20 @@
   <section class="py-5">
     <div class="container">
       <div class="row g-4">
-        <!-- 新着コミュニティトピック -->
         <div class="col-md-6">
           <div class="card h-100">
             <div class="card-body">
               <h5 class="card-title">新着コミュニティトピック</h5>
-              <% if @latest_topics.present? %>
-                <ul class="list-unstyled mb-3">
-                  <% @latest_topics.each do |topic| %>
-                    <li>
-                      <%= link_to topic.title, forum_topic_path(topic.forum_id, topic.id), class: "text-decoration-none fw-bold" %>
-                      <span class="text-muted small ms-2"><%= l(topic.created_at, format: :short) %></span>
-                    </li>
-                  <% end %>
-                </ul>
-              <% else %>
-                <div class="text-muted">新着トピックはありません。</div>
-              <% end %>
+              <%= render partial: 'latest_list', locals: { items: @latest_topics, path_helper: ->(topic) { forum_topic_path(topic.forum_id, topic.id) }, title_field: :title } %>
               <%= link_to 'コミュニティ一覧へ', forums_path, class: 'btn btn-sm btn-outline-secondary' %>
             </div>
           </div>
         </div>
-        <!-- 新着レビュー -->
         <div class="col-md-6">
           <div class="card h-100">
             <div class="card-body">
               <h5 class="card-title">新着レビュー</h5>
-              <% if @latest_reviews.present? %>
-                <ul class="list-unstyled mb-3">
-                  <% @latest_reviews.each do |review| %>
-                    <li>
-                      <%= link_to review.title, review_path(review), class: "text-decoration-none fw-bold" %>
-                      <span class="text-muted small ms-2"><%= l(review.created_at, format: :short) %></span>
-                    </li>
-                  <% end %>
-                </ul>
-              <% else %>
-                <div class="text-muted">新着レビューはありません。</div>
-              <% end %>
+              <%= render partial: 'latest_list', locals: { items: @latest_reviews, path_helper: :review_path, title_field: :title } %>
               <%= link_to 'レビュー一覧へ', reviews_path, class: 'btn btn-sm btn-outline-secondary' %>
             </div>
           </div>

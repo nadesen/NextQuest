@@ -1,0 +1,17 @@
+<%# ボタン群をまとめた部分テンプレート %>
+<% if !user_signed_in? %>
+  <%= link_to '新規登録', new_user_registration_path, class: 'btn btn-primary' %>
+  <%= link_to 'ログイン', new_user_session_path, class: 'btn btn-outline-primary' %>
+  <%= button_to 'ゲストログイン', users_guest_sign_in_path, method: :post, form: { class: 'd-inline' }, class: 'btn btn-secondary', data: { turbo: false } %>
+<% else %>
+  <% is_guest = defined?(guest_user?) ? guest_user? : (defined?(guest?) ? guest? : false) %>
+  <% if is_guest %>
+    <%= link_to 'コミュニティ一覧', forums_path, class: 'btn btn-primary' %>
+    <%= link_to 'レビュー一覧', reviews_path, class: 'btn btn-outline-primary' %>
+  <% else %>
+    <%= link_to 'コミュニティ一覧', forums_path, class: 'btn btn-primary' %>
+    <%= link_to '新規コミュニティ作成', new_topic_path, class: 'btn btn-outline-primary' %>
+    <%= link_to 'レビュー一覧', reviews_path, class: 'btn btn-success' %>
+    <%= link_to '新規レビュー作成', new_review_path, class: 'btn btn-outline-success' %>
+  <% end %>
+<% end %>

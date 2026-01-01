@@ -1,0 +1,19 @@
+<%# 新着リスト表示用テンプレート%>
+<% if items.present? %>
+  <ul class="list-unstyled mb-3">
+    <% items.each do |item| %>
+      <li>
+        <%# path_helperがProcならcall、Symbol/Stringならpublic_send %>
+        <% url = if path_helper.is_a?(Proc)
+                   path_helper.call(item)
+                 else
+                   public_send(path_helper, item)
+                 end %>
+        <%= link_to item.send(title_field || :title), url, class: "text-decoration-none fw-bold" %>
+        <span class="text-muted small ms-2"><%= l(item.created_at, format: :short) %></span>
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+  <div class="text-muted">新着情報はありません。</div>
+<% end %>
