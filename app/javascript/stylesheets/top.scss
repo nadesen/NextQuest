@@ -1,61 +1,26 @@
 .top-hero {
-  background: url("../images/トップページ画像.png") center center / 55% 100% no-repeat;
-  background-size: 55% 100% !important;
-  background-position: center !important;
-  background-repeat: no-repeat !important;
-  min-height: 50vh;
+  background: url("../images/トップページ画像.png") center center / cover no-repeat;
+  min-height: 55vh;
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 100vw;
+  overflow: hidden;
 }
 
-@media (max-width: 768px) {
-  .top-hero {
-    background-size: cover !important;
-    background-position: center top !important;
-    min-height: 38vh;
-    padding-top: 6em;
-    padding-bottom: 1em;
-  }
-
-  .top-description {
-    max-width: 100%;
-    font-size: 1rem;
-    line-height: 1.7;
-    padding: 1em 0.7em;
-    margin: 0 auto 1em auto;
-    background: rgba(0,0,0,0.44);
-  }
-
-  .top-hero .container {
-    margin-top: 2%;
-  }
-}
-
-@media (max-width: 576px) {
-  .top-hero {
-    padding-top: 6em;
-    padding-bottom: 1.5em;
-    min-height: 35vh;
-  }
-  .top-description {
-    font-size: 0.96rem;
-    line-height: 1.6;
-    padding: 0.6em 0.5em;
-    margin: 0 auto 0.8em auto;
-    background: rgba(0,0,0,0.46);
-  }
-
-  .top-hero .container {
-    margin-top: 0.5em;
-  }
+.top-logo-title {
+  width: 250px;
+  height: auto;
+  display: block;
+  margin: 0 auto 0.5em auto;
 }
 
 .top-hero .container {
-  position: relative;
   z-index: 2;
-  margin-top: 5%;
+  margin-top: 0;                // 余計な上マージンを消す
+  padding: 2vw 3vw;             // 画面比率による余白
+  width: 100%;
 }
 
 .top-hero h5 {
@@ -63,35 +28,58 @@
   text-shadow: 0 2px 10px #FFF;
 }
 
-.top-hero p.lead {
+.top-hero p.lead.top-description {
   color: #eef;
+  background: rgba(0,0,0,0.32);
   text-shadow: 0 1px 6px #222;
-}
-
-.top-hero .btn {
-  font-size: 1.1rem;
-  padding: 0.6em 1.8em;
-}
-
-.top-description {
-  font-size: 1.15rem;        // 行間・文字サイズの微調整
-  line-height: 2.1;          // 行間広めで読みやすく
-  color: #eaf6ff;            // 明るめ
-  text-shadow: 0 1px 6px #222, 0 0px 1px #000; // コントラストUP
-  background: rgba(0,0,0,0.22); // 文字背景を少し暗めに
-  padding: 1.5em 2em;        // 周囲余白
-  border-radius: 1em;        // 角丸
-  display: inline-block;     // タイトル下中央にまとまる
-  max-width: 900px;          // 最大幅制限・大画面でもバランス良く
-  margin: 0 auto 1.5em auto; // 下余白
+  border-radius: 1em;
+  padding: 1.5em 2em;
+  margin: 0 auto 1.5em auto;
   box-sizing: border-box;
+  max-width: 900px;
+  width: 100%;                     // 画面幅に応じて伸縮
+  display: block;
 }
 
-@media (max-width: 576px) {
-  .top-description {
-    font-size: 1rem;
-    line-height: 1.7;
-    padding: 1em 0.8em;
+/* スマホ向け */
+@media (max-width: 1200px) {
+  .top-hero {
+    min-height: 44vh;
+    background-size: cover !important;
+    padding-top: 5vw;
+    padding-bottom: 3vw;
+  }
+  .top-hero p.top-description { 
     max-width: 100%;
+    font-size: 1.03rem;
+    padding: 1em 0.8em;
+    margin-bottom: 1em;
+  }
+}
+@media (max-width: 768px) {
+  .top-hero {
+    min-height: 38vh;
+    padding-top: 2em;
+    padding-bottom: 1em;
+  }
+  .top-hero p.top-description {
+    padding: 1em 0.5em;
+    font-size: 1.0rem;
+    line-height: 1.7;
+    background: rgba(0,0,0,0.44);
+    max-width: 100%;
+  }
+}
+@media (max-width: 576px) {
+  .top-hero {
+    min-height: 32vh;
+    padding-top: 2em;
+    padding-bottom: 1em;
+  }
+  .top-hero p.top-description {
+    font-size: 0.96rem;
+    padding: 0.7em 0.3em;
+    margin-bottom: 0.7em;
+    background: rgba(0,0,0,0.48);
   }
 }
