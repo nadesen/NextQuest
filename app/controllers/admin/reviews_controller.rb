@@ -26,7 +26,11 @@ class Admin::ReviewsController < ApplicationController
     @reviews = @reviews.order("#{sort} #{direction}").page(params[:page]).per(20)
   end
 
-  def show; end
+  def show
+    sort_type = %w[score created_at].include?(params[:sort_type]) ? params[:sort_type] : 'created_at'
+    sort_order = params[:sort_order].in?(%w[asc desc]) ? params[:sort_order] : 'desc'
+    @review_comments = @review.review_comments.order("#{sort_type} #{sort_order}")
+  end
 
   def edit
   end

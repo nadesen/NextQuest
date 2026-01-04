@@ -66,12 +66,28 @@
   <div class="card shadow-sm mt-4">
     <div class="card-header d-flex justify-content-between align-items-center">
       <strong class="mb-0">コメント一覧</strong>
-      <small class="text-muted">全 <%= @review.review_comments.count %> 件</small>
+      <div>
+        <%# 並び順ボタン - スコア順 & 投稿日順で切り替え %>
+        <% sort_type = params[:sort_type] || 'created_at' %>
+        <% sort_order = params[:sort_order] || 'desc' %>
+        <% score_active = sort_type == 'score' %>
+        <% created_at_active = sort_type == 'created_at' %>
+        <% score_order_next = (score_active && sort_order == 'desc') ? 'asc' : 'desc' %>
+        <% created_at_order_next = (created_at_active && sort_order == 'desc') ? 'asc' : 'desc' %>
+
+        <%= link_to "スコア順" + (score_active ? (sort_order == 'desc' ? " (高順)" : " (低順)") : ""), 
+              admin_review_path(@review, sort_type: 'score', sort_order: score_order_next), 
+              class: "btn btn-sm #{score_active ? 'btn-primary' : 'btn-outline-primary'} ms-1" %>
+        <%= link_to "投稿日順" + (created_at_active ? (sort_order == 'desc' ? " (新しい順)" : " (古い順)") : ""), 
+              admin_review_path(@review, sort_type: 'created_at', sort_order: created_at_order_next), 
+              class: "btn btn-sm #{created_at_active ? 'btn-primary' : 'btn-outline-primary'} ms-1" %>
+        <small class="text-muted ms-2">全 <%= @review_comments.count %> 件</small>
+      </div>
     </div>
     <div class="card-body p-0">
-      <% if @review.review_comments.any? %>
+      <% if @review_comments.any? %>
         <div class="list-group list-group-flush">
-          <% @review.review_comments.each do |comment| %>
+          <% @review_comments.each do |comment| %>
             <div class="list-group-item d-flex justify-content-between align-items-start">
               <div class="me-3" style="min-width: 56px;">
                 <div class="fw-bold small">
