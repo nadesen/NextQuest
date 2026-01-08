@@ -16,6 +16,7 @@ class  Public::ReviewCommentsController < ApplicationController
     @comment = current_user.review_comments.new(review_comment_params)
     @comment.review = @review
     @comment.score = Language.get_data(@comment.comment)
+    @review_comments = @review.review_comments.order(created_at: :asc)
   
     if @comment.save
       respond_to do |format|
@@ -39,6 +40,7 @@ class  Public::ReviewCommentsController < ApplicationController
     if @comment.user == current_user
       @comment.destroy
     end
+    @review_comments = @review.review_comments.order(created_at: :asc)
 
     respond_to do |format|
       format.js   # destroy.js.erb を返す
