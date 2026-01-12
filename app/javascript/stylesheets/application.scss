@@ -94,11 +94,27 @@ a {
 
 
 // ---- header/navbar style ----
-header, .navbar {
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1050; // 固定表示が他要素より前面になるように
   background: linear-gradient(90deg, #142145 0%, #233c64 100%);
   color: #ADE8FF;
   box-shadow: 0 4px 24px rgba(12,24,36,0.09);
   border-bottom: 1px solid #244076;
+}
+.navbar {
+  background: linear-gradient(90deg, #142145 0%, #233c64 100%);
+  color: #ADE8FF;
+  box-shadow: 0 4px 24px rgba(12,24,36,0.09);
+  border-bottom: 1px solid #244076;
+}
+
+// ヘッダー固定による本文が隠れないための余白
+body {
+  padding-top: 80px; // ヘッダーの実際の高さ(ロゴ・ナビサイズなど)に応じて調整
 }
 
 .navbar-light .navbar-brand,
