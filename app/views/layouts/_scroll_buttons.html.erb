@@ -1,0 +1,53 @@
+<!-- スクロールボタン -->
+<div id="scroll-buttons">
+  <button id="scroll-to-top" title="最上部へ">
+    <i class="fas fa-arrow-up"></i>
+  </button>
+  <button id="scroll-to-bottom" title="最下部へ">
+    <i class="fas fa-arrow-down"></i>
+  </button>
+</div>
+
+<style>
+#scroll-buttons {
+  position: fixed;
+  right: 30px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+#scroll-buttons button {
+  background: #333;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  cursor: pointer;
+  font-size: 22px;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+#scroll-buttons button:hover {
+  opacity: 1;
+  background: #555;
+}
+</style>
+
+<script>
+document.addEventListener('turbolinks:load', function() {
+  const btnTop = document.getElementById('scroll-to-top');
+  const btnBottom = document.getElementById('scroll-to-bottom');
+
+  btnTop?.addEventListener('click', function() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  btnBottom?.addEventListener('click', function() {
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+  });
+});
+</script>
