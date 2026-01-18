@@ -1,59 +1,24 @@
 class Public::ReviewsController < ApplicationController
-  # new/create/show/edit/update/destroy を保護
   before_action :authenticate_user!, only: %i[new create show edit update destroy index]
   before_action :set_review, only: %i[show edit update destroy]
   before_action :forbid_guest_user!, only: %i[new create edit update destroy]
 
   def index
-    permitted_sorts = %w[created_at title likes_count]
-    sort = permitted_sorts.include?(params[:sort]) ? params[:sort] : "created_at"
-    direction = params[:direction] == 'asc' ? 'asc' : 'desc'
-  
     @platforms = Platform.order(id: :asc)
-    @genres = Genre.order(:name)
-  
-    @reviews = Review.where(approved: true).includes(:platform, :genre, :user)
-
-    # 絞り込み (プラットフォームID)
-    if params[:platform_id].present?
-      @reviews = @reviews.where(platform_id: params[:platform_id])
-    end
-    # 絞り込み (ジャンルID)
-    if params[:genre_id].present?
-      @reviews = @reviews.where(genre_id: params[:genre_id])
-    end
-  
-    # 並び替え
-    if sort == 'likes_count'
-      @reviews = @reviews.left_joins(:likes).group("reviews.id").order("COUNT(likes.id) #{direction}")
-    else
-      @reviews = @reviews.order("#{sort} #{direction}")
-    end
-  
-    # ページネーション（表示上限を30件に設定）
-    if defined?(Kaminari)
-      @reviews = @reviews.page(params[:page]).per(30)
-    elsif defined?(WillPaginate)
-      @reviews = @reviews.paginate(page: params[:page], per_page: 30)
-    end
+    @genres    = Genre.order(:name)
+    @reviews   = Review.where(approved: true).includes(:platform, :genre, :user)
+    @reviews   = filter_reviews(@reviews)
+    @reviews   = sort_reviews(@reviews)
+    @reviews   = paginate_reviews(@reviews)
   end
 
   def show
-    @review = Review.find(params[:id])
-    # 管理者以外で未承認はブロック
-    unless @review.approved? || (current_user.respond_to?(:admin?) && current_user.admin?)
-      redirect_to reviews_path, alert: "このレビューは管理者により非表示となっています。"
-      return
+    # 未承認レビューは管理者以外見られない
+    unless @review.approved? || admin_access?
+      redirect_to reviews_path, alert: "このレビューは管理者により非表示となっています。" and return
     end
     @review_comment = ReviewComment.new
-    
-    if defined?(Kaminari)
-      @review_comments = @review.review_comments.order(created_at: :asc).page(params[:review_comments_page]).per(200)
-    elsif defined?(WillPaginate)
-      @review_comments = @review.review_comments.order(created_at: :asc).paginate(page: params[:review_comments_page], per_page: 200)
-    else
-      @review_comments = @review.review_comments.order(created_at: :asc).limit(200)
-    end
+    @review_comments = paginate_review_comments(@review.review_comments)
   end
 
   def new
@@ -62,9 +27,7 @@ class Public::ReviewsController < ApplicationController
   end
 
   def create
-    @review = Review.new(review_params)
-    @review.user_id = current_user.id
-
+    @review = Review.new(review_params.merge(user_id: current_user.id))
     if @review.save
       redirect_to review_path(@review), notice: 'レビューを作成しました。'
     else
@@ -76,18 +39,12 @@ class Public::ReviewsController < ApplicationController
 
   def edit
     load_selects
-    # 必要なら投稿者チェックを追加（下の destroy と同様）
-    unless current_user && current_user.id == @review.user_id
-      redirect_to review_path(@review), alert: '編集権限がありません。'
-    end
+    forbid_edit_unless_owner!
   end
 
   def update
     load_selects
-    unless current_user && current_user.id == @review.user_id
-      redirect_to review_path(@review), alert: '更新権限がありません。' and return
-    end
-
+    forbid_edit_unless_owner! and return
     if @review.update(review_params)
       redirect_to review_path(@review), notice: 'レビューを更新しました。'
     else
@@ -97,8 +54,7 @@ class Public::ReviewsController < ApplicationController
   end
 
   def destroy
-    # 投稿者または管理者のみ削除できるようにする場合は条件を追加してください
-    if current_user && current_user.id == @review.user_id
+    if owner_or_admin?
       @review.destroy
       redirect_to user_path(current_user), notice: 'レビューを削除しました。'
     else
@@ -117,7 +73,60 @@ class Public::ReviewsController < ApplicationController
   end
 
   def load_selects
-    @platforms = Platform.all.order(id: :asc)
-    @genres = Genre.all.order(:name)
+    @platforms = Platform.order(id: :asc)
+    @genres    = Genre.order(:name)
+  end
+
+  def filter_reviews(reviews)
+    reviews = reviews.where(platform_id: params[:platform_id]) if params[:platform_id].present?
+    reviews = reviews.where(genre_id: params[:genre_id])       if params[:genre_id].present?
+    reviews
+  end
+
+  def sort_reviews(reviews)
+    permitted_sorts = %w[created_at title likes_count]
+    sort      = permitted_sorts.include?(params[:sort]) ? params[:sort] : "created_at"
+    direction = params[:direction] == 'asc' ? 'asc' : 'desc'
+    if sort == 'likes_count'
+      reviews.left_joins(:likes).group("reviews.id").order("COUNT(likes.id) #{direction}")
+    else
+      reviews.order("#{sort} #{direction}")
+    end
+  end
+
+  def paginate_reviews(reviews)
+    if defined?(Kaminari)
+      reviews.page(params[:page]).per(30)
+    elsif defined?(WillPaginate)
+      reviews.paginate(page: params[:page], per_page: 30)
+    else
+      reviews
+    end
+  end
+
+  def paginate_review_comments(review_comments)
+    ordered = review_comments.order(created_at: :asc)
+    if defined?(Kaminari)
+      ordered.page(params[:review_comments_page]).per(200)
+    elsif defined?(WillPaginate)
+      ordered.paginate(page: params[:review_comments_page], per_page: 200)
+    else
+      ordered.limit(200)
+    end
+  end
+
+  def owner_or_admin?
+    current_user && (current_user.id == @review.user_id || (current_user.respond_to?(:admin?) && current_user.admin?))
+  end
+
+  def admin_access?
+    current_user.respond_to?(:admin?) && current_user.admin?
+  end
+
+  def forbid_edit_unless_owner!
+    unless current_user && current_user.id == @review.user_id
+      redirect_to review_path(@review), alert: '権限がありません。'
+      true
+    end
   end
 end
