@@ -8,80 +8,31 @@ class Public::TopicsController < ApplicationController
 
   # GET /forums/:forum_id/topics
   def index
-    # 並び替え対象の確認（不正な値はデフォルトにする）
-    sort = %w[title created_at posts_count].include?(params[:sort]) ? params[:sort] : 'created_at'
-    direction = params[:direction] == 'asc' ? 'asc' : 'desc'
-
-    # pinned は常に優先してソート（先頭に表示）
-    base_scope = @forum.topics.where(locked: false).order(pinned: :desc)
-
-    # 並び替え句を組み立てる
-    order_clause =
-      case sort
-      when 'title'
-        "title #{direction}"
-      when 'created_at'
-        "created_at #{direction}"
-      when 'posts_count'
-        # posts_count を使う想定（counter_cache が設定されていること）
-        "posts_count #{direction}"
-      else
-        "created_at #{direction}"
-      end
-
-    @topics = base_scope.order(Arel.sql(order_clause))
-
-    # ページネーション（表示上限を30件に設定）
-    if defined?(Kaminari)
-      @topics = @topics.page(params[:page]).per(30)
-    elsif defined?(WillPaginate)
-      @topics = @topics.paginate(page: params[:page], per_page: 30)
-    end
+    @topics = filtered_sorted_topics
+    @topics = paginate_collection(@topics, 30)
   end
 
   # GET /forums/:forum_id/topics/:id
   def show
-    # ロック判定
-    if @topic.locked? && !(current_user&.respond_to?(:admin?) && current_user.admin?)
+    # 管理者以外はロックされたトピックにアクセス不可
+    if @topic.locked? && !admin_user?
       redirect_to forum_topics_path(@forum), alert: 'このトピックは管理者によりロックされているためアクセスできません。'
       return
     end
 
-    @posts = @topic.posts.order(created_at: :asc)
-    @posts = @posts.page(params[:page]) if defined?(Kaminari) || defined?(WillPaginate)
-    # 非同期投稿用フォームで利用する空の Post を用意
-    @post = Post.new
+    @posts = @topic.posts.order(:created_at)
+    @posts = paginate_collection(@posts, nil)
+    @post = Post.new # 非同期投稿フォーム用
 
-    # 投稿権限判定（作成者 / admin / 承認済メンバーのみ投稿可）
-    @can_post = false
-    if user_signed_in?
-      @can_post = true if current_user.respond_to?(:admin?) && current_user.admin?
-
-      # 作成者判定：関連オブジェクトで比較できればそれを使い、無ければ creator_id / user_id で比較する
-      creator = @topic.respond_to?(:creator) ? @topic.creator : @topic.user
-      if creator.present?
-        @can_post = true if creator == current_user
-      else
-        @can_post = true if @topic.respond_to?(:creator_id) && @topic.creator_id == current_user&.id
-        @can_post = true if @topic.respond_to?(:user_id) && @topic.user_id == current_user&.id
-      end
-
-      # 承認済メンバーかどうか（作成者や admin でなければチェック）
-      if !@can_post && @topic.respond_to?(:topic_memberships)
-        @can_post = @topic.topic_memberships.approved.exists?(user_id: current_user.id)
-      end
-    end
+    # 投稿権限判定
+    @can_post = can_post_to_topic?
   end
 
-  # GET /topics/new  (全フォーラム共通) または /forums/:forum_id/topics/new
+  # GET /topics/new または /forums/:forum_id/topics/new
   def new
     @forums = Forum.order(:position)
-    if params[:forum_id].present?
-      @forum = Forum.find(params[:forum_id])
-      @topic = @forum.topics.build
-    else
-      @topic = Topic.new
-    end
+    @forum  = Forum.find(params[:forum_id]) if params[:forum_id].present?
+    @topic  = @forum ? @forum.topics.build : Topic.new
   end
 
   def create
@@ -91,21 +42,13 @@ class Public::TopicsController < ApplicationController
       @forum = Forum.find(forum_id)
       @topic = @forum.topics.build(topic_params.except(:forum_id))
     else
-      # フォーラム未選択なら topic_params をそのまま使ってモデル検証させる
       @forums = Forum.order(:position)
-      @topic = Topic.new(topic_params.except(:forum_id))
-      # モデル側の validates :forum_id があるので valid? を呼んでエラーを収集する
+      @topic  = Topic.new(topic_params.except(:forum_id))
       @topic.valid?
-      # ここでは追加で errors.add をしない（モデルの message を利用する）
       render :new and return
     end
 
-    # 作成者情報をセット
-    if @topic.respond_to?(:creator_id)
-      @topic.creator_id ||= current_user.id
-    elsif @topic.respond_to?(:user_id)
-      @topic.user_id ||= current_user.id
-    end
+    set_topic_creator(@topic)
 
     if @topic.save
       redirect_to forum_topic_path(@forum, @topic), notice: 'コミュニティを作成しました。'
@@ -118,15 +61,12 @@ class Public::TopicsController < ApplicationController
 
   # GET /forums/:forum_id/topics/:id/edit
   def edit
-    # フォーラム選択肢が必要なので必ず用意する
     @forums = Forum.order(:position)
   end
 
   # PATCH/PUT /forums/:forum_id/topics/:id
   def update
-    # edit を再描画する場合のために準備
     @forums = Forum.order(:position)
-
     tp = topic_params.dup
     new_forum_id = tp.delete(:forum_id)
 
@@ -154,47 +94,112 @@ class Public::TopicsController < ApplicationController
     if user_signed_in?
       redirect_to user_path(current_user), notice: 'コミュニティを削除しました。'
     else
-      # 万一ログインしていなければフォーラムのトピック一覧へフォールバック
-      redirect_to forum_topics_path(@forum), notice: 'コミュニテを削除しました。'
+      redirect_to forum_topics_path(@forum), notice: 'コミュニティを削除しました。'
     end
   end
 
   private
 
-  # ネストされたルート用に forum をセット（new/create のときは除外）
+  # forumをセット（new/create以外）
   def set_forum
     @forum = Forum.find(params[:forum_id])
   end
 
-  # set_topic はネストされた場合とトップレベルの両方に対応
+  # topicセット（フォーラムID有無で場合分け）
   def set_topic
     if params[:forum_id].present?
-      @forum = Forum.find(params[:forum_id])
-      @topic = @forum.topics.find(params[:id])
+      @forum  = Forum.find(params[:forum_id])
+      @topic  = @forum.topics.find(params[:id])
     else
-      @topic = Topic.find(params[:id])
-      @forum = @topic.forum
+      @topic  = Topic.find(params[:id])
+      @forum  = @topic.forum
     end
   end
 
-  # :forum_id を許可（トップレベル new から選択された forum_id を受け取るため）
+  # StrongParameter（forum_idはnew共通フォーム用に許可）
   def topic_params
     params.require(:topic).permit(:forum_id, :title, :description, :pinned, :locked)
   end
 
+  # ゲストユーザーは投稿不可
   def prevent_guest_posting!
-    return unless current_user && current_user.respond_to?(:guest?) && current_user.guest?
-
-    # ネストされていない場合はフォーラム一覧へ。ネストありならそのフォーラムのトピック一覧へ。
-    redirect_target = @forum.present? ? forum_topics_path(@forum) : forums_path
-    redirect_to redirect_target, alert: 'ゲストユーザーは投稿できません。'
+    if guest_user?
+      redirect_target = @forum.present? ? forum_topics_path(@forum) : forums_path
+      redirect_to redirect_target, alert: 'ゲストユーザーは投稿できません。'
+    end
   end
 
+  # 権限判定（管理者か投稿者のみ許可）
   def authorize_topic_owner!
-    return if current_user&.respond_to?(:admin?) && current_user.admin?
+    return if admin_user?
     return if @topic.respond_to?(:creator_id) && @topic.creator_id == current_user&.id
     return if @topic.respond_to?(:user) && @topic.user == current_user
 
     redirect_to forum_topics_path(@forum), alert: 'この操作を行う権限がありません。'
+  end
+
+  # 管理者ユーザー判定
+  def admin_user?
+    current_user&.respond_to?(:admin?) && current_user.admin?
+  end
+
+  # ゲストユーザー判定
+  def guest_user?
+    current_user&.respond_to?(:guest?) && current_user.guest?
+  end
+
+  # 投稿権限判定
+  def can_post_to_topic?
+    return false unless user_signed_in?
+    return true  if admin_user?
+    creator      = @topic.respond_to?(:creator) ? @topic.creator : @topic.user
+    return true  if creator.present? && creator == current_user
+    return true  if @topic.respond_to?(:creator_id) && @topic.creator_id == current_user.id
+    return true  if @topic.respond_to?(:user_id) && @topic.user_id == current_user.id
+
+    # 承認済みメンバーか
+    if @topic.respond_to?(:topic_memberships)
+      return @topic.topic_memberships.approved.exists?(user_id: current_user.id)
+    end
+
+    false
+  end
+
+  # トピック作成時に作成者情報セット
+  def set_topic_creator(topic)
+    if topic.respond_to?(:creator_id)
+      topic.creator_id ||= current_user.id
+    elsif topic.respond_to?(:user_id)
+      topic.user_id ||= current_user.id
+    end
+  end
+
+  # 並び替え・絞り込みされたトピック一覧を返す
+  def filtered_sorted_topics
+    permitted_sorts = %w[title created_at posts_count]
+    sort      = permitted_sorts.include?(params[:sort]) ? params[:sort] : 'created_at'
+    direction = params[:direction] == 'asc' ? 'asc' : 'desc'
+    base_scope = @forum.topics.where(locked: false).order(pinned: :desc)
+
+    order_clause =
+      case sort
+      when 'title'       then "title #{direction}"
+      when 'created_at'  then "created_at #{direction}"
+      when 'posts_count' then "posts_count #{direction}" # counter_cache前提
+      else                    "created_at #{direction}"
+      end
+
+    base_scope.order(Arel.sql(order_clause))
+  end
+
+  # コレクションのページング（Kaminari/WillPaginate対応）
+  def paginate_collection(collection, per_page)
+    if defined?(Kaminari)
+      per_page ? collection.page(params[:page]).per(per_page) : collection.page(params[:page])
+    elsif defined?(WillPaginate)
+      per_page ? collection.paginate(page: params[:page], per_page: per_page) : collection.paginate(page: params[:page])
+    else
+      collection
+    end
   end
 end
