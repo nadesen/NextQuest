@@ -1,18 +1,17 @@
 class Public::ForumsController < ApplicationController
-  before_action :set_forum, only: %i[show edit update destroy]
+  before_action :set_forum,   only: %i[show edit update destroy]
   before_action :authenticate_user!, only: %i[new create edit update destroy index show]
-  before_action :require_admin!, only: %i[new create edit update destroy]
+  before_action :require_admin!,     only: %i[new create edit update destroy]
 
   # GET /forums
   def index
     @forums = Forum.order(position: :asc)
-    # ページネーションがプロジェクトで導入されていれば適用する
-    @forums = @forums.page(params[:page]) if defined?(Kaminari) || defined?(WillPaginate)
+    @forums = paginate(@forums)
   end
 
   # GET /forums/:id
   def show
-    # フォーラムの詳細（必要に応じて最近のトピックや統計をロード）
+    # フォーラム詳細に最近のトピックや統計情報を表示したい場合
     @recent_topics = @forum.topics.order(updated_at: :desc).limit(10)
   end
 
@@ -35,15 +34,14 @@ class Public::ForumsController < ApplicationController
   end
 
   # GET /forums/:id/edit
-  def edit
-  end
+  def edit; end
 
   # PATCH/PUT /forums/:id
   def update
     if @forum.update(forum_params)
       redirect_to forums_path, notice: 'フォーラムを更新しました。'
     else
-      flash.now[:alert] = 'フォーラムの更新に失敗しました。入力内容を確認してください。'
+      flash.now[:alert] = 'フォーラムの更新に失敗しました。入力内容を確認してくさい。'
       render :edit
     end
   end
@@ -64,10 +62,21 @@ class Public::ForumsController < ApplicationController
     params.require(:forum).permit(:title, :description, :public, :position)
   end
 
+  # 管理者以外は全ての管理操作を禁ずる
   def require_admin!
-    return if current_user&.admin?
-
-    redirect_to root_path, alert: 'この操作を行う権限がありません。'
+    unless current_user&.admin?
+      redirect_to root_path, alert: 'この操作を行う権限がありません。'
+    end
   end
-  
+
+  # ページネーション用ヘルパー（Kaminari/WillPaginate 両対応）
+  def paginate(scope)
+    if defined?(Kaminari)
+      scope.page(params[:page])
+    elsif defined?(WillPaginate)
+      scope.paginate(page: params[:page])
+    else
+      scope
+    end
+  end
 end
