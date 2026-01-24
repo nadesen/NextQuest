@@ -4,69 +4,23 @@ class Public::NotificationsController < ApplicationController
 
   def index
     notifications = current_user.notifications.where(read: false).order(created_at: :desc)
-    if defined?(Kaminari)
-      @topic_notifications = notifications.where(notif_type: ["topic_post", "topic_membership_request", "topic_membership_approved", "topic_membership_rejected"])
-                                         .page(params[:topic_page]).per(10)
-      @review_comment_notifications = notifications.where(notif_type: "review_comment")
-                                                   .page(params[:review_comment_page]).per(10)
-      @followee_review_notifications = notifications.where(notif_type: "followee_review")
-                                                    .page(params[:followee_review_page]).per(10)
-    elsif defined?(WillPaginate)
-      @topic_notifications = notifications.where(notif_type: ["topic_post", "topic_membership_request", "topic_membership_approved", "topic_membership_rejected"])
-                                         .paginate(page: params[:topic_page], per_page: 10)
-      @review_comment_notifications = notifications.where(notif_type: "review_comment")
-                                                   .paginate(page: params[:review_comment_page], per_page: 10)
-      @followee_review_notifications = notifications.where(notif_type: "followee_review")
-                                                    .paginate(page: params[:followee_review_page], per_page: 10)
-    else
-      @topic_notifications = notifications.where(notif_type: ["topic_post", "topic_membership_request", "topic_membership_approved", "topic_membership_rejected"]).limit(10)
-      @review_comment_notifications = notifications.where(notif_type: "review_comment").limit(10)
-      @followee_review_notifications = notifications.where(notif_type: "followee_review").limit(10)
-    end
+
+    @topic_notifications         = filter_paginate_notifications(notifications, ["topic_post", "topic_membership_request", "topic_membership_approved", "topic_membership_rejected"], :topic_page)
+    @review_comment_notifications = filter_paginate_notifications(notifications, "review_comment", :review_comment_page)
+    @followee_review_notifications = filter_paginate_notifications(notifications, "followee_review", :followee_review_page)
   end
 
   def update
     notification = current_user.notifications.find(params[:id])
     notification.update(read: true)
-    # 通知の種類に応じてリダイレクト先を変更
-    case notification.notif_type
-    when "topic_membership_approved", "topic_membership_rejected"
-      tm = notification.notifiable
-      topic = tm.topic if tm.respond_to?(:topic)
-      forum = topic&.forum
-      if topic && forum
-        redirect_to forum_topic_path(forum, topic) and return
-      end
-    when "topic_post"
-      topic = notification.notifiable
-      forum = topic&.forum
-      if topic && forum
-        redirect_to forum_topic_path(forum, topic) and return
-      end
-    when "review_comment"
-      comment = notification.notifiable
-      if comment&.respond_to?(:review) && comment.review
-        redirect_to review_path(comment.review) and return
-      end
-    when "followee_review"
-      review = notification.notifiable
-      redirect_to review_path(review) and return if review
-    when "topic_membership_request"
-      topic = notification.notifiable
-      forum = topic&.forum
-      # トピックのメンバー一覧へ
-      if topic && forum
-        redirect_to forum_topic_topic_members_path(forum, topic) and return
-      end
-    end
-    # どれにも当てはまらない場合
-    redirect_back fallback_location: notifications_path
+    # 種類ごとにリダイレクト先を分ける
+    redirect_to_notification(notification)
   end
 
   def batch_update
     type = params[:type]
     allowed_types = {
-      "topic" => ["topic_post"],
+      "topic"          => ["topic_post"],
       "review_comment" => ["review_comment"],
       "followee_review" => ["followee_review"]
     }
@@ -77,7 +31,7 @@ class Public::NotificationsController < ApplicationController
     else
       flash[:alert] = "この種類の通知は一括既読できません。"
     end
-    redirect_back(fallback_location: notifications_path)
+    redirect_back fallback_location: notifications_path
   end
 
   private
@@ -88,4 +42,42 @@ class Public::NotificationsController < ApplicationController
     end
   end
 
+  # 通知タイプごとにページネートして返す
+  def filter_paginate_notifications(scope, notif_type, page_param)
+    query = scope.where(notif_type: notif_type)
+    if defined?(Kaminari)
+      query.page(params[page_param]).per(10)
+    elsif defined?(WillPaginate)
+      query.paginate(page: params[page_param], per_page: 10)
+    else
+      query.limit(10)
+    end
+  end
+
+  # 各通知タイプに応じた遷移を統一的に処理する
+  def redirect_to_notification(notification)
+    case notification.notif_type
+    when "topic_membership_approved", "topic_membership_rejected"
+      tm    = notification.notifiable
+      topic = tm.topic if tm.respond_to?(:topic)
+      forum = topic&.forum
+      return redirect_to forum_topic_path(forum, topic) if forum && topic
+    when "topic_post"
+      topic = notification.notifiable
+      forum = topic&.forum
+      return redirect_to forum_topic_path(forum, topic) if forum && topic
+    when "review_comment"
+      comment = notification.notifiable
+      return redirect_to review_path(comment.review) if comment&.respond_to?(:review) && comment.review
+    when "followee_review"
+      review = notification.notifiable
+      return redirect_to review_path(review) if review
+    when "topic_membership_request"
+      topic = notification.notifiable
+      forum = topic&.forum
+      return redirect_to forum_topic_topic_members_path(forum, topic) if forum && topic
+    end
+    # どの分岐にも当てはまらなければ通知一覧へ戻る
+    redirect_back fallback_location: notifications_path
+  end
 end
