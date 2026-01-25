@@ -8,35 +8,24 @@ class Public::PostsController < ApplicationController
 
   # POST /forums/:forum_id/topics/:topic_id/posts
   def create
-    # topicロック確認
-    if @topic.locked? && !(current_user&.respond_to?(:admin?) && current_user.admin?)
-      respond_to do |format|
-        format.html {
-          redirect_to forum_topic_path(@forum, @topic), alert: 'このトピックはロックされているため投稿できません。'
-        }
-        format.js {
-          render js: "alert('このトピックはロックされているため投稿できません。');", status: :forbidden
-        }
-      end
-      return
+    # ロック済トピックへの投稿は管理者以外不可
+    if @topic.locked? && !admin_user?
+      respond_with_lock_forbidden and return
     end
 
     @post = @topic.posts.build(post_params)
     @post.creator_id = current_user.id if @post.respond_to?(:creator_id)
 
     if @post.save
-      # 最新の投稿一覧を用意して JS で差し替える
-      @posts = @topic.posts.order(created_at: :asc)
-      @posts = @posts.page(params[:page]) if defined?(Kaminari) || defined?(WillPaginate)
+      @posts = paginated_posts
       respond_to do |format|
         format.js
         format.html { redirect_to forum_topic_path(@forum, @topic), notice: '投稿しました' }
       end
     else
-      @posts = @topic.posts.order(created_at: :asc)
-      @posts = @posts.page(params[:page]) if defined?(Kaminari) || defined?(WillPaginate)
+      @posts = paginated_posts
       respond_to do |format|
-        format.js { render status: :unprocessable_entity }
+        format.js   { render status: :unprocessable_entity }
         format.html do
           flash.now[:alert] = '投稿に失敗しました'
           render 'public/topics/show'
@@ -48,16 +37,14 @@ class Public::PostsController < ApplicationController
   # DELETE /forums/:forum_id/topics/:topic_id/posts/:id
   def destroy
     if @post.destroy
-      @posts = @topic.posts.order(created_at: :asc)
-      @posts = @posts.page(params[:page]) if defined?(Kaminari) || defined?(WillPaginate)
+      @posts = paginated_posts
       respond_to do |format|
         format.js
         format.html { redirect_to forum_topic_path(@forum, @topic), notice: '投稿を削除しました。' }
       end
     else
-      # destroy が false を返す場合に備える
       respond_to do |format|
-        format.js { render js: "alert('投稿の削除に失敗しました。');", status: :internal_server_error }
+        format.js   { render js: "alert('投稿の削除に失敗しました。');", status: :internal_server_error }
         format.html { redirect_to forum_topic_path(@forum, @topic), alert: '投稿の削除に失敗しました。' }
       end
     end
@@ -78,54 +65,61 @@ class Public::PostsController < ApplicationController
     params.require(:post).permit(:content)
   end
 
-  # 投稿の所有者（creator_id あるいは user association）かどうかを判定
+  # 投稿の所有者または管理者かどうかを判定
   def authorize_post_owner!
-    # 管理者は常に許可
-    return if current_user.respond_to?(:admin?) && current_user.admin?
-
-    # creator オブジェクトと比較できる場合
-    if @post.respond_to?(:creator) && @post.creator.present?
-      return if @post.creator == current_user
-    end
-
-    # creator_id で比較できる場合（数値フィールド）
-    if @post.respond_to?(:creator_id)
-      return if @post.creator_id == current_user&.id
-    end
-
-    # 古い実装や別名 user を使っている場合
-    if @post.respond_to?(:user) && @post.user.present?
-      return if @post.user == current_user
-    end
-
-    if @post.respond_to?(:user_id)
-      return if @post.user_id == current_user&.id
-    end
-
-    # どれにも該当しない場合はアクセス拒否（リダイレクトで通知）
+    return if admin_user?
+    return if object_belongs_to_current_user?(@post)
     redirect_to forum_topic_path(@forum, @topic), alert: '編集権限がありません。投稿一覧に戻ります。'
   end
 
-  # 投稿権限の確認（create 前のガード）
+  # 投稿する権限の確認（作成・参加者・管理者のみ可）
   def authorize_posting!
-    return if current_user.respond_to?(:admin?) && current_user.admin?
-
-    # 作成者判定：関連オブジェクトで比較できればそれを使い、無ければ creator_id / user_id で比較する
-    creator = @topic.respond_to?(:creator) ? @topic.creator : @topic.user
-    if creator.present?
-      return if creator == current_user
-    else
-      return if @topic.respond_to?(:creator_id) && @topic.creator_id == current_user&.id
-      return if @topic.respond_to?(:user_id) && @topic.user_id == current_user&.id
-    end
-
-    if @topic.respond_to?(:topic_memberships)
-      return if @topic.topic_memberships.approved.exists?(user_id: current_user.id)
-    end
+    return if admin_user? || object_belongs_to_current_user?(@topic)
+    return if topic_approved_member?
 
     respond_to do |format|
       format.html { redirect_back fallback_location: forum_topic_path(@forum, @topic), alert: '投稿するには参加が必要です。参加申請を送信してください。' }
-      format.js { render js: "alert('投稿するには参加が必要です。');", status: :forbidden }
+      format.js   { render js: "alert('投稿するには参加が必要です。');", status: :forbidden }
+    end
+  end
+
+  # 管理者権限判定
+  def admin_user?
+    current_user&.respond_to?(:admin?) && current_user.admin?
+  end
+
+  # さまざまな命名に対応した所有者判定（creator/user/id等に柔軟対応）
+  def object_belongs_to_current_user?(obj)
+    return true  if obj.respond_to?(:creator)   && obj.creator   == current_user
+    return true  if obj.respond_to?(:creator_id) && obj.creator_id == current_user&.id
+    return true  if obj.respond_to?(:user)      && obj.user      == current_user
+    return true  if obj.respond_to?(:user_id)   && obj.user_id   == current_user&.id
+    false
+  end
+
+  # topicに承認済メンバーとして現在のユーザーが含まれるか
+  def topic_approved_member?
+    @topic.respond_to?(:topic_memberships) &&
+      @topic.topic_memberships.approved.exists?(user_id: current_user.id)
+  end
+
+  # 投稿一覧（ページネーション、gem有無による分岐も吸収）
+  def paginated_posts
+    posts = @topic.posts.order(created_at: :asc)
+    if defined?(Kaminari)
+      posts.page(params[:page])
+    elsif defined?(WillPaginate)
+      posts.paginate(page: params[:page])
+    else
+      posts
+    end
+  end
+
+  # JS/HTML両方で使う「ロックされた投稿ブロック」の共通レスポンス
+  def respond_with_lock_forbidden
+    respond_to do |format|
+      format.html { redirect_to forum_topic_path(@forum, @topic), alert: 'このトピックはロックされているため投稿できません。' }
+      format.js   { render js: "alert('このトピックはロックされているため投稿できません。');", status: :forbidden }
     end
   end
 end
