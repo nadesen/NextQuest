@@ -2,57 +2,15 @@ class Public::UsersController < ApplicationController
   before_action :authenticate_user!, only: [:show, :edit, :update, :destroy, :my_page, :my_likes, :likes]
   before_action :set_user, only: [:show, :edit, :update, :destroy, :likes]
   before_action :authorize_user!, only: [:edit, :update, :destroy]
-  before_action :ensure_guest_user, only: [:edit]
+  before_action :ensure_guest_user_edit_block, only: [:edit]
   before_action :redirect_guest_user_from_mypage, only: [:show]
 
   def show
-    @user = User.find(params[:id])
-
-    # 各一覧はページネーションを入れる（表示上限 5）
-    # 複数の paginate を同一ページに置くためにページパラメータ名を個別に分ける:
-    # topics_page, posts_page, reviews_page, review_comments_page
-
-    # トピック
-    topics_relation = fetch_user_topics(@user.id)
-    if defined?(Kaminari)
-      @topics = topics_relation.page(params[:topics_page]).per(5)
-    elsif defined?(WillPaginate)
-      @topics = topics_relation.paginate(page: params[:topics_page], per_page: 5)
-    else
-      @topics = topics_relation.limit(5)
-    end
-
-    # ポスト
-    posts_relation = fetch_user_posts(@user.id)
-    if defined?(Kaminari)
-      @posts = posts_relation.page(params[:posts_page]).per(5)
-    elsif defined?(WillPaginate)
-      @posts = posts_relation.paginate(page: params[:posts_page], per_page: 5)
-    else
-      @posts = posts_relation.limit(5)
-    end
-
-    # レビュー
-    reviews_relation = fetch_user_reviews(@user.id)
-    if defined?(Kaminari)
-      @reviews = reviews_relation.page(params[:reviews_page]).per(5)
-    elsif defined?(WillPaginate)
-      @reviews = reviews_relation.paginate(page: params[:reviews_page], per_page: 5)
-    else
-      @reviews = reviews_relation.limit(5)
-    end
-
-    # レビューへのコメント（review が存在するコメントのみ取得）
-    review_comments_relation = @user.review_comments.joins(:review)
-                                    .includes(:review)
-                                    .order(created_at: :desc)
-    if defined?(Kaminari)
-      @review_comments = review_comments_relation.page(params[:review_comments_page]).per(5)
-    elsif defined?(WillPaginate)
-      @review_comments = review_comments_relation.paginate(page: params[:review_comments_page], per_page: 5)
-    else
-      @review_comments = review_comments_relation.limit(5)
-    end
+    # 各一覧はページネーションを使用（表示上限 5）
+    @topics         = paginated(fetch_user_topics(@user.id),          :topics_page)
+    @posts          = paginated(fetch_user_posts(@user.id),           :posts_page)
+    @reviews        = paginated(fetch_user_reviews(@user.id),         :reviews_page)
+    @review_comments = paginated(fetch_user_review_comments(@user),   :review_comments_page)
   end
 
   # GET /users/:id/likes
@@ -77,117 +35,104 @@ class Public::UsersController < ApplicationController
   end
 
   def destroy
-    user = @user
-    if current_user && current_user.id == user.id
+    if current_user && current_user.id == @user.id
       sign_out(current_user) if defined?(sign_out)
-      if user.destroy
+      if @user.destroy
         redirect_to new_user_registration_path, notice: 'アカウントを削除しました。ご利用ありがとうございました。'
       else
-        redirect_to user_path(user), alert: 'アカウントの削除に失敗しました。'
+        redirect_to user_path(@user), alert: 'アカウントの削除に失敗しました。'
       end
     else
-      redirect_to user_path(user), alert: '削除権限がありません。'
+      redirect_to user_path(@user), alert: '削除権限がありません。'
     end
   end
 
   private
 
-  # fetch_user_* は可能な限り ActiveRecord::Relation を返すようにしておく（paginate 対応）
-  def fetch_user_topics(user_id, limit: nil)
-    return Topic.none unless defined?(Topic)
-    relation =
-      if @user.respond_to?(:topics)
-        @user.topics.includes(:forum).order(created_at: :desc)
-      else
-        cols = Topic.column_names rescue []
-        if cols.include?('user_id')
-          Topic.where(user_id: user_id).includes(:forum).order(created_at: :desc)
-        elsif cols.include?('creator_id')
-          Topic.where(creator_id: user_id).includes(:forum).order(created_at: :desc)
-        elsif cols.include?('author_id')
-          Topic.where(author_id: user_id).includes(:forum).order(created_at: :desc)
-        elsif Topic.reflect_on_association(:posts) && defined?(Post) && (Post.column_names.include?('user_id') rescue false)
-          Topic.joins(:posts).where(posts: { user_id: user_id }).distinct.includes(:forum).order('topics.created_at DESC')
-        else
-          Topic.none
-        end
-      end
+  # Userを取得
+  def set_user
+    @user = User.find(params[:id])
+  end
 
-    relation = relation.limit(limit) if limit.present?
-    relation
+  # ページネーション共通化（Kaminari/WillPaginate両対応/デフォ5件）
+  def paginated(relation, page_param, per: 5)
+    if defined?(Kaminari)
+      relation.page(params[page_param]).per(per)
+    elsif defined?(WillPaginate)
+      relation.paginate(page: params[page_param], per_page: per)
+    else
+      relation.limit(per)
+    end
+  end
+
+  # トピックをユーザIDから取得 (AR::Relation で返す)
+  def fetch_user_topics(user_id)
+    topic_assoc(@user) || Topic.where(author_column_hash(Topic, user_id)).includes(:forum).order(created_at: :desc)
   rescue => e
     Rails.logger.warn("[UsersController#fetch_user_topics] #{e.message}")
     Topic.none
   end
 
-  def fetch_user_posts(user_id, limit: nil)
-    return Post.none unless defined?(Post)
-    relation =
-      if @user.respond_to?(:posts)
-        @user.posts.includes(:topic).order(created_at: :desc)
-      else
-        cols = Post.column_names rescue []
-        if cols.include?('user_id')
-          Post.where(user_id: user_id).includes(:topic).order(created_at: :desc)
-        elsif cols.include?('author_id')
-          Post.where(author_id: user_id).includes(:topic).order(created_at: :desc)
-        elsif cols.include?('creator_id')
-          Post.where(creator_id: user_id).includes(:topic).order(created_at: :desc)
-        else
-          Post.none
-        end
-      end
-
-    relation = relation.limit(limit) if limit.present?
-    relation
+  # ポストをユーザIDから取得
+  def fetch_user_posts(user_id)
+    post_assoc(@user) || Post.where(author_column_hash(Post, user_id)).includes(:topic).order(created_at: :desc)
   rescue => e
     Rails.logger.warn("[UsersController#fetch_user_posts] #{e.message}")
     Post.none
   end
 
-  def fetch_user_reviews(user_id, limit: nil)
-    return Review.none unless defined?(Review)
-    relation =
-      if @user.respond_to?(:reviews)
-        @user.reviews.includes(:platform, :genre).order(created_at: :desc)
-      else
-        cols = Review.column_names rescue []
-        if cols.include?('user_id')
-          Review.where(user_id: user_id).includes(:platform, :genre).order(created_at: :desc)
-        elsif cols.include?('author_id')
-          Review.where(author_id: user_id).includes(:platform, :genre).order(created_at: :desc)
-        elsif cols.include?('creator_id')
-          Review.where(creator_id: user_id).includes(:platform, :genre).order(created_at: :desc)
-        else
-          Review.none
-        end
-      end
-
-    relation = relation.limit(limit) if limit.present?
-    relation
+  # レビューをユーザIDから取得
+  def fetch_user_reviews(user_id)
+    review_assoc(@user) || Review.where(author_column_hash(Review, user_id)).includes(:platform, :genre).order(created_at: :desc)
   rescue => e
     Rails.logger.warn("[UsersController#fetch_user_reviews] #{e.message}")
     Review.none
   end
 
-  def set_user
-    @user = User.find(params[:id])
+  # レビューコメント取得
+  def fetch_user_review_comments(user)
+    user.review_comments.joins(:review)
+        .includes(:review)
+        .order(created_at: :desc)
   end
 
-  def authorize_user!
-    # current_user が自分のページを編集しようとしているかチェック
-    unless current_user && current_user.id == @user.id
-      # ログイン済みなら current_user の show ページへ、未ログインなら通常のユーザー詳細へ
-      if user_signed_in?
-        redirect_to user_path(current_user), alert: '編集権限がありません。マイページに移動しました。'
-      else
-        redirect_to user_path(@user), alert: '権限がありません。'
-      end
+  # モデルごとのユーザー関連カラム判定
+  def author_column_hash(model, user_id)
+    cols = model.column_names rescue []
+    if cols.include?('user_id')      then { user_id: user_id }
+    elsif cols.include?('author_id') then { author_id: user_id }
+    elsif cols.include?('creator_id') then { creator_id: user_id }
+    else {}
     end
   end
 
+  # アソシエーションで取れる場合はそれを優先（Topic/User, Post/User, Review/User）
+  def topic_assoc(user)
+    user.topics.includes(:forum).order(created_at: :desc) if user.respond_to?(:topics)
+  end
+  def post_assoc(user)
+    user.posts.includes(:topic).order(created_at: :desc) if user.respond_to?(:posts)
+  end
+  def review_assoc(user)
+    user.reviews.includes(:platform, :genre).order(created_at: :desc) if user.respond_to?(:reviews)
+  end
+
+  # 編集・削除等の本人確認
+  def authorize_user!
+    unless current_user && current_user.id == @user.id
+      redirect_to(user_signed_in? ? user_path(current_user) : user_path(@user), alert: '編集権限がありません。マイページに移動しました。')
+    end
+  end
+
+  # ゲストユーザーによる編集ブロック
+  def ensure_guest_user_edit_block
+    if @user.email == "guest@example.com"
+      redirect_to user_path(current_user), notice: "ゲストユーザーはプロフィール編集画面へ遷移できません。"
+    end
+  end
+
+  # ゲストによるマイページアクセス制限
   def redirect_guest_user_from_mypage
-    # ログイン中、かつゲスト、かつマイページ参照時
     if user_signed_in? && current_user.email == "guest@example.com" && params[:id].to_i == current_user.id
       redirect_to root_path, alert: "ゲストユーザーはマイページは利用できません。"
     end
@@ -196,11 +141,4 @@ class Public::UsersController < ApplicationController
   def user_params
     params.require(:user).permit(:name, :nickname, :email, :profile_text)
   end
-
-  def ensure_guest_user
-    @user = User.find(params[:id])
-    if @user.email == "guest@example.com"
-      redirect_to user_path(current_user) , notice: "ゲストユーザーはプロフィール編集画面へ遷移できません。"
-    end
-  end 
 end
