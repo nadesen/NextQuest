@@ -1,22 +1,23 @@
 class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
+
+  # ===== 各種関連 =====
   has_many :review_comments, dependent: :destroy
-  # ユーザーが行ったいいねを保持
   has_many :likes, dependent: :destroy
-  # ユーザーがいいねしたレビュー一覧取得用
+
+  # いいねしたレビュー(Review)
   has_many :liked_reviews, through: :likes, source: :review
 
-  # メンバーシップ機能用
+  # トピックメンバーシップ系
   has_many :topic_memberships, dependent: :destroy
   has_many :joined_topics, through: :topic_memberships, source: :topic
 
-  # --- フォロー機能 ---
+  # フォロー機能
   has_many :following_relationships,
             class_name: 'Follow',
             foreign_key: 'follower_id',
             dependent: :destroy
-
   has_many :followings,
             through: :following_relationships,
             source: :followed
@@ -25,25 +26,25 @@ class User < ApplicationRecord
             class_name: 'Follow',
             foreign_key: 'followed_id',
             dependent: :destroy
-
   has_many :followers,
             through: :follower_relationships,
             source: :follower
 
-  # --- 通知機能 ---
+  # 通知
   has_many :notifications, dependent: :destroy
 
-  validates :name, presence: true, length: { maximum: 30 }
+  # ====== バリデーション ======
+  validates :name,     presence: true, length: { maximum: 30 }
   validates :nickname, presence: true, length: { maximum: 50 }
 
   # ゲストユーザー用の定数
   GUEST_USER_EMAIL = "guest@example.com"
 
+  # ----- ゲスト取得 -----
   def self.guest
     find_or_create_by!(email: GUEST_USER_EMAIL) do |user|
       user.password = SecureRandom.urlsafe_base64
-      user.name = "ゲストユーザー"
-      user.nickname = "ゲストユーザー"
+      user.name = user.nickname = "ゲストユーザー"
     end
   end
 
@@ -51,34 +52,25 @@ class User < ApplicationRecord
     email == GUEST_USER_EMAIL
   end
 
-  # suspended が true の場合はログイン不可にする
+  # ----- Devise サスペンド対応 -----
   def active_for_authentication?
     super && !suspended?
   end
 
-  # ログイン不可（active_for_authentication? が false）の理由を返す
-  # :suspended を返すと Devise は devise.failure.suspended の i18n を使います
   def inactive_message
     suspended? ? :suspended : super
   end
 
-  # 検索メソッド（searches_controller から呼び出す）
-  # content: 検索語
+  # ----- 検索 -----
   # method: 'perfect' | 'forward' | 'backward' | 'partial'
   def self.search_for(content, method)
     return none if content.blank?
-
-    pattern =
-      case method
-      when 'perfect'
-        content
-      when 'forward'
-        "#{sanitize_sql_like(content)}%"
-      when 'backward'
-        "%#{sanitize_sql_like(content)}"
-      else
-        "%#{sanitize_sql_like(content)}%"
-      end
+    pattern = case method
+              when 'perfect' then content
+              when 'forward' then "#{sanitize_sql_like(content)}%"
+              when 'backward' then "%#{sanitize_sql_like(content)}"
+              else "%#{sanitize_sql_like(content)}%"
+              end
 
     if method == 'perfect'
       where('nickname = :q OR name = :q OR email = :q OR profile_text = :q', q: content)
@@ -87,26 +79,22 @@ class User < ApplicationRecord
     end
   end
 
-  # ユーザーをフォローする
+  # ----- フォロー操作 -----
   def follow(other_user)
     return if other_user.nil? || self == other_user
     following_relationships.find_or_create_by(followed_id: other_user.id)
   end
 
-  # フォロー解除
   def unfollow(other_user)
-    rel = following_relationships.find_by(followed_id: other_user.id)
-    rel&.destroy
+    following_relationships.find_by(followed_id: other_user.id)&.destroy
   end
 
-  # フォローしているか
   def following?(other_user)
     followings.exists?(other_user&.id)
   end
 
-  # フィードを取得する（例: フォローしているユーザーのレビューや投稿をまとめる）
+  # ----- フィード生成例（フォロー中ユーザー+自分のレビュー） -----
   def feed_reviews
     Review.where(user_id: (followings.pluck(:id) + [id]))
   end
-
 end
