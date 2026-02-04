@@ -8,14 +8,14 @@
       <%= link_to '一覧に戻る', admin_forums_path, class: 'btn btn-outline-secondary' %>
     </div>
   </div>
-
+  
   <div class="row justify-content-center">
     <div class="col-lg-8">
       <div class="card shadow-sm">
         <div class="card-body">
-          <%= form_with(model: [:admin, @forum], local: true) do |f| %>
+          <%# new/edit 共通フォーム %>
+          <%= form_with model: [:admin, @forum], local: true do |f| %>
             <%= render 'form', form: f, forum: @forum %>
-
             <div class="d-flex justify-content-end gap-2 mt-4">
               <%= f.submit '作成する', class: 'btn btn-primary' %>
               <%= link_to 'キャンセル', admin_forums_path, class: 'btn btn-outline-secondary' %>
