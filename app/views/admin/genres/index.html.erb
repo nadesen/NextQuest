@@ -1,3 +1,4 @@
+<%# ジャンル一覧・管理画面 %>
 <div class="container mt-5">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
@@ -13,12 +14,12 @@
   <div class="card shadow-sm">
     <div class="card-body p-0">
       <div class="table-responsive">
-        <table class="table table-hover mb-0">
+        <table class="table table-hover mb-0" aria-label="ジャンル一覧テーブル">
           <thead class="table-light">
             <tr>
-              <th>#</th>
-              <th>名前</th>
-              <th class="text-end">操作</th>
+              <th scope="col">#</th>
+              <th scope="col">名前</th>
+              <th scope="col" class="text-end">操作</th>
             </tr>
           </thead>
           <tbody>
@@ -47,5 +48,4 @@
     <!-- 下部ページネーション -->
     <%= paginate @genres, theme: 'bootstrap4' %>
   </div>
-
 </div>

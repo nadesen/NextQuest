@@ -1,4 +1,4 @@
-<%# 共通フォーム（new と edit で使用） %>
+<%# 共通フォーム（new/editで使用）: ジャンル入力 %>
 <% if genre.errors.any? %>
   <div class="alert alert-danger">
     <h6 class="mb-2">入力に問題があります。以下を確認してください：</h6>
@@ -12,6 +12,6 @@
 
 <div class="mb-3">
   <%= form.label :name, 'ジャンル名', class: 'form-label' %>
-  <%= form.text_field :name, class: 'form-control', required: true, maxlength: 255, autofocus: true %>
+  <%= form.text_field :name, class: 'form-control', required: true, maxlength: 255, autofocus: true, autocomplete: "off" %>
   <div class="form-text">例：アクション / RPG / シミュレーション など</div>
 </div>
