@@ -1,3 +1,4 @@
+<%# プラットフォーム編集画面 %>
 <div class="container mt-5">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
@@ -13,21 +14,19 @@
     <div class="col-lg-6">
       <div class="card shadow-sm">
         <div class="card-body">
-          <%= form_with(model: [:admin, @platform], local: true) do |f| %>
+          <%= form_with model: [:admin, @platform], local: true do |f| %>
             <%= render 'form', form: f, platform: @platform %>
-
             <div class="d-flex justify-content-end gap-2 mt-4">
               <%= f.submit '更新する', class: 'btn btn-primary' %>
               <%= link_to 'キャンセル', admin_platforms_path, class: 'btn btn-outline-secondary' %>
             </div>
           <% end %>
-
           <hr class="my-4" />
-
           <div class="d-flex">
-            <%= link_to '削除', admin_platform_path(@platform), method: :delete,
-                        data: { confirm: 'このプラットフォームを削除します。よろしいですか？' },
-                        class: 'btn btn-outline-danger' %>
+            <%= link_to '削除', admin_platform_path(@platform),
+                  method: :delete,
+                  data: { confirm: 'このプラットフォームを削除します。よろしいですか？' },
+                  class: 'btn btn-outline-danger' %>
           </div>
         </div>
       </div>
