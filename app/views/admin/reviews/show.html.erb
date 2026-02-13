@@ -1,3 +1,4 @@
+<%# 管理用レビュー詳細画面 %>
 <div class="container mt-5">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
@@ -9,7 +10,6 @@
       <%= link_to '編集', edit_admin_review_path(@review), class: 'btn btn-outline-primary' %>
     </div>
   </div>
-
   <div class="card shadow-sm">
     <div class="card-body">
       <div class="d-flex justify-content-between align-items-start mb-3">
@@ -31,50 +31,43 @@
           </p>
         </div>
         <div class="text-end">
-          <% if @review.approved? %>
-            <span class="badge bg-success">承認済み</span>
-          <% else %>
-            <span class="badge bg-warning text-dark">未承認</span>
-          <% end %>
+          <span class="badge <%= @review.approved? ? 'bg-success' : 'bg-warning text-dark' %>">
+            <%= @review.approved? ? '承認済み' : '未承認' %>
+          </span>
         </div>
       </div>
 
       <p><%= simple_format(@review.content) %></p>
 
       <div class="mt-4 d-flex gap-2">
-        <%# 承認切替ボタンを show にも追加 %>
         <% if @review.approved? %>
           <%= button_to '承認取り消し', admin_review_path(@review),
-                method: :patch,
-                params: { review: { approved: false } },
+                method: :patch, params: { review: { approved: false } },
                 class: 'btn btn-warning',
                 data: { confirm: 'このレビューの承認を取り消しますか？' } %>
         <% else %>
           <%= button_to '承認する', admin_review_path(@review),
-                method: :patch,
-                params: { review: { approved: true } },
+                method: :patch, params: { review: { approved: true } },
                 class: 'btn btn-success',
                 data: { confirm: 'このレビューを承認しますか？' } %>
         <% end %>
-
         <%= link_to '削除', admin_review_path(@review), method: :delete, data: { confirm: 'このレビューを削除しますか？' }, class: 'btn btn-danger' %>
       </div>
     </div>
   </div>
 
-  <%# === コメント表示エリア === %>
+  <%# コメント表示エリア %>
   <div class="card shadow-sm mt-4">
     <div class="card-header d-flex justify-content-between align-items-center">
       <strong class="mb-0">コメント一覧</strong>
       <div>
-        <%# 並び順ボタン - スコア順 & 投稿日順で切り替え %>
+        <%# コメント並び順切り替え %>
         <% sort_type = params[:sort_type] || 'created_at' %>
         <% sort_order = params[:sort_order] || 'desc' %>
         <% score_active = sort_type == 'score' %>
         <% created_at_active = sort_type == 'created_at' %>
         <% score_order_next = (score_active && sort_order == 'desc') ? 'asc' : 'desc' %>
         <% created_at_order_next = (created_at_active && sort_order == 'desc') ? 'asc' : 'desc' %>
-
         <%= link_to "スコア順" + (score_active ? (sort_order == 'desc' ? " (高順)" : " (低順)") : ""), 
               admin_review_path(@review, sort_type: 'score', sort_order: score_order_next), 
               class: "btn btn-sm #{score_active ? 'btn-primary' : 'btn-outline-primary'} ms-1" %>
@@ -107,13 +100,12 @@
                 </div>
               </div>
               <div class="flex-fill">
-                <!-- 感情分析スコアをコメントごとに表示 -->
+                <%# 感情分析スコア表示 %>
                 <% if comment.respond_to?(:score) && comment.score.present? %>
                   <span class="sentiment-score small text-muted d-block mb-2">
                     感情分析スコア: <%= number_with_precision(comment.score.to_f, precision: 2) %>
                   </span>
                 <% end %>
-
                 <%= simple_format(comment.comment) %>
               </div>
               <div class="ms-3 text-end">

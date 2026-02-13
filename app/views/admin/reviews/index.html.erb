@@ -1,3 +1,4 @@
+<%# 管理レビュー一覧画面 %>
 <div class="container mt-5">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
@@ -31,11 +32,13 @@
           <div class="row g-2 align-items-center">
             <div class="col-auto">
               <%= f.label :platform_id, 'プラットフォーム', class: 'form-label mb-0 me-1' %>
-              <%= f.select :platform_id, options_for_select(@platforms.map { |p| [p.name, p.id] }, params[:platform_id]), { include_blank: '指定なし' }, class: 'form-select form-select-sm' %>
+              <%= f.select :platform_id, options_for_select(@platforms.map { |p| [p.name, p.id] }, params[:platform_id]),
+                           { include_blank: '指定なし' }, class: 'form-select form-select-sm' %>
             </div>
             <div class="col-auto">
               <%= f.label :genre_id, 'ジャンル', class: 'form-label mb-0 me-1' %>
-              <%= f.select :genre_id, options_for_select(@genres.map { |g| [g.name, g.id] }, params[:genre_id]), { include_blank: '指定なし' }, class: 'form-select form-select-sm' %>
+              <%= f.select :genre_id, options_for_select(@genres.map { |g| [g.name, g.id] }, params[:genre_id]),
+                           { include_blank: '指定なし' }, class: 'form-select form-select-sm' %>
             </div>
             <div class="col-auto">
               <%= hidden_field_tag :sort, params[:sort] %>
@@ -50,7 +53,7 @@
       </div>
       
       <div class="table-responsive">
-        <table class="table table-hover mb-0">
+        <table class="table table-hover mb-0" aria-label="レビューテーブル">
           <thead class="table-light">
             <tr>
               <th>#</th>
@@ -84,28 +87,22 @@
                 <td><%= review.genre&.name %></td>
                 <td><%= review.rating %></td>
                 <td>
-                  <% if review.approved? %>
-                    <span class="badge bg-success">承認済み</span>
-                  <% else %>
-                    <span class="badge bg-warning text-dark">未承認</span>
-                  <% end %>
+                  <span class="badge <%= review.approved? ? 'bg-success' : 'bg-warning text-dark' %>">
+                    <%= review.approved? ? "承認済み" : "未承認" %>
+                  </span>
                 </td>
                 <td class="text-end">
-                  <%# 承認切替ボタン %>
                   <% if review.approved? %>
                     <%= button_to '承認取り消し', admin_review_path(review),
-                          method: :patch,
-                          params: { review: { approved: false } },
+                          method: :patch, params: { review: { approved: false } },
                           class: 'btn btn-sm btn-outline-warning me-2',
                           data: { confirm: 'このレビューの承認を取り消しますか？' } %>
                   <% else %>
                     <%= button_to '承認する', admin_review_path(review),
-                          method: :patch,
-                          params: { review: { approved: true } },
+                          method: :patch, params: { review: { approved: true } },
                           class: 'btn btn-sm btn-success me-2',
                           data: { confirm: 'このレビューを承認しますか？' } %>
                   <% end %>
-
                   <%= link_to '表示', admin_review_path(review), class: 'btn btn-sm btn-outline-primary me-2' %>
                   <%= link_to '削除', admin_review_path(review), method: :delete, data: { confirm: 'レビューを削除しますか？' }, class: 'btn btn-sm btn-danger' %>
                 </td>
@@ -121,10 +118,8 @@
       </div>
     </div>
   </div>
-
   <div class="d-flex justify-content-center mt-3">
     <!-- 下部ページネーション -->
     <%= paginate @reviews, theme: 'bootstrap4' %>
   </div>
-
 </div>
