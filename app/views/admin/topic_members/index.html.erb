@@ -1,3 +1,4 @@
+<%# 管理側: トピックメンバー管理画面 %>
 <div class="container py-5">
   <div class="row justify-content-center">
     <div class="col-lg-9 col-md-10">
@@ -7,12 +8,11 @@
           <%= link_to 'トピックに戻る', admin_topic_path(@topic), class: 'btn btn-sm btn-link' %>
         </div>
       </div>
-
       <div class="card mb-3">
         <div class="card-body">
           <h3 class="h6">承認待ち申請</h3>
           <% if @pending_memberships.any? %>
-            <ul class="list-group mb-3">
+            <ul class="list-group mb-3" aria-label="申請中メンバー">
               <% @pending_memberships.each do |tm| %>
                 <%= render 'admin/topic_members/member_row', tm: tm, pending: true, topic: @topic %>
               <% end %>
@@ -20,10 +20,9 @@
           <% else %>
             <div class="text-muted">承認待ちはありません。</div>
           <% end %>
-
           <h3 class="h6 mt-4">メンバー一覧（承認済み）</h3>
           <% if @approved_memberships.any? %>
-            <ul class="list-group">
+            <ul class="list-group" aria-label="承認済みメンバー">
               <% @approved_memberships.each do |tm| %>
                 <%= render 'admin/topic_members/member_row', tm: tm, pending: false, topic: @topic %>
               <% end %>
@@ -33,7 +32,6 @@
           <% end %>
         </div>
       </div>
-
     </div>
   </div>
 </div>
