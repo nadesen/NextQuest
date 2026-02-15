@@ -1,3 +1,4 @@
+<%# 管理トピック一覧画面 %>
 <div class="container mt-5">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
@@ -16,7 +17,6 @@
         <% end %>
       </div>
     </div>
-
     <div>
       <% if defined?(@forum) && @forum.present? %>
         <%= link_to 'フォーラム一覧へ戻る', admin_forums_path, class: 'btn btn-outline-secondary me-2' %>
@@ -24,7 +24,6 @@
       <%= link_to '管理ダッシュボードへ', admin_root_path, class: 'btn btn-outline-secondary' %>
     </div>
   </div>
-
   <div class="card shadow-sm">
     <div class="card-body p-0">
       <!-- 並び替え -->
@@ -37,9 +36,8 @@
           <% unless key == :created_at %>｜<% end %>
         <% end %>
       </div>
-
       <div class="table-responsive">
-        <table class="table table-hover mb-0 align-middle">
+        <table class="table table-hover mb-0 align-middle" aria-label="トピック一覧テーブル">
           <thead class="table-light">
             <tr>
               <th>#</th>
@@ -52,20 +50,19 @@
               <th class="text-end">操作</th>
             </tr>
           </thead>
-
           <tbody>
             <% @topics.each do |topic| %>
               <tr>
                 <td><%= topic.id %></td>
                 <td style="max-width: 360px;">
-                  <%= link_to truncate(topic.title, length: 80), admin_topic_path(topic), class: 'text-decoration-none' %>
+                  <%= link_to truncate(topic.title, length: 80), admin_topic_path(topic), class: 'text-decoration-none', title: 'トピック詳細' %>
                   <% if topic.description.present? %>
                     <div class="text-muted small mt-1"><%= truncate(topic.description, length: 120) %></div>
                   <% end %>
                 </td>
                 <td>
                   <% if topic.forum.present? %>
-                    <%= link_to topic.forum.title, admin_forums_path(anchor: "forum-#{topic.forum.id}"), class: 'text-decoration-none' %>
+                    <%= link_to topic.forum.title, admin_forums_path(anchor: "forum-#{topic.forum.id}"), class: 'text-decoration-none', title: 'フォーラム詳細' %>
                   <% else %>
                     <span class="text-muted">なし</span>
                   <% end %>
@@ -73,11 +70,10 @@
                 <td>
                   <% if topic.creator.present? %>
                     <% name = topic.creator.respond_to?(:nickname) ? h(topic.creator.nickname) : "User##{topic.creator_id}" %>
-                    <%# 管理画面のユーザー詳細 (admin_user_path) が存在すればそちらへ、なければ通常のユーザー詳細へフォールバックします %>
                     <% begin %>
-                      <%= link_to name, [:admin, topic.creator], class: 'text-decoration-none' %>
+                      <%= link_to name, [:admin, topic.creator], class: 'text-decoration-none', title: '作成者詳細' %>
                     <% rescue ActionController::UrlGenerationError, NameError %>
-                      <%= link_to name, topic.creator, class: 'text-decoration-none' %>
+                      <%= link_to name, topic.creator, class: 'text-decoration-none', title: '作成者詳細' %>
                     <% end %>
                   <% else %>
                     <span class="text-muted">User#<%= topic.creator_id %></span>
@@ -85,38 +81,26 @@
                 </td>
                 <td><%= topic.posts_count %></td>
                 <td>
-                  <% if topic.locked? %>
-                    <span class="badge bg-danger">ロック</span>
-                  <% else %>
-                    <span class="badge bg-success">公開</span>
-                  <% end %>
+                  <span class="badge <%= topic.locked? ? 'bg-danger' : 'bg-success' %>">
+                    <%= topic.locked? ? "ロック" : "公開" %>
+                  </span>
                 </td>
                 <td><%= l(topic.created_at, format: :short) rescue topic.created_at.to_s %></td>
                 <td class="text-end">
-
-                  <%# ロック or アンロック切替ボタン（PATCHで update を利用） %>
                   <% if topic.locked? %>
-                    <%= button_to 'ロック解除', admin_topic_path(topic),
-                          method: :patch,
-                          params: { topic: { locked: false } },
-                          class: 'btn btn-sm btn-outline-success me-2',
-                          data: { confirm: 'このトピックのロックを解除しますか？' } %>
+                    <%= button_to 'ロック解除', admin_topic_path(topic), method: :patch, params: { topic: { locked: false } },
+                          class: 'btn btn-sm btn-outline-success me-2', data: { confirm: 'このトピックのロックを解除しますか？' } %>
                   <% else %>
-                    <%= button_to 'ロックする', admin_topic_path(topic),
-                          method: :patch,
-                          params: { topic: { locked: true } },
-                          class: 'btn btn-sm btn-outline-warning me-2',
-                          data: { confirm: 'このトピックをロック（投稿禁止）にしますか？' } %>
+                    <%= button_to 'ロックする', admin_topic_path(topic), method: :patch, params: { topic: { locked: true } },
+                          class: 'btn btn-sm btn-outline-warning me-2', data: { confirm: 'このトピックをロック（投稿禁止）にしますか？' } %>
                   <% end %>
-
-                  <%= link_to '表示', admin_topic_path(topic), class: 'btn btn-sm btn-outline-primary me-2' %>
+                  <%= link_to '表示', admin_topic_path(topic), class: 'btn btn-sm btn-outline-primary me-2', title: '詳細' %>
                   <%= link_to '削除', admin_topic_path(topic), method: :delete,
                         data: { confirm: 'このトピックを削除しますか？' },
-                        class: 'btn btn-sm btn-danger' %>
+                        class: 'btn btn-sm btn-danger', title: '削除' %>
                 </td>
               </tr>
             <% end %>
-
             <% if @topics.empty? %>
               <tr>
                 <td colspan="9" class="text-center text-muted py-4">トピックが見つかりません。</td>
@@ -127,9 +111,8 @@
       </div>
     </div>
   </div>
-
   <div class="d-flex justify-content-center mt-3">
-    <!-- 下部ページネーション -->
+    <%# ページネーション %>
     <%= paginate @topics, theme: 'bootstrap4' %>
   </div>
 </div>

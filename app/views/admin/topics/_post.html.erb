@@ -1,12 +1,13 @@
+<%# トピック投稿一覧の1件分: 管理用パーツ %>
 <div class="list-group-item d-flex justify-content-between align-items-start">
   <div class="me-3" style="min-width: 56px;">
     <div class="fw-bold small">
       <% if post.creator.present? %>
         <% name = post.creator.respond_to?(:nickname) ? post.creator.nickname : "User##{post.creator_id}" %>
         <% begin %>
-          <%= link_to name, [:admin, post.creator], class: 'text-decoration-none' %>
+          <%= link_to name, [:admin, post.creator], class: 'text-decoration-none', title: '作成者詳細' %>
         <% rescue ActionController::UrlGenerationError, NameError %>
-          <%= link_to name, post.creator, class: 'text-decoration-none' %>
+          <%= link_to name, post.creator, class: 'text-decoration-none', title: '作成者詳細' %>
         <% end %>
       <% else %>
         <span class="text-muted">User#<%= post.creator_id %></span>
@@ -15,7 +16,7 @@
     <div class="small text-muted"><%= l(post.created_at, format: :short) rescue post.created_at.to_s %></div>
   </div>
 
-  <div class="flex-fill text-white">
+  <div class="flex-fill">
     <div class="mb-2"><%= simple_format(post.content) %></div>
     <% if post.edited? %>
       <small class="text-muted">編集済み</small>
@@ -25,6 +26,6 @@
   <div class="ms-3 text-end">
     <%= link_to '削除', admin_post_path(post), method: :delete,
           data: { confirm: 'この投稿を削除しますか？' },
-          class: 'btn btn-sm btn-danger' %>
+          class: 'btn btn-sm btn-danger', title: '投稿削除' %>
   </div>
 </div>

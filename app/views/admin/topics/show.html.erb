@@ -1,3 +1,4 @@
+<%# 管理トピック詳細画面 %>
 <div class="container mt-5">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
@@ -21,30 +22,30 @@
 
           <div class="d-flex justify-content-between align-items-center">
             <div class="small text-muted">
-              作成者: <%= @topic.creator&.nickname || "User##{@topic.creator_id}" %> ・ 投稿数: <%= @topic.posts_count %>
+              作成者:
+              <% if @topic.creator.present? %>
+                <% name = @topic.creator.respond_to?(:nickname) ? h(@topic.creator.nickname) : "User##{@topic.creator_id}" %>
+                <% begin %>
+                  <%= link_to name, [:admin, @topic.creator], class: 'text-decoration-none', title: '作成者詳細' %>
+                <% rescue ActionController::UrlGenerationError, NameError %>
+                  <%= link_to name, @topic.creator, class: 'text-decoration-none', title: '作成者詳細' %>
+                <% end %>
+              <% else %>
+                <span class="text-muted">User#<%= @topic.creator_id %></span>
+              <% end %>
+              ・ 投稿数: <%= @topic.posts_count %>
             </div>
-
             <div class="d-flex align-items-center">
               <% if @topic.locked? %>
                 <span class="badge bg-danger me-3">ロック中</span>
-                <%= button_to 'ロック解除', admin_topic_path(@topic),
-                      method: :patch,
-                      params: { topic: { locked: false } },
-                      class: 'btn btn-sm btn-outline-success me-2',
-                      data: { confirm: 'このトピックのロックを解除しますか？' } %>
+                <%= button_to 'ロック解除', admin_topic_path(@topic), method: :patch, params: { topic: { locked: false } },
+                      class: 'btn btn-sm btn-outline-success me-2', data: { confirm: 'このトピックのロックを解除しますか？' } %>
               <% else %>
                 <span class="badge bg-success me-3">公開中</span>
-                <%= button_to 'ロックする', admin_topic_path(@topic),
-                      method: :patch,
-                      params: { topic: { locked: true } },
-                      class: 'btn btn-sm btn-outline-warning me-2',
-                      data: { confirm: 'このトピックをロック（投稿禁止）にしますか？' } %>
+                <%= button_to 'ロックする', admin_topic_path(@topic), method: :patch, params: { topic: { locked: true } },
+                      class: 'btn btn-sm btn-outline-warning me-2', data: { confirm: 'このトピックをロック（投稿禁止）にしますか？' } %>
               <% end %>
-
-              <%# ここに「メンバー一覧」ボタンを追加しました。 %>
-              <%= link_to 'メンバー一覧', admin_topic_members_path(@topic),
-                    class: 'btn btn-sm btn-outline-secondary me-2' %>
-
+              <%= link_to 'メンバー一覧', admin_topic_members_path(@topic), class: 'btn btn-sm btn-outline-secondary me-2' %>
               <%= link_to '削除', admin_topic_path(@topic), method: :delete,
                     data: { confirm: 'このトピックを削除しますか？' },
                     class: 'btn btn-sm btn-danger' %>
@@ -52,46 +53,40 @@
           </div>
         </div>
       </div>
-
       <%# 投稿一覧 %>
       <div class="card shadow-sm">
         <div class="card-header d-flex justify-content-between align-items-center">
           <strong class="mb-0">投稿一覧</strong>
           <small class="text-muted">全 <%= @posts.size %> 件</small>
         </div>
-
         <div class="card-body p-0">
           <% if @posts.any? %>
-            <div class="list-group list-group-flush">
-              <% @posts.each do |post| %>
-                <%= render partial: 'post', locals: { post: post } %>
-              <% end %>
-            </div>
+            <ul class="list-group list-group-flush" aria-label="投稿リスト">
+            <% @posts.each do |post| %>
+              <%= render partial: 'post', locals: { post: post } %>
+            <% end %>
+            </ul>
           <% else %>
             <div class="p-4 text-center text-muted">投稿がありません。</div>
           <% end %>
         </div>
-
-        <%# 必要ならページネーションを下に表示 %>
         <div class="card-footer text-center">
-          <%# paginate(@posts) を入れる場合はコントローラでページネーションを有効にしてください %>
+          <%# paginate(@posts) を入れる場合はコントローラでページネーション処理をする %>
         </div>
       </div>
     </div>
-
     <div class="col-lg-4">
       <div class="card shadow-sm mb-3">
         <div class="card-body">
           <h6 class="mb-2">フォーラム</h6>
           <% if @topic.forum.present? %>
-            <p class="mb-1"><%= link_to @topic.forum.title, admin_forum_path(@topic.forum), class: 'text-decoration-none' %></p>
+            <p class="mb-1"><%= link_to @topic.forum.title, admin_forum_path(@topic.forum), class: 'text-decoration-none', title: 'フォーラム詳細' %></p>
             <p class="text-muted small mb-0">ID: <%= @topic.forum.id %></p>
           <% else %>
             <p class="text-muted small mb-0">関連フォーラムがありません。</p>
           <% end %>
         </div>
       </div>
-
       <div class="card shadow-sm">
         <div class="card-body">
           <h6 class="mb-2">管理アクション</h6>
