@@ -1,63 +1,68 @@
 <div class="container mt-5">
+  <!-- ページヘッダー -->
   <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
       <h2 class="h4 mb-0">ユーザー詳細</h2>
       <div class="text-muted">ID: <%= @user.id %></div>
     </div>
     <div>
-      <%= link_to '一覧へ戻る', admin_users_path, class: 'btn btn-outline-secondary me-2' %>
-      <%= link_to '編集', edit_admin_user_path(@user), class: 'btn btn-primary' %>
+      <%= link_to '一覧へ戻る', admin_users_path, 
+                  class: 'btn btn-outline-secondary me-2' %>
+      <%= link_to '編集', edit_admin_user_path(@user), 
+                  class: 'btn btn-primary' %>
     </div>
   </div>
 
   <div class="row">
+    <!-- メインコンテンツエリア -->
     <div class="col-md-8">
       <div class="card shadow-sm">
         <div class="card-body">
-          <h5 class="card-title mb-3"><%= @user.name %> <small class="text-muted">（<%= @user.nickname %>）</small></h5>
+          <!-- ユーザー名とニックネーム -->
+          <h5 class="card-title mb-3">
+            <%= @user.name %> 
+            <small class="text-muted">（<%= @user.nickname %>）</small>
+          </h5>
 
+          <!-- ユーザー情報詳細 -->
           <dl class="row">
             <dt class="col-sm-3">メール</dt>
             <dd class="col-sm-9"><%= @user.email %></dd>
 
             <dt class="col-sm-3">作成日</dt>
-            <dd class="col-sm-9"><%= l(@user.created_at, format: :long) rescue @user.created_at.to_s %></dd>
+            <dd class="col-sm-9">
+              <%= l(@user.created_at, format: :long) rescue @user.created_at.to_s %>
+            </dd>
 
             <dt class="col-sm-3">状態</dt>
             <dd class="col-sm-9">
-              <% if @user.suspended? %>
-                <span class="badge bg-danger">停止中</span>
-              <% else %>
-                <span class="badge bg-success">有効</span>
-              <% end %>
+              <%= render 'status_badge', user: @user %>
             </dd>
 
             <dt class="col-sm-3">プロフィール</dt>
-            <dd class="col-sm-9"><%= simple_format(@user.profile_text) if @user.profile_text.present? %></dd>
+            <dd class="col-sm-9">
+              <%= simple_format(@user.profile_text) if @user.profile_text.present? %>
+            </dd>
           </dl>
 
+          <!-- アクションボタン群 -->
           <div class="mt-4 d-flex gap-2">
-            <% if @user.suspended? %>
-              <%= button_to '解除', admin_user_path(@user),
-                    method: :patch,
-                    params: { user: { suspended: false } },
-                    class: 'btn btn-warning',
-                    data: { confirm: 'ユーザーを有効化します。よろしいですか？' } %>
-            <% else %>
-              <%= button_to '停止', admin_user_path(@user),
-                    method: :patch,
-                    params: { user: { suspended: true } },
-                    class: 'btn btn-danger',
-                    data: { confirm: 'このユーザーを停止します。本当に続けますか？' } %>
-            <% end %>
+            <!-- 停止/解除トグルボタン（共通パーシャルを使用） -->
+            <%= render 'suspend_toggle_button', user: @user %>
 
-            <%= link_to '編集', edit_admin_user_path(@user), class: 'btn btn-outline-secondary' %>
-            <%= link_to '削除', admin_user_path(@user), method: :delete, data: { confirm: 'このユーザーを削除しますか？' }, class: 'btn btn-outline-danger' %>
+            <%= link_to '編集', edit_admin_user_path(@user), 
+                        class: 'btn btn-outline-secondary' %>
+            
+            <%= link_to '削除', admin_user_path(@user), 
+                        method: :delete, 
+                        data: { confirm: 'このユーザーを削除しますか？' }, 
+                        class: 'btn btn-outline-danger' %>
           </div>
         </div>
       </div>
     </div>
 
+    <!-- サイドバー（管理情報） -->
     <div class="col-md-4">
       <div class="card shadow-sm">
         <div class="card-body">

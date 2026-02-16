@@ -1,4 +1,5 @@
 <div class="container mt-5">
+  <!-- ページヘッダー -->
   <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
       <h2 class="h4 mb-0">ユーザー一覧</h2>
@@ -11,17 +12,30 @@
 
   <div class="card shadow-sm">
     <div class="card-body p-0">
-      <!-- 並び替え -->
-      <div class="mb-2">
-        <% sort_params = { id: 'ID順', name: '名前順', nickname: 'ニックネーム順', created_at: '作成日順' } %>
-        <% sort_params.each do |key, label| %>
-          <% selected = (params[:sort] == key.to_s) %>
-          <% direction = selected ? (params[:direction] == 'asc' ? 'desc' : 'asc') : 'asc' %>
-          <%= link_to "#{label}#{selected ? (params[:direction] == 'asc' ? '↑' : '↓') : ''}", url_for(sort: key, direction: direction), class: (selected ? "fw-bold text-primary" : "") %>
-          <% unless key == :created_at %>｜<% end %>
+      <!-- 並び替えコントロール -->
+      <div class="p-3 border-bottom">
+        <% sort_options = { 
+          id: 'ID順', 
+          name: '名前順', 
+          nickname: 'ニックネーム順', 
+          created_at: '作成日順' 
+        } %>
+        
+        <% sort_options.each_with_index do |(key, label), index| %>
+          <% is_selected = (params[:sort] == key.to_s) %>
+          <% next_direction = is_selected ? (params[:direction] == 'asc' ? 'desc' : 'asc') : 'asc' %>
+          <% sort_indicator = is_selected ? (params[:direction] == 'asc' ? '↑' : '↓') : '' %>
+          
+          <%= link_to "#{label}#{sort_indicator}", 
+                      url_for(sort: key, direction: next_direction), 
+                      class: (is_selected ? "fw-bold text-primary" : "text-decoration-none") %>
+          
+          <!-- 区切り文字（最後の項目以外） -->
+          <%= ' ｜ ' unless index == sort_options.size - 1 %>
         <% end %>
       </div>
       
+      <!-- ユーザーテーブル -->
       <div class="table-responsive">
         <table class="table table-hover mb-0">
           <thead class="table-light">
@@ -35,39 +49,41 @@
             </tr>
           </thead>
           <tbody>
-            <% @users.each do |user| %>
+            <% if @users.empty? %>
+              <!-- 空状態 -->
               <tr>
-                <td><%= user.id %></td>
-                <td><%= user.name %></td>
-                <td><%= user.nickname %></td>
-                <td><%= user.email %></td>
-                <td><%= l(user.created_at, format: :short) rescue user.created_at.to_s %></td>
-                <td class="text-end">
-                  <%= link_to '表示', admin_user_path(user), class: 'btn btn-sm btn-outline-primary me-2' %>
-                  <%= link_to '編集', edit_admin_user_path(user), class: 'btn btn-sm btn-outline-secondary me-2' %>
-                  <% if user.suspended? %>
-                    <%= button_to '解除', admin_user_path(user),
-                          method: :patch,
-                          params: { user: { suspended: false } },
-                          form: { data: { turbo: false }, class: 'd-inline' },
-                          class: 'btn btn-sm btn-warning',
-                          data: { confirm: 'ユーザーを有効化します。よろしいですか？' } %>
-                  <% else %>
-                    <%= button_to '停止', admin_user_path(user),
-                          method: :patch,
-                          params: { user: { suspended: true } },
-                          form: { data: { turbo: false }, class: 'd-inline' },
-                          class: 'btn btn-sm btn-danger',
-                          data: { confirm: 'このユーザーを停止します。本当によろしいですか？' } %>
-                  <% end %>
-                  <%= link_to '削除', admin_user_path(user), method: :delete, data: { confirm: '本当に削除しますか？' }, class: 'btn btn-sm btn-danger' %>
+                <td colspan="6" class="text-center text-muted py-4">
+                  ユーザーが見つかりません。
                 </td>
               </tr>
-            <% end %>
-            <% if @users.empty? %>
-              <tr>
-                <td colspan="6" class="text-center text-muted py-4">ユーザーが見つかりません。</td>
-              </tr>
+            <% else %>
+              <% @users.each do |user| %>
+                <tr>
+                  <td><%= user.id %></td>
+                  <td><%= user.name %></td>
+                  <td><%= user.nickname %></td>
+                  <td><%= user.email %></td>
+                  <td><%= l(user.created_at, format: :short) rescue user.created_at.to_s %></td>
+                  <td class="text-end">
+                    <!-- 操作ボタン群 -->
+                    <%= link_to '表示', admin_user_path(user), 
+                                class: 'btn btn-sm btn-outline-primary me-2' %>
+                    
+                    <%= link_to '編集', edit_admin_user_path(user), 
+                                class: 'btn btn-sm btn-outline-secondary me-2' %>
+                    
+                    <!-- 停止/解除トグルボタン（共通パーシャルを使用） -->
+                    <%= render 'suspend_toggle_button', 
+                               user: user, 
+                               btn_size: 'sm' %>
+                    
+                    <%= link_to '削除', admin_user_path(user), 
+                                method: :delete, 
+                                data: { confirm: '本当に削除しますか？' }, 
+                                class: 'btn btn-sm btn-danger' %>
+                  </td>
+                </tr>
+              <% end %>
             <% end %>
           </tbody>
         </table>
@@ -75,9 +91,8 @@
     </div>
   </div>
 
+  <!-- ページネーション -->
   <div class="d-flex justify-content-center mt-3">
-    <!-- 下部ページネーション -->
     <%= paginate @users, theme: 'bootstrap4' %>
   </div>
-  
 </div>

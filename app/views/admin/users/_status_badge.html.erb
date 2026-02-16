@@ -1,0 +1,35 @@
+<%
+  # 停止/解除トグルボタンパーシャル
+  # 
+  # パラメータ:
+  #   user (required) - ユーザーオブジェクト
+  #   btn_size (optional) - ボタンサイズ ('sm', 'lg' など)。デフォルトは標準サイズ
+  #   immediate (optional) - 即時操作モード（編集画面用）。デフォルトは false
+  
+  btn_size ||= nil
+  immediate ||= false
+  
+  # ボタンサイズクラス
+  size_class = btn_size ? "btn-#{btn_size}" : ''
+  
+  if user.suspended?
+    # 停止中 → 解除ボタン
+    button_text = immediate ? '強制解除 (即時有効化)' : '解除'
+    button_class = "btn #{size_class} btn-warning"
+    confirm_message = immediate ? 'ユーザーを即時有効化します。よろしいですか？' : 'ユーザーを有効化します。よろしいですか？'
+    new_status = false
+  else
+    # 有効 → 停止ボタン
+    button_text = immediate ? '強制停止 (即時無効化)' : '停止'
+    button_class = "btn #{size_class} btn-danger"
+    confirm_message = immediate ? 'ユーザーを即時停止します。本当に続けますか？' : 'このユーザーを停止します。本当によろしいですか？'
+    new_status = true
+  end
+%>
+
+<%= button_to button_text, admin_user_path(user),
+      method: :patch,
+      params: { user: { suspended: new_status } },
+      form: { data: { turbo: false }, class: 'd-inline' },
+      class: button_class,
+      data: { confirm: confirm_message } %>
